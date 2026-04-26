@@ -1,12 +1,13 @@
-"""Sweep prompt + sampling variants on a stratified subset of public.jsonl.
+"""Independent prompt sweep on a stratified subset of public.jsonl.
 
-Two-stage pipeline:
-  Stage 1 (cheap screen): every variant @ temp=0.0, n=1
-  Stage 2 (self-consistency): top-K variants from stage 1 @ temp=0.7, n=3, majority vote
+Pipeline:
+  Stage 1a: each MCQ prompt  on MCQ items   (greedy, n=1)
+  Stage 1b: each FREE prompt on FREE items  (greedy, n=1)
+  Stage 2 : winners of each side rerun with self-consistency (n=3, vote)
 
 Outputs:
-  results/sweep/<variant>_<config>.jsonl    per-question records
-  results/sweep/summary.csv                 sorted accuracy table
+  results/sweep/<type>__<prompt>__<config>.jsonl    per-question records
+  results/sweep/summary.csv                          ranked accuracy table
 
 Run:
   python prompt_sweep.py
@@ -20,7 +21,7 @@ import random
 import re
 import sys
 from collections import Counter
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
 
@@ -30,10 +31,9 @@ GPU_ID      = "0"
 DATA_PATH   = "data/public.jsonl"
 OUTPUT_DIR  = Path("results/sweep")
 MAX_TOKENS  = 32768
-SUBSET_SIZE = 40           # stratified: half MCQ, half free-form (when possible)
+SUBSET_SIZE = 40           # stratified ~half MCQ, ~half free-form
 RNG_SEED    = 42
-TOP_K_FOR_VOTING = 3       # how many stage-1 variants advance to self-consistency
-SC_NUM_SAMPLES   = 3       # self-consistency sample count
+SC_NUM_SAMPLES   = 3       # self-consistency sample count for stage 2
 
 os.environ["CUDA_VISIBLE_DEVICES"] = GPU_ID
 
@@ -43,7 +43,7 @@ from tqdm import tqdm
 
 sys.path.insert(0, ".")
 from judger import Judger
-from prompt_variants import VARIANTS, build_prompt
+from prompt_variants import MCQ_PROMPTS, FREE_PROMPTS, build_mcq_prompt, build_free_prompt
 
 
 # ── Sampling configs ───────────────────────────────────────────────────────
@@ -53,16 +53,17 @@ class SamplingConfig:
     temperature: float
     top_p: float
     top_k: int
-    n: int                                  # samples per question
-    vote: bool = False                      # if True, majority-vote the n samples
+    n: int
+    vote: bool = False
 
 
 STAGE1 = SamplingConfig(name="greedy_n1", temperature=0.0, top_p=1.0, top_k=-1, n=1)
-STAGE2 = SamplingConfig(name="sc_n3",     temperature=0.7, top_p=0.95, top_k=20, n=SC_NUM_SAMPLES, vote=True)
+STAGE2 = SamplingConfig(name="sc_n3",     temperature=0.7, top_p=0.95, top_k=20,
+                        n=SC_NUM_SAMPLES, vote=True)
 
 
 # ── Data loading + stratified subset ───────────────────────────────────────
-def load_subset(path: str, k: int, seed: int) -> list[dict]:
+def load_subset(path: str, k: int, seed: int) -> tuple[list[dict], list[dict]]:
     rng = random.Random(seed)
     data = [json.loads(line) for line in open(path)]
     mcq  = [d for d in data if d.get("options")]
@@ -73,20 +74,54 @@ def load_subset(path: str, k: int, seed: int) -> list[dict]:
     n_free = min(k - n_mcq, len(free))
     if n_mcq + n_free < k:
         n_mcq = min(k - n_free, len(mcq))
-    subset = mcq[:n_mcq] + free[:n_free]
-    rng.shuffle(subset)
-    print(f"Subset: {len(subset)} total ({n_mcq} MCQ, {n_free} free-form)")
-    return subset
+    mcq_subset  = mcq[:n_mcq]
+    free_subset = free[:n_free]
+    print(f"Subset: {n_mcq} MCQ + {n_free} free-form = {n_mcq + n_free} total")
+    return mcq_subset, free_subset
 
 
-# ── Scoring ────────────────────────────────────────────────────────────────
-_LETTER_RE = re.compile(r"\\boxed\{([A-Za-z])\}")
+# ── Answer extraction ──────────────────────────────────────────────────────
+_LETTER_RE        = re.compile(r"\\boxed\{\s*([A-Za-z])\s*\}")
+_LETTER_PHRASE_RE = re.compile(
+    r"(?:option|choice|answer\s+is)\s*[:\s]*\(?([A-Z])\)?\b", re.IGNORECASE
+)
 
-def extract_letter(text: str) -> str:
-    m = _LETTER_RE.search(text)
+
+def extract_letter(text: str, options: Optional[list], judger: Judger) -> str:
+    """Robust MCQ letter extractor with multiple fallbacks."""
+    think_end = text.rfind("</think>")
+    tail = text[think_end + len("</think>"):] if think_end >= 0 else text
+
+    m = _LETTER_RE.search(tail) or _LETTER_RE.search(text)
     if m:
         return m.group(1).upper()
-    matches = re.findall(r"\b([A-Z])\b", text.upper())
+
+    if options:
+        try:
+            boxed_contents = judger.extract_all_boxed(tail) or judger.extract_all_boxed(text)
+        except Exception:
+            boxed_contents = []
+        if boxed_contents:
+            cand = boxed_contents[-1]
+            try:
+                cand_norm = judger.norm_ans_str(cand)
+            except Exception:
+                cand_norm = cand
+            for i, opt in enumerate(options):
+                opt_str = str(opt).strip()
+                if cand.strip() == opt_str or cand_norm == opt_str:
+                    return chr(65 + i)
+                try:
+                    if judger.is_equal(cand_norm, judger.norm_ans_str(opt_str)):
+                        return chr(65 + i)
+                except Exception:
+                    pass
+
+    pm = list(_LETTER_PHRASE_RE.finditer(tail))
+    if pm:
+        return pm[-1].group(1).upper()
+
+    matches = re.findall(r"\b([A-Z])\b", tail.upper())
     return matches[-1] if matches else ""
 
 
@@ -94,7 +129,7 @@ def score_one(judger: Judger, item: dict, response: str) -> bool:
     is_mcq = bool(item.get("options"))
     gold   = item["answer"]
     if is_mcq:
-        return extract_letter(response) == str(gold).strip().upper()
+        return extract_letter(response, item.get("options"), judger) == str(gold).strip().upper()
     gold_list = gold if isinstance(gold, list) else [gold]
     try:
         return judger.auto_judge(pred=response, gold=gold_list, options=[[]] * len(gold_list))
@@ -102,10 +137,10 @@ def score_one(judger: Judger, item: dict, response: str) -> bool:
         return False
 
 
-def majority_vote_response(responses: list[str], is_mcq: bool, judger: Judger) -> str:
-    """Pick a representative response by majority vote on the extracted answer."""
+def majority_vote(responses: list[str], item: dict, judger: Judger) -> str:
+    is_mcq = bool(item.get("options"))
     if is_mcq:
-        keys = [extract_letter(r) for r in responses]
+        keys = [extract_letter(r, item.get("options"), judger) for r in responses]
     else:
         keys = []
         for r in responses:
@@ -118,18 +153,21 @@ def majority_vote_response(responses: list[str], is_mcq: bool, judger: Judger) -
     counts = Counter(k for k in keys if k)
     if not counts:
         return responses[0]
-    winning_key = counts.most_common(1)[0][0]
+    winning = counts.most_common(1)[0][0]
     for k, r in zip(keys, responses):
-        if k == winning_key:
+        if k == winning:
             return r
     return responses[0]
 
 
 # ── Generation ─────────────────────────────────────────────────────────────
-def render_prompts(tokenizer, variant: str, items: list[dict]) -> list[str]:
+def render_prompts(tokenizer, qtype: str, prompt_name: str, items: list[dict]) -> list[str]:
     out = []
     for it in items:
-        sys_p, usr_p = build_prompt(variant, it["question"], it.get("options"))
+        if qtype == "mcq":
+            sys_p, usr_p = build_mcq_prompt(prompt_name, it["question"], it["options"])
+        else:
+            sys_p, usr_p = build_free_prompt(prompt_name, it["question"])
         text = tokenizer.apply_chat_template(
             [{"role": "system", "content": sys_p},
              {"role": "user",   "content": usr_p}],
@@ -140,10 +178,13 @@ def render_prompts(tokenizer, variant: str, items: list[dict]) -> list[str]:
     return out
 
 
-def run_variant(llm, tokenizer, judger: Judger, variant: str, cfg: SamplingConfig,
-                items: list[dict]) -> dict:
-    prompts = render_prompts(tokenizer, variant, items)
+def run_one(llm, tokenizer, judger: Judger, qtype: str, prompt_name: str,
+            cfg: SamplingConfig, items: list[dict]) -> dict:
+    if not items:
+        return {"type": qtype, "prompt": prompt_name, "config": cfg.name,
+                "n": 0, "correct": 0, "acc": 0.0}
 
+    prompts = render_prompts(tokenizer, qtype, prompt_name, items)
     sampling = SamplingParams(
         max_tokens=MAX_TOKENS,
         temperature=cfg.temperature,
@@ -151,55 +192,63 @@ def run_variant(llm, tokenizer, judger: Judger, variant: str, cfg: SamplingConfi
         top_k=cfg.top_k,
         n=cfg.n,
     )
-    print(f"\n[{variant} / {cfg.name}] generating {len(prompts)} prompts × n={cfg.n} ...")
+    print(f"\n[{qtype} / {prompt_name} / {cfg.name}] generating {len(prompts)} prompts × n={cfg.n} ...")
     outputs = llm.generate(prompts, sampling_params=sampling)
 
     records = []
     for item, out in zip(items, outputs):
         responses = [o.text.strip() for o in out.outputs]
-        if cfg.vote and len(responses) > 1:
-            chosen = majority_vote_response(responses, bool(item.get("options")), judger)
-        else:
-            chosen = responses[0]
-        correct = score_one(judger, item, chosen)
+        chosen = majority_vote(responses, item, judger) if (cfg.vote and len(responses) > 1) else responses[0]
         records.append({
-            "id":         item.get("id"),
-            "is_mcq":     bool(item.get("options")),
-            "gold":       item["answer"],
-            "response":   chosen,
+            "id":          item.get("id"),
+            "is_mcq":      qtype == "mcq",
+            "gold":        item["answer"],
+            "response":    chosen,
             "all_samples": responses if cfg.n > 1 else None,
-            "correct":    correct,
+            "correct":     score_one(judger, item, chosen),
         })
 
     n_total = len(records)
     n_corr  = sum(r["correct"] for r in records)
-    mcq     = [r for r in records if r["is_mcq"]]
-    free    = [r for r in records if not r["is_mcq"]]
     summary = {
-        "variant":  variant,
-        "config":   cfg.name,
-        "n":        n_total,
-        "correct":  n_corr,
-        "acc":      n_corr / n_total if n_total else 0.0,
-        "mcq_acc":  sum(r["correct"] for r in mcq)  / len(mcq)  if mcq  else 0.0,
-        "free_acc": sum(r["correct"] for r in free) / len(free) if free else 0.0,
+        "type":    qtype,
+        "prompt":  prompt_name,
+        "config":  cfg.name,
+        "n":       n_total,
+        "correct": n_corr,
+        "acc":     n_corr / n_total if n_total else 0.0,
     }
 
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-    out_path = OUTPUT_DIR / f"{variant}_{cfg.name}.jsonl"
+    out_path = OUTPUT_DIR / f"{qtype}__{prompt_name}__{cfg.name}.jsonl"
     with open(out_path, "w", encoding="utf-8") as f:
         for r in records:
             f.write(json.dumps(r, ensure_ascii=False) + "\n")
-    print(f"  -> acc {summary['acc']:.3f} (mcq {summary['mcq_acc']:.3f}, free {summary['free_acc']:.3f}) "
-          f"[{out_path}]")
+    print(f"  -> acc {summary['acc']:.3f}  ({n_corr}/{n_total})  [{out_path.name}]")
     return summary
 
 
 # ── Main ───────────────────────────────────────────────────────────────────
+def write_summary(summaries: list[dict]) -> Path:
+    csv_path = OUTPUT_DIR / "summary.csv"
+    with open(csv_path, "w", newline="", encoding="utf-8") as f:
+        w = csv.DictWriter(f, fieldnames=["type", "prompt", "config", "n", "correct", "acc"])
+        w.writeheader()
+        for s in sorted(summaries, key=lambda x: (x["type"], -x["acc"], x["config"])):
+            w.writerow(s)
+    return csv_path
+
+
+def print_table(title: str, rows: list[dict]):
+    print(f"\n── {title} ──")
+    print(f"{'type':<5} {'prompt':<22} {'config':<12} {'acc':>7} {'n':>4}")
+    for s in sorted(rows, key=lambda x: -x["acc"]):
+        print(f"{s['type']:<5} {s['prompt']:<22} {s['config']:<12} {s['acc']:>7.3f} {s['n']:>4}")
+
+
 def main():
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-
-    items = load_subset(DATA_PATH, SUBSET_SIZE, RNG_SEED)
+    mcq_items, free_items = load_subset(DATA_PATH, SUBSET_SIZE, RNG_SEED)
 
     tokenizer = AutoTokenizer.from_pretrained(MODEL_ID)
     tokenizer.pad_token = tokenizer.eos_token
@@ -219,38 +268,57 @@ def main():
 
     summaries: list[dict] = []
 
+    # ── Stage 1a: MCQ prompts on MCQ items ──
     print("\n" + "=" * 60)
-    print("STAGE 1: cheap screen (greedy, n=1)")
+    print("STAGE 1a: MCQ prompts on MCQ items (greedy, n=1)")
     print("=" * 60)
-    for name, *_ in VARIANTS:
-        summaries.append(run_variant(llm, tokenizer, judger, name, STAGE1, items))
+    mcq_results = []
+    for name, *_ in MCQ_PROMPTS:
+        s = run_one(llm, tokenizer, judger, "mcq", name, STAGE1, mcq_items)
+        mcq_results.append(s); summaries.append(s)
+    print_table("MCQ ranking (stage 1a)", mcq_results)
 
-    stage1_sorted = sorted(summaries, key=lambda s: s["acc"], reverse=True)
-    top_variants = [s["variant"] for s in stage1_sorted[:TOP_K_FOR_VOTING]]
-    print(f"\nTop-{TOP_K_FOR_VOTING} after stage 1: {top_variants}")
+    # ── Stage 1b: FREE prompts on FREE items ──
+    print("\n" + "=" * 60)
+    print("STAGE 1b: FREE prompts on FREE items (greedy, n=1)")
+    print("=" * 60)
+    free_results = []
+    for name, *_ in FREE_PROMPTS:
+        s = run_one(llm, tokenizer, judger, "free", name, STAGE1, free_items)
+        free_results.append(s); summaries.append(s)
+    print_table("FREE ranking (stage 1b)", free_results)
+
+    # ── Stage 2: self-consistency on each side's winner ──
+    best_mcq  = max(mcq_results,  key=lambda s: s["acc"])["prompt"] if mcq_results  else None
+    best_free = max(free_results, key=lambda s: s["acc"])["prompt"] if free_results else None
+    print(f"\nStage-1 winners: MCQ='{best_mcq}'  FREE='{best_free}'")
 
     print("\n" + "=" * 60)
     print(f"STAGE 2: self-consistency (n={SC_NUM_SAMPLES}, majority vote)")
     print("=" * 60)
-    for name in top_variants:
-        summaries.append(run_variant(llm, tokenizer, judger, name, STAGE2, items))
+    if best_mcq:
+        summaries.append(run_one(llm, tokenizer, judger, "mcq",  best_mcq,  STAGE2, mcq_items))
+    if best_free:
+        summaries.append(run_one(llm, tokenizer, judger, "free", best_free, STAGE2, free_items))
 
-    summaries.sort(key=lambda s: s["acc"], reverse=True)
-    csv_path = OUTPUT_DIR / "summary.csv"
-    with open(csv_path, "w", newline="", encoding="utf-8") as f:
-        writer = csv.DictWriter(f, fieldnames=["variant", "config", "n", "correct",
-                                                "acc", "mcq_acc", "free_acc"])
-        writer.writeheader()
-        for s in summaries:
-            writer.writerow(s)
+    csv_path = write_summary(summaries)
+    print_table("FINAL RANKING", summaries)
 
+    # Combined best — projected accuracy if you used best_mcq for all MCQs and best_free for all free
+    def best_for(qtype: str) -> dict:
+        rows = [s for s in summaries if s["type"] == qtype]
+        return max(rows, key=lambda s: s["acc"]) if rows else {"acc": 0.0, "n": 0, "correct": 0,
+                                                                "prompt": "-", "config": "-"}
+    bm, bf = best_for("mcq"), best_for("free")
+    total_n = bm["n"] + bf["n"]
+    total_c = bm["correct"] + bf["correct"]
     print("\n" + "=" * 60)
-    print("FINAL RANKING")
+    print("BEST COMBINED CONFIG")
     print("=" * 60)
-    print(f"{'variant':<24} {'config':<12} {'acc':>7} {'mcq':>7} {'free':>7}")
-    for s in summaries:
-        print(f"{s['variant']:<24} {s['config']:<12} {s['acc']:>7.3f} "
-              f"{s['mcq_acc']:>7.3f} {s['free_acc']:>7.3f}")
+    print(f"  MCQ : prompt='{bm['prompt']}'  config={bm['config']}  acc={bm['acc']:.3f}  ({bm['correct']}/{bm['n']})")
+    print(f"  FREE: prompt='{bf['prompt']}'  config={bf['config']}  acc={bf['acc']:.3f}  ({bf['correct']}/{bf['n']})")
+    if total_n:
+        print(f"  Combined acc on subset: {total_c}/{total_n} = {total_c/total_n:.3f}")
     print(f"\nSummary written to {csv_path}")
 
 

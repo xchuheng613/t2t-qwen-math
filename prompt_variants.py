@@ -1,8 +1,5 @@
-"""Prompt variants for the sweep. Edit freely; each entry must define
-system prompts for both MCQ and free-form, plus an optional few-shot block
-inserted into the user message."""
-
-from typing import Optional
+"""Prompt variants for the sweep. MCQ and free-form prompts are independent
+lists so they can be swept separately. Edit either list freely."""
 
 
 # ── Free-form system prompts ────────────────────────────────────────────────
@@ -16,9 +13,11 @@ SYS_FREE_BASELINE = (
 SYS_FREE_STRICT_FORMAT = (
     "You are an expert mathematician. Solve the problem rigorously.\n"
     "Output rules for the FINAL ANSWER (very important):\n"
-    "  1. Put exactly ONE \\boxed{...} at the very end of your response.\n"
-    "  2. Inside the box: NO units, NO words, NO equals signs, NO 'x =' prefix.\n"
-    "  3. For multiple sub-answers, comma-separate inside the single box: \\boxed{3, 7}.\n"
+    "  1. Put exactly ONE \\boxed{...} at the VERY END of your response. No boxes anywhere else.\n"
+    "  2. Inside the box: ONLY the final answer value/expression. NO units, NO words, NO 'x =' prefix, NO equals signs.\n"
+    "     Wrong: \\boxed{x = 2}, \\boxed{2 cm}, \\boxed{answer is 2}\n"
+    "     Right: \\boxed{2}\n"
+    "  3. For multiple sub-answers, comma-separate inside ONE box: \\boxed{3, 7}. Never use multiple boxes.\n"
     "  4. Use \\frac{a}{b} (not a/b), \\sqrt{n} (not sqrt n), and standard LaTeX.\n"
     "  5. Do not box intermediate results — only the final answer."
 )
@@ -47,17 +46,28 @@ SYS_MCQ_BASELINE = (
 
 SYS_MCQ_STRICT_FORMAT = (
     "You are an expert mathematician answering a multiple-choice question.\n"
-    "Output rules (very important):\n"
-    "  1. Your final line must be \\boxed{X} where X is a single capital letter (A-Z).\n"
-    "  2. Do NOT box anything else. Do NOT include the option text.\n"
-    "  3. If you are unsure, pick your best guess — never leave the box empty."
+    "Mandatory procedure:\n"
+    "  1. Solve the problem to get a numerical/symbolic answer.\n"
+    "  2. Compare your answer against EACH listed option (A, B, C, ...) and identify the matching letter.\n"
+    "  3. Your final line MUST be \\boxed{X} where X is a single capital letter (A-Z) — the letter, NOT the value.\n"
+    "  4. Never box the numerical value, expression, or option text. Never leave the box empty.\n"
+    "  5. If your computed answer doesn't match any option exactly, pick the closest one."
 )
 
 SYS_MCQ_ELIMINATE = (
     "You are an expert mathematician answering a multiple-choice question. "
     "First, briefly eliminate options that are clearly wrong (wrong sign, wrong magnitude, "
     "wrong units, contradicts a known constraint). Then choose among the remaining options. "
-    "Output ONLY the chosen letter inside \\boxed{}, e.g. \\boxed{C}."
+    "Output ONLY the chosen letter inside \\boxed{}, e.g. \\boxed{C} — never the value."
+)
+
+SYS_MCQ_MATCH_BACK = (
+    "You are an expert mathematician answering a multiple-choice question. "
+    "Solve the problem first, then EXPLICITLY map your computed answer to the option list. "
+    "End your response with two lines:\n"
+    "  Line 1: 'My computed answer is <value>, which matches option <letter>.'\n"
+    "  Line 2: \\boxed{<letter>}\n"
+    "The box must contain only a single capital letter (A-Z), not the value."
 )
 
 
@@ -71,56 +81,59 @@ FEW_SHOT_FREE = (
 )
 
 FEW_SHOT_MCQ = (
-    "Here is a worked example of the expected format:\n\n"
-    "Example problem: What is 2 + 2?\n"
-    "Options:\nA. 3\nB. 4\nC. 5\nD. 6\n"
-    "Example reasoning: 2+2 = 4, so option B.\n"
-    "Final answer: \\boxed{B}\n\n"
-    "Now solve the following problem:\n"
+    "Here is a worked example showing the required compute-then-match-then-box procedure:\n\n"
+    "Example problem: Solve x^2 = 4 for the positive root.\n"
+    "Options:\nA. -2\nB. 0\nC. 2\nD. 4\n"
+    "Example reasoning: x^2 = 4 gives x = ±2; the positive root is 2. "
+    "Matching against options: 2 corresponds to option C.\n"
+    "Final answer: \\boxed{C}\n\n"
+    "Notice the box contains the LETTER C, not the value 2. Now solve the following problem:\n"
 )
 
 
-# ── Variant registry ────────────────────────────────────────────────────────
-# Each variant: (name, sys_free, sys_mcq, few_shot_free, few_shot_mcq)
-VARIANTS = [
-    ("baseline",
-     SYS_FREE_BASELINE, SYS_MCQ_BASELINE, None, None),
+# ── Independent prompt registries ──────────────────────────────────────────
+# Each entry: (name, system_prompt, few_shot_block_or_None)
 
-    ("strict_format",
-     SYS_FREE_STRICT_FORMAT, SYS_MCQ_STRICT_FORMAT, None, None),
+MCQ_PROMPTS = [
+    ("baseline",            SYS_MCQ_BASELINE,        None),
+    ("strict_format",       SYS_MCQ_STRICT_FORMAT,   None),
+    ("eliminate",           SYS_MCQ_ELIMINATE,       None),
+    ("match_back",          SYS_MCQ_MATCH_BACK,      None),
+    ("few_shot",            SYS_MCQ_BASELINE,        FEW_SHOT_MCQ),
+    ("strict_few_shot",     SYS_MCQ_STRICT_FORMAT,   FEW_SHOT_MCQ),
+    ("match_back_few_shot", SYS_MCQ_MATCH_BACK,      FEW_SHOT_MCQ),
+]
 
-    ("verify",
-     SYS_FREE_VERIFY, SYS_MCQ_BASELINE, None, None),
-
-    ("concise",
-     SYS_FREE_CONCISE, SYS_MCQ_BASELINE, None, None),
-
-    ("mcq_eliminate",
-     SYS_FREE_BASELINE, SYS_MCQ_ELIMINATE, None, None),
-
-    ("few_shot",
-     SYS_FREE_BASELINE, SYS_MCQ_BASELINE, FEW_SHOT_FREE, FEW_SHOT_MCQ),
-
-    ("strict_plus_few_shot",
-     SYS_FREE_STRICT_FORMAT, SYS_MCQ_STRICT_FORMAT, FEW_SHOT_FREE, FEW_SHOT_MCQ),
+FREE_PROMPTS = [
+    ("baseline",            SYS_FREE_BASELINE,       None),
+    ("strict_format",       SYS_FREE_STRICT_FORMAT,  None),
+    ("verify",              SYS_FREE_VERIFY,         None),
+    ("concise",             SYS_FREE_CONCISE,        None),
+    ("few_shot",            SYS_FREE_BASELINE,       FEW_SHOT_FREE),
+    ("strict_few_shot",     SYS_FREE_STRICT_FORMAT,  FEW_SHOT_FREE),
 ]
 
 
-def build_prompt(variant_name: str, question: str, options: Optional[list]) -> tuple[str, str]:
-    """Return (system_prompt, user_prompt) for a given variant and question."""
-    for name, sys_free, sys_mcq, fs_free, fs_mcq in VARIANTS:
-        if name != variant_name:
-            continue
-        if options:
-            labels = [chr(65 + i) for i in range(len(options))]
-            opts_text = "\n".join(f"{lbl}. {opt.strip()}" for lbl, opt in zip(labels, options))
-            user = f"{question}\n\nOptions:\n{opts_text}"
-            if fs_mcq:
-                user = fs_mcq + user
-            return sys_mcq, user
-        else:
-            user = question
-            if fs_free:
-                user = fs_free + user
-            return sys_free, user
-    raise KeyError(f"Unknown variant: {variant_name}")
+def _lookup(prompts: list, name: str):
+    for n, sys_p, fs in prompts:
+        if n == name:
+            return sys_p, fs
+    raise KeyError(f"Unknown prompt name: {name}")
+
+
+def build_mcq_prompt(name: str, question: str, options: list) -> tuple[str, str]:
+    sys_p, fs = _lookup(MCQ_PROMPTS, name)
+    labels = [chr(65 + i) for i in range(len(options))]
+    opts_text = "\n".join(f"{lbl}. {opt.strip()}" for lbl, opt in zip(labels, options))
+    user = f"{question}\n\nOptions:\n{opts_text}"
+    if fs:
+        user = fs + user
+    return sys_p, user
+
+
+def build_free_prompt(name: str, question: str) -> tuple[str, str]:
+    sys_p, fs = _lookup(FREE_PROMPTS, name)
+    user = question
+    if fs:
+        user = fs + user
+    return sys_p, user
