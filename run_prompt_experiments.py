@@ -20,6 +20,14 @@ from typing import Any
 DEFAULT_MODEL_ID = "Qwen/Qwen3-4B-Thinking-2507"
 DEFAULT_DATA_PATH = "data/public.jsonl"
 DEFAULT_OUTPUT_DIR = "results/prompt_experiments"
+ERROR_TYPES = [
+    "Format error",
+    "Arithmetic error",
+    "Conceptual error",
+    "Overthinking",
+    "MCQ mismatch",
+    "Extraction issue",
+]
 
 
 STARTER_MATH = (
@@ -139,6 +147,43 @@ The final line must contain only the option letter in this format:
 
 Replace A with the correct option letter. Do not write anything after the boxed answer."""
 
+SPLIT_CONCISE_MATH = """You are solving a math problem.
+
+Solve it efficiently. Show only the necessary reasoning. Avoid unnecessary long explanations or changing your answer after reaching a valid result.
+
+Final formatting rule:
+The last line must contain only the final answer in this format:
+\\boxed{answer}
+
+Do not write anything after the boxed answer."""
+
+SPLIT_CONCISE_MCQ = """You are solving a multiple-choice math problem.
+
+Solve the problem briefly and carefully. Your final answer must be the option letter, not the numeric value or the full option text.
+
+After solving, compare your result with the answer choices and identify the matching option letter.
+
+Final formatting rule:
+The last line must contain only one boxed capital letter, like:
+\\boxed{A}
+
+Do not put the numeric answer inside the box. Do not write anything after the boxed letter."""
+
+MCQ_MATCH_V2 = """You are solving a multiple-choice math problem.
+
+Step 1: Solve the problem.
+Step 2: Match your result to exactly one answer choice.
+Step 3: Output only the option letter.
+
+Important:
+The boxed final answer must be the option letter only.
+Never box the computed numeric answer for multiple-choice questions.
+
+The last line must be exactly:
+\\boxed{A}
+
+Replace A with the correct option letter. Do not write anything after it."""
+
 
 @dataclass(frozen=True)
 class PromptSpec:
@@ -188,6 +233,18 @@ PROMPTS: dict[str, PromptSpec] = {
         mcq_system=VALIDATE_MCQ,
         notes="Seeded random proposed answer; model validates or corrects it.",
         validate_candidate=True,
+    ),
+    "split_concise_v1": PromptSpec(
+        name="split_concise_v1",
+        math_system=SPLIT_CONCISE_MATH,
+        mcq_system=SPLIT_CONCISE_MCQ,
+        notes="Concise free-response prompt plus explicit MCQ option-letter prompt.",
+    ),
+    "mcq_match_v2": PromptSpec(
+        name="mcq_match_v2",
+        math_system=SPLIT_CONCISE_MATH,
+        mcq_system=MCQ_MATCH_V2,
+        notes="Concise free-response prompt plus stepwise MCQ answer-choice matching.",
     ),
 }
 
@@ -283,25 +340,100 @@ def extract_boxed_values(text: str) -> list[str]:
     return values
 
 
-def extract_mcq_prediction(text: str, n_options: int) -> str:
-    valid = {chr(65 + i) for i in range(n_options)}
+def visible_response_text(text: str) -> str:
+    think_end = text.rfind("</think>")
+    return text[think_end + len("</think>") :] if think_end >= 0 else text
+
+
+def normalize_choice_text(text: str) -> str:
+    normalized = text.strip()
+    normalized = re.sub(r"^\s*([A-Z])[\.\):]\s*", "", normalized)
+    normalized = normalized.replace("\\(", "").replace("\\)", "")
+    normalized = normalized.replace("\\[", "").replace("\\]", "")
+    normalized = normalized.strip("$ \n\t")
+    normalized = re.sub(r"\s+", "", normalized)
+    return normalized.lower()
+
+
+def extract_option_letter(candidate: str, valid: set[str]) -> str:
+    upper = candidate.strip().upper()
+    exact = re.fullmatch(r"([A-Z])", upper)
+    if exact and exact.group(1) in valid:
+        return exact.group(1)
+    leading = re.match(r"([A-Z])(?:[\.\):\s]|$)", upper)
+    if leading and leading.group(1) in valid:
+        return leading.group(1)
+    option = re.search(r"\b(?:OPTION|CHOICE)\s+([A-Z])\b", upper)
+    if option and option.group(1) in valid:
+        return option.group(1)
+    return ""
+
+
+def option_matching_candidate(candidate: str, options: list[str], judger: Any) -> str:
+    normalized_candidate = normalize_choice_text(candidate)
+    if not normalized_candidate:
+        return ""
+
+    labels = [chr(65 + idx) for idx in range(len(options))]
+    for label, option in zip(labels, options):
+        if normalized_candidate == normalize_choice_text(option):
+            return label
+
+    for label, option in zip(labels, options):
+        try:
+            if judger.auto_judge(
+                pred=f"\\boxed{{{candidate}}}",
+                gold=[option],
+                options=[[]],
+            ):
+                return label
+        except Exception:
+            continue
+    return ""
+
+
+def extract_explicit_mcq_letter(text: str, valid: set[str]) -> str:
+    upper = text.upper()
+    patterns = [
+        r"\b(?:FINAL\s+)?(?:ANSWER|OPTION|CHOICE)\s*(?:IS|:)?\s*([A-Z])\b",
+        r"\bCORRESPONDS\s+TO\s+(?:OPTION\s+|CHOICE\s+)?([A-Z])\b",
+        r"\bMATCH(?:ES)?\s+(?:OPTION\s+|CHOICE\s+)?([A-Z])\b",
+    ]
+    matches: list[str] = []
+    for pattern in patterns:
+        matches.extend(match for match in re.findall(pattern, upper) if match in valid)
+    return matches[-1] if matches else ""
+
+
+def extract_mcq_prediction(text: str, options: list[str], judger: Any) -> str:
+    valid = {chr(65 + i) for i in range(len(options))}
+    visible = visible_response_text(text)
     boxed = extract_boxed_values(text)
+
+    if boxed:
+        boxed_candidate = boxed[-1]
+        letter = extract_option_letter(boxed_candidate, valid)
+        if letter:
+            return letter
+        matched = option_matching_candidate(boxed_candidate, options, judger)
+        if matched:
+            return matched
+
+    letter = extract_explicit_mcq_letter(visible, valid)
+    if letter:
+        return letter
+
     candidates = [boxed[-1]] if boxed else []
-    candidates.append(text.split("</think>")[-1] if "</think>" in text else text)
-
+    candidates.append(visible)
     for candidate in candidates:
-        upper = candidate.strip().upper()
-        exact = re.fullmatch(r"([A-Z])", upper)
-        if exact and exact.group(1) in valid:
-            return exact.group(1)
-        leading = re.match(r"([A-Z])(?:[\.\):\s]|$)", upper)
-        if leading and leading.group(1) in valid:
-            return leading.group(1)
-        option = re.search(r"\bOPTION\s+([A-Z])\b", upper)
-        if option and option.group(1) in valid:
-            return option.group(1)
+        letter = extract_option_letter(candidate, valid)
+        if letter:
+            return letter
+        matched = option_matching_candidate(candidate, options, judger)
+        if matched:
+            return matched
 
-    matches = [m for m in re.findall(r"\b([A-Z])\b", text.upper()) if m in valid]
+    matches = [m for m in re.findall(r"\b([A-Z])\b", visible.upper()) if m in valid]
     return matches[-1] if matches else ""
 
 
@@ -320,7 +452,10 @@ def make_judger():
 
 def extract_free_prediction(text: str, judger: Any) -> str:
     try:
-        return judger.extract_ans(text)
+        prediction = judger.extract_ans(text)
+        if repeated_single_answer(prediction):
+            return prediction.split(",", maxsplit=1)[0].strip()
+        return prediction
     except Exception:
         return ""
 
@@ -395,16 +530,72 @@ def summarize(results: list[dict[str, Any]]) -> dict[str, Any]:
     }
 
 
-def rough_error_type(row: dict[str, Any]) -> str:
-    if not row.get("chosen_prediction"):
-        return "Extraction issue"
+def final_visible_text(response: str) -> str:
+    think_end = response.rfind("</think>")
+    return response[think_end + len("</think>") :] if think_end >= 0 else response
+
+
+def looks_like_prose(prediction: str) -> bool:
+    stripped = prediction.strip()
+    return (
+        len(stripped) > 160
+        or "\n" in stripped
+        or any(token in stripped.lower() for token in ("probably", "let's", "wait", "therefore"))
+    )
+
+
+def repeated_single_answer(prediction: str) -> bool:
+    parts = [part.strip() for part in prediction.split(",") if part.strip()]
+    return len(parts) > 1 and len(set(parts)) == 1
+
+
+def numericish(value: Any) -> bool:
+    text = str(value).strip()
+    if not text:
+        return False
+    text = text.replace(",", "")
+    return bool(re.fullmatch(r"-?\d+(?:\.\d+)?", text))
+
+
+def classify_error(row: dict[str, Any]) -> tuple[str, str]:
+    prediction = str(row.get("chosen_prediction") or "").strip()
+    responses = row.get("responses", [])
+    response = responses[0] if responses else ""
+    visible = final_visible_text(response)
+    boxed = extract_boxed_values(response)
+
+    if not prediction:
+        return "Extraction issue", "No final answer could be extracted from the response."
+
+    if looks_like_prose(prediction):
+        return "Extraction issue", "Extracted answer looks like prose instead of a clean final answer."
+
     if row["is_mcq"]:
-        if len(str(row["chosen_prediction"])) != 1:
-            return "Format error"
-        return "MCQ mismatch"
-    if not any("\\boxed{" in response for response in row.get("responses", [])):
-        return "Format error"
-    return "Unclassified"
+        if not re.fullmatch(r"[A-Z]", prediction.upper()):
+            return "Format error", "MCQ answer was not a single option letter."
+        return "MCQ mismatch", f"Predicted option {prediction.upper()}, but gold option is {row['gold']}."
+
+    if "\\boxed{" not in visible:
+        return "Format error", "No boxed final answer appears after the reasoning section."
+
+    if repeated_single_answer(prediction):
+        return "Format error", "The same answer was boxed more than once, so it was read as multiple answers."
+
+    if len(boxed) > 1 and "," in prediction:
+        return "Format error", "Multiple boxed answers were extracted for a problem that may expect one final answer."
+
+    gold = row.get("gold")
+    gold_values = gold if isinstance(gold, list) else [gold]
+    if all(numericish(value) for value in gold_values) and all(
+        numericish(part.strip()) for part in prediction.split(",") if part.strip()
+    ):
+        return "Arithmetic error", "The output is well-formatted but the numeric value does not match the gold answer."
+
+    wait_count = len(re.findall(r"\bwait\b", response.lower()))
+    if wait_count >= 12:
+        return "Overthinking", "The response repeatedly revises itself before ending with the wrong answer."
+
+    return "Conceptual error", "The output is readable and boxed, but the method or final conclusion is wrong."
 
 
 def write_error_analysis(results: list[dict[str, Any]], path: Path, limit: int = 20) -> None:
@@ -424,6 +615,7 @@ def write_error_analysis(results: list[dict[str, Any]], path: Path, limit: int =
         writer.writeheader()
         for row in wrong:
             responses = row.get("responses", [])
+            error_type, notes = classify_error(row)
             preview = responses[0].replace("\n", " ")[:500] if responses else ""
             writer.writerow(
                 {
@@ -431,12 +623,21 @@ def write_error_analysis(results: list[dict[str, Any]], path: Path, limit: int =
                     "is_mcq": row["is_mcq"],
                     "gold": json.dumps(row["gold"]),
                     "chosen_prediction": row.get("chosen_prediction", ""),
-                    "suggested_error_type": rough_error_type(row),
+                    "suggested_error_type": error_type,
                     "manual_error_type": "",
-                    "notes": "",
+                    "notes": notes,
                     "response_preview": preview,
                 }
             )
+
+
+def summarize_error_types(results: list[dict[str, Any]], limit: int = 20) -> dict[str, Any]:
+    wrong = [row for row in results if not row["correct"]][:limit]
+    counts = Counter(classify_error(row)[0] for row in wrong)
+    return {
+        "wrong_examples_analyzed": len(wrong),
+        **{error_type: counts.get(error_type, 0) for error_type in ERROR_TYPES},
+    }
 
 
 def append_summary_csv(path: Path, row: dict[str, Any]) -> None:
@@ -462,6 +663,23 @@ def append_summary_csv(path: Path, row: dict[str, Any]) -> None:
         "free_count",
         "free_accuracy",
         "notes",
+    ]
+    with path.open("a", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=fields)
+        if not exists:
+            writer.writeheader()
+        writer.writerow({field: row.get(field, "") for field in fields})
+
+
+def append_error_summary_csv(path: Path, row: dict[str, Any]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    exists = path.exists()
+    fields = [
+        "timestamp",
+        "run_name",
+        "experiment",
+        "wrong_examples_analyzed",
+        *ERROR_TYPES,
     ]
     with path.open("a", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=fields)
@@ -548,10 +766,10 @@ def run_experiment(
         for item_idx, output in zip(indices, outputs):
             responses_by_index[item_idx] = [choice.text.strip() for choice in output.outputs]
 
-    results: list[dict[str, Any]] = []
+        results: list[dict[str, Any]] = []
     for item, candidate, responses in zip(items, candidates, responses_by_index):
         if item.get("options"):
-            predictions = [extract_mcq_prediction(response, len(item["options"])) for response in responses]
+            predictions = [extract_mcq_prediction(response, item["options"], judger) for response in responses]
             vote_keys = predictions
         else:
             predictions = [extract_free_prediction(response, judger) for response in responses]
@@ -559,6 +777,7 @@ def run_experiment(
 
         chosen = choose_majority(predictions, vote_keys)
         correct = score_prediction(item, chosen, judger)
+        clean_boxed = f"\\boxed{{{chosen}}}" if chosen else ""
         results.append(
             {
                 "id": item.get("id"),
@@ -568,6 +787,7 @@ def run_experiment(
                 "responses": responses,
                 "sample_predictions": predictions,
                 "chosen_prediction": chosen,
+                "clean_boxed_prediction": clean_boxed,
                 "correct": correct,
             }
         )
@@ -672,6 +892,15 @@ def main() -> None:
 
         error_path = output_dir / f"{run_name}_wrong20.csv"
         write_error_analysis(results, error_path)
+        append_error_summary_csv(
+            output_dir / "error_analysis_summary.csv",
+            {
+                "timestamp": timestamp,
+                "run_name": run_name,
+                "experiment": experiment,
+                **summarize_error_types(results),
+            },
+        )
 
         summary_row = {
             "timestamp": timestamp,
