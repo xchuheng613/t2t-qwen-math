@@ -136,7 +136,43 @@ def score_one(judger: Judger, item: dict, response: str) -> bool:
         return False
 
 
-def majority_vote(responses: list[str], item: dict, judger: Judger) -> str:
+# Error taxonomy. Mutually exclusive; aggregated per (type, prompt, config)
+# so we can see WHY a prompt loses accuracy, not just THAT it does.
+ERROR_TYPES = ["correct", "truncated", "no_answer", "out_of_range", "wrong", "judge_error"]
+
+
+def categorize(judger: Judger, item: dict, response: str,
+               correct: bool, finish_reason: str | None) -> tuple[str, str]:
+    """Return (error_type, extracted_answer_str). Order of checks matters."""
+    if correct:
+        return "correct", ""
+    is_mcq = bool(item.get("options"))
+    # Truncation = vLLM hit max_tokens, OR thinking model never closed </think>.
+    if finish_reason == "length" or "</think>" not in response:
+        return "truncated", ""
+    if is_mcq:
+        try:
+            extracted = extract_letter(response, item.get("options"), judger)
+        except Exception:
+            return "judge_error", ""
+        if not extracted:
+            return "no_answer", ""
+        n_opts = len(item.get("options") or [])
+        if n_opts and (ord(extracted) - 65) >= n_opts:
+            return "out_of_range", extracted
+        return "wrong", extracted
+    # Free-form
+    try:
+        ans = judger.extract_ans(response) or ""
+    except Exception:
+        return "judge_error", ""
+    if not ans:
+        return "no_answer", ""
+    return "wrong", str(ans)
+
+
+def majority_vote(responses: list[str], item: dict, judger: Judger) -> tuple[str, int]:
+    """Return (chosen_text, chosen_idx) so caller can fetch its finish_reason."""
     is_mcq = bool(item.get("options"))
     if is_mcq:
         keys = [extract_letter(r, item.get("options"), judger) for r in responses]
@@ -151,12 +187,12 @@ def majority_vote(responses: list[str], item: dict, judger: Judger) -> str:
             keys.append(k)
     counts = Counter(k for k in keys if k)
     if not counts:
-        return responses[0]
+        return responses[0], 0
     winning = counts.most_common(1)[0][0]
-    for k, r in zip(keys, responses):
+    for i, (k, r) in enumerate(zip(keys, responses)):
         if k == winning:
-            return r
-    return responses[0]
+            return r, i
+    return responses[0], 0
 
 
 # ── Generation ─────────────────────────────────────────────────────────────
@@ -197,18 +233,29 @@ def run_one(llm, tokenizer, judger: Judger, qtype: str, prompt_name: str,
     records = []
     for item, out in zip(items, outputs):
         responses = [o.text.strip() for o in out.outputs]
-        chosen = majority_vote(responses, item, judger) if (cfg.vote and len(responses) > 1) else responses[0]
+        finishes  = [getattr(o, "finish_reason", None) for o in out.outputs]
+        if cfg.vote and len(responses) > 1:
+            chosen, idx = majority_vote(responses, item, judger)
+        else:
+            chosen, idx = responses[0], 0
+        finish_reason = finishes[idx]
+        is_correct = score_one(judger, item, chosen)
+        err_type, extracted = categorize(judger, item, chosen, is_correct, finish_reason)
         records.append({
-            "id":          item.get("id"),
-            "is_mcq":      qtype == "mcq",
-            "gold":        item["answer"],
-            "response":    chosen,
-            "all_samples": responses if cfg.n > 1 else None,
-            "correct":     score_one(judger, item, chosen),
+            "id":            item.get("id"),
+            "is_mcq":        qtype == "mcq",
+            "gold":          item["answer"],
+            "response":      chosen,
+            "all_samples":   responses if cfg.n > 1 else None,
+            "finish_reason": finish_reason,
+            "extracted":     extracted,
+            "correct":       is_correct,
+            "error_type":    err_type,
         })
 
     n_total = len(records)
     n_corr  = sum(r["correct"] for r in records)
+    err_counts = Counter(r["error_type"] for r in records)
     summary = {
         "type":    qtype,
         "prompt":  prompt_name,
@@ -217,21 +264,26 @@ def run_one(llm, tokenizer, judger: Judger, qtype: str, prompt_name: str,
         "correct": n_corr,
         "acc":     n_corr / n_total if n_total else 0.0,
     }
+    for et in ERROR_TYPES:
+        summary[f"err_{et}"] = err_counts.get(et, 0)
 
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     out_path = OUTPUT_DIR / f"{qtype}__{prompt_name}__{cfg.name}.jsonl"
     with open(out_path, "w", encoding="utf-8") as f:
         for r in records:
             f.write(json.dumps(r, ensure_ascii=False) + "\n")
+    err_str = "  ".join(f"{et}={err_counts.get(et, 0)}" for et in ERROR_TYPES if et != "correct")
     print(f"  -> acc {summary['acc']:.3f}  ({n_corr}/{n_total})  [{out_path.name}]")
+    print(f"     errors: {err_str}")
     return summary
 
 
 # ── Main ───────────────────────────────────────────────────────────────────
 def write_summary(summaries: list[dict]) -> Path:
     csv_path = OUTPUT_DIR / "summary.csv"
+    fields = ["type", "prompt", "config", "n", "correct", "acc"] + [f"err_{et}" for et in ERROR_TYPES]
     with open(csv_path, "w", newline="", encoding="utf-8") as f:
-        w = csv.DictWriter(f, fieldnames=["type", "prompt", "config", "n", "correct", "acc"])
+        w = csv.DictWriter(f, fieldnames=fields)
         w.writeheader()
         for s in sorted(summaries, key=lambda x: (x["type"], -x["acc"], x["config"])):
             w.writerow(s)
@@ -240,9 +292,14 @@ def write_summary(summaries: list[dict]) -> Path:
 
 def print_table(title: str, rows: list[dict]):
     print(f"\n── {title} ──")
-    print(f"{'type':<5} {'prompt':<22} {'config':<12} {'acc':>7} {'n':>4}")
+    hdr = f"{'type':<5} {'prompt':<22} {'config':<12} {'acc':>7} {'n':>4} " \
+          f"{'trunc':>6} {'noans':>6} {'oor':>5} {'wrong':>6} {'judge':>6}"
+    print(hdr)
     for s in sorted(rows, key=lambda x: -x["acc"]):
-        print(f"{s['type']:<5} {s['prompt']:<22} {s['config']:<12} {s['acc']:>7.3f} {s['n']:>4}")
+        print(f"{s['type']:<5} {s['prompt']:<22} {s['config']:<12} {s['acc']:>7.3f} {s['n']:>4} "
+              f"{s.get('err_truncated', 0):>6} {s.get('err_no_answer', 0):>6} "
+              f"{s.get('err_out_of_range', 0):>5} {s.get('err_wrong', 0):>6} "
+              f"{s.get('err_judge_error', 0):>6}")
 
 
 def main():
