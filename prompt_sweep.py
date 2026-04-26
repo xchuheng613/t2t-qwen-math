@@ -1,9 +1,8 @@
 """Independent prompt sweep on a stratified subset of public.jsonl.
 
 Pipeline:
-  Stage 1a: each MCQ prompt  on MCQ items   (greedy, n=1)
-  Stage 1b: each FREE prompt on FREE items  (greedy, n=1)
-  Stage 2 : winners of each side rerun with self-consistency (n=3, vote)
+  Single stage: every MCQ prompt on MCQ items, every FREE prompt on FREE
+  items, all with self-consistency n=3 (majority vote) on a 100/100 subset.
 
 Outputs:
   results/sweep/<type>__<prompt>__<config>.jsonl    per-question records
@@ -31,9 +30,9 @@ GPU_ID      = "0"
 DATA_PATH   = "data/public.jsonl"
 OUTPUT_DIR  = Path("results/sweep")
 MAX_TOKENS  = 32768
-SUBSET_SIZE = 40           # stratified ~half MCQ, ~half free-form
+SUBSET_SIZE = 200          # stratified: ~100 MCQ + ~100 free-form
 RNG_SEED    = 42
-SC_NUM_SAMPLES   = 3       # self-consistency sample count for stage 2
+SC_NUM_SAMPLES   = 3       # self-consistency sample count (every prompt)
 
 os.environ["CUDA_VISIBLE_DEVICES"] = GPU_ID
 
@@ -57,9 +56,9 @@ class SamplingConfig:
     vote: bool = False
 
 
-STAGE1 = SamplingConfig(name="greedy_n1", temperature=0.0, top_p=1.0, top_k=-1, n=1)
-STAGE2 = SamplingConfig(name="sc_n3",     temperature=0.7, top_p=0.95, top_k=20,
-                        n=SC_NUM_SAMPLES, vote=True)
+SWEEP_CFG = SamplingConfig(name=f"sc_n{SC_NUM_SAMPLES}",
+                           temperature=0.7, top_p=0.95, top_k=20,
+                           n=SC_NUM_SAMPLES, vote=True)
 
 
 # ── Data loading + stratified subset ───────────────────────────────────────
@@ -268,38 +267,25 @@ def main():
 
     summaries: list[dict] = []
 
-    # ── Stage 1a: MCQ prompts on MCQ items ──
+    # ── MCQ prompts on MCQ items (sc_n3) ──
     print("\n" + "=" * 60)
-    print("STAGE 1a: MCQ prompts on MCQ items (greedy, n=1)")
+    print(f"MCQ prompts on MCQ items (sc_n{SC_NUM_SAMPLES}, majority vote)")
     print("=" * 60)
     mcq_results = []
     for name, *_ in MCQ_PROMPTS:
-        s = run_one(llm, tokenizer, judger, "mcq", name, STAGE1, mcq_items)
+        s = run_one(llm, tokenizer, judger, "mcq", name, SWEEP_CFG, mcq_items)
         mcq_results.append(s); summaries.append(s)
-    print_table("MCQ ranking (stage 1a)", mcq_results)
+    print_table("MCQ ranking", mcq_results)
 
-    # ── Stage 1b: FREE prompts on FREE items ──
+    # ── FREE prompts on FREE items (sc_n3) ──
     print("\n" + "=" * 60)
-    print("STAGE 1b: FREE prompts on FREE items (greedy, n=1)")
+    print(f"FREE prompts on FREE items (sc_n{SC_NUM_SAMPLES}, majority vote)")
     print("=" * 60)
     free_results = []
     for name, *_ in FREE_PROMPTS:
-        s = run_one(llm, tokenizer, judger, "free", name, STAGE1, free_items)
+        s = run_one(llm, tokenizer, judger, "free", name, SWEEP_CFG, free_items)
         free_results.append(s); summaries.append(s)
-    print_table("FREE ranking (stage 1b)", free_results)
-
-    # ── Stage 2: self-consistency on each side's winner ──
-    best_mcq  = max(mcq_results,  key=lambda s: s["acc"])["prompt"] if mcq_results  else None
-    best_free = max(free_results, key=lambda s: s["acc"])["prompt"] if free_results else None
-    print(f"\nStage-1 winners: MCQ='{best_mcq}'  FREE='{best_free}'")
-
-    print("\n" + "=" * 60)
-    print(f"STAGE 2: self-consistency (n={SC_NUM_SAMPLES}, majority vote)")
-    print("=" * 60)
-    if best_mcq:
-        summaries.append(run_one(llm, tokenizer, judger, "mcq",  best_mcq,  STAGE2, mcq_items))
-    if best_free:
-        summaries.append(run_one(llm, tokenizer, judger, "free", best_free, STAGE2, free_items))
+    print_table("FREE ranking", free_results)
 
     csv_path = write_summary(summaries)
     print_table("FINAL RANKING", summaries)
