@@ -1,0 +1,17 @@
+timestamp,run_name,experiment,wrong_examples_analyzed,Format error,Arithmetic error,Conceptual error,Overthinking,MCQ mismatch,Extraction issue
+20260426_123134,20260426_123134_starter_n100_mcq1x_free1x_t0.6,starter,20,6,3,1,0,6,4
+20260426_123727,20260426_123727_concise_n100_mcq1x_free1x_t0.6,concise,20,3,2,2,4,6,3
+20260426_123727,20260426_123727_detailed_n100_mcq1x_free1x_t0.6,detailed,20,7,0,1,2,7,3
+20260426_123727,20260426_123727_starter_n100_mcq1x_free1x_t0.6,starter,20,6,1,1,0,7,5
+20260426_123727,20260426_123727_strict_boxed_n100_mcq1x_free1x_t0.6,strict_boxed,20,8,0,1,2,6,3
+20260426_123727,20260426_123727_verify_n100_mcq1x_free1x_t0.6,verify,20,3,2,1,4,3,7
+20260426_125334,20260426_125334_concise_n100_mcq1x_free1x_t0.6,concise,20,4,3,1,4,5,3
+20260426_125334,20260426_125334_detailed_n100_mcq1x_free1x_t0.6,detailed,20,4,2,1,2,6,5
+20260426_125334,20260426_125334_starter_n100_mcq1x_free1x_t0.6,starter,20,6,1,1,0,6,6
+20260426_125334,20260426_125334_strict_boxed_n100_mcq1x_free1x_t0.6,strict_boxed,20,5,2,1,1,8,3
+20260426_125334,20260426_125334_validate_random_n100_mcq1x_free1x_t0.6,validate_random,20,0,3,2,7,6,2
+20260426_125334,20260426_125334_verify_n100_mcq1x_free1x_t0.6,verify,20,5,1,1,4,5,4
+20260426_133647,20260426_133647_split_concise_v1_n100_mcq1x_free1x_t0.6,split_concise_v1,20,2,4,2,3,5,4
+20260426_134222,20260426_134222_split_concise_v1_n100_mcq1x_free1x_t0.3,split_concise_v1,20,2,2,1,6,6,3
+20260426_134803,20260426_134803_split_concise_v1_n100_mcq1x_free4x_t0.6,split_concise_v1,20,3,3,3,3,6,2
+20260426_135929,20260426_135929_mcq_match_v2_n100_mcq1x_free1x_t0.6,mcq_match_v2,20,5,2,2,1,7,3

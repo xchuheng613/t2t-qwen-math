@@ -1,0 +1,214 @@
+id,is_mcq,gold,chosen_prediction,suggested_error_type,manual_error_type,notes,response_preview
+1,True,"""F""",E,MCQ mismatch,,"Predicted option E, but gold option is F.","Okay, let's try to solve this integral. The problem is the integral from negative infinity to positive infinity of (a^(3/2)) divided by (s² + a²) ds. Hmm, first, I need to recall how to integrate functions like 1/(s² + a²).   Wait, the integral of 1/(s² + a²) ds is (1/a) arctan(s/a) + C, right? Because the derivative of arctan(s/a) is (1/(1 + (s/a)²)) * (1/a) = a/(a² + s²), so actually, the integral of 1/(s² + a²) ds is (1/a) arctan(s/a) + C. Let me confirm that. If I take the derivative of (1/a"
+2,False,"[""143.224229233795"", ""2.32624773420025""]"," T(t) = T_s + (T_0 - T_s) e^{-kt} \)
+
+where:
+- \( T(t) \) is the temperature of the object at time \( t \),
+- \( T_s \) is the surrounding temperature (room temperature),
+- \( T_0 \) is the initial temperature of the object,
+- \( k \) is a positive constant (the cooling constant),
+- \( t \) is time.
+
+Let me confirm the variables here. In this problem, \( T_0 = 185°F \), \( T_s = 75°F \), and after \( t = 30 \) minutes, \( T(30) = 155°F \). We need to find \( T(45) \).
+
+First, let's write down the equation for \( T(t) \):
+
+\( T(t) = 75 + (185 - 75) e^{-kt} = 75 + 110 e^{-kt} \)
+
+We know that at \( t = 30 \), \( T(30) = 155 \). So let's plug that in to find \( k \).
+
+\( 155 = 75 + 110 e^{-k \cdot 30} \)
+
+Subtract 75 from both sides:
+
+\( 80 = 110 e^{-30k} \)
+
+Divide both sides by 110:
+
+\( \frac{80}{110} = e^{-30k} \)
+
+Simplify the fraction: \( \frac{8}{11} = e^{-30k} \)
+
+Take the natural logarithm of both sides:
+
+\( \ln\left( \frac{8}{11} \right) = -30k \)
+
+So, \( k = -\frac{1}{30} \ln\left( \frac{8}{11} \right) = \frac{1}{30} \ln\left( \frac{11}{8} \right) \)
+
+Let me compute that value later, maybe we don't need to compute k numerically yet.
+
+Now, we need to find \( T(45) \). Let's write the equation for \( T(45) \):
+
+\( T(45) = 75 + 110 e^{-k \cdot 45} \)
+
+We can express \( e^{-45k} \) in terms of the known value from \( t = 30 \). Let's see, from \( t = 30 \), we have \( e^{-30k} = 8/11 \), so \( e^{-45k} = (e^{-30k})^{1.5} = (8/11)^{3/2} \). Wait, 45 is 1.5 times 30, so exponent is 45 = 30 * 1.5, so yes.
+
+Let me verify that. If \( e^{-30k} = 8/11 \), then \( e^{-45k} = (e^{-30k})^{45/30} = (8/11)^{3/2} \). Correct.
+
+So, \( T(45) = 75 + 110 \times (8/11)^{3/2} \)
+
+Let's compute \( (8/11)^{3/2} \). First, \( (8/11)^{1/2} = \sqrt{8/11} \approx \sqrt{0.727} \approx 0.852 \). Then, \( (0.852)^3 \approx 0.852 \times 0.852 \times 0.852 \). Let's compute step by step.
+
+First, \( (8/11) = 0.72727... \)
+
+\( (8/11)^{3/2} = \sqrt{(8/11)^3} = \sqrt{(512)/(1331)} \approx \sqrt{0.385} \approx 0.620 \). Wait, maybe better to compute exactly.
+
+Wait, \( (8/11)^{3/2} = (8^{3/2}) / (11^{3/2}) = ( (8^{1/2})^3 ) / ( (11^{1/2})^3 ) = (2\sqrt{2})^3 / (11\sqrt{11}) )? Maybe not. Let's compute numerically.
+
+First, compute \( e^{-30k} = 8/11 \approx 0.72727 \)
+
+So \( e^{-45k} = (e^{-30k})^{1.5} = (0.72727)^{1.5} \). Let's compute 0.72727^1.5.
+
+First, take natural log: ln(0.72727) ≈ -0.316. Then multiply by 1.5: -0.316 * 1.5 ≈ -0.474. Then exponentiate: e^{-0.474} ≈ 0.623.
+
+So, 110 * 0.623 ≈ 68.53. Then T(45) = 75 + 68.53 ≈ 143.53. So approximately 144°F? Let me check with more precise calculation.
+
+Wait, let's do it step by step.
+
+First, compute \( k \):
+
+",Extraction issue,,Extracted answer looks like prose instead of a clean final answer.,"Okay, let's try to solve this problem step by step. First, part (a) is about a turkey cooling down from 185°F to 155°F in 30 minutes, and we need to find its temperature after 45 minutes. This sounds like a Newton's Law of Cooling problem. Newton's Law of Cooling states that the rate of change of the temperature of an object is proportional to the difference between its temperature and the ambient temperature.   So, the formula for Newton's Law of Cooling is usually written as:  \( T(t) = T_s + "
+4,True,"""C""",I,MCQ mismatch,,"Predicted option I, but gold option is C.","Okay, let's try to solve this problem step by step. The question is about finding an analytic function \( f(z) = u + iv \) where \( u(x, y) = x^3 + 6x^2y - 3xy^2 - 2y^3 \), and \( f(0) = 0 \).   First, I remember that for a function to be analytic, the Cauchy-Riemann equations must hold. So, if \( u \) is the real part of an analytic function \( f(z) \), then \( v \) (the imaginary part) can be found using the Cauchy-Riemann equations. Alternatively, since \( f(z) \) is analytic, it can be expre"
+5,False,"[""62.7777777777778"", ""335.927777777778"", ""604.67""]","62.78, 335.93, 604.67",Format error,,Multiple boxed answers were extracted for a problem that may expect one final answer.,"Okay, let's see. I need to convert 145 degrees Fahrenheit to Celsius, Kelvin, and Rankine. Hmm, first I remember the formulas for each conversion. Let me recall.  Starting with Fahrenheit to Celsius. The formula is Celsius = (Fahrenheit - 32) * 5/9. Right? So for 145°F, I subtract 32 first. Let me calculate that: 145 - 32 is 113. Then multiply by 5/9. So 113 * 5 = 565, divided by 9. Let me do that division. 565 divided by 9. 9*62 is 558, so 565 - 558 is 7, so it's 62.777... So approximately 62.7"
+8,False,"[""(1/2)^[(1999-1963)/31]""]"," N(t) = N_0 \times e^{-kt} \]
+
+But another way to write it, especially for half-life, is using the half-life directly. The formula can also be expressed as:
+
+\[ N(t) = N_0 \times \left( \frac{1}{2} \right)^{t / T} \]
+
+where \( T \) is the half-life, and \( t \) is the time elapsed. 
+
+First, let's find the time elapsed between 1963 and 1999. Let's calculate that. 1999 minus 1963. Let's do 1999 - 1963. 1999 - 1960 is 39, so 1999 - 1963 is 36. So 36 years. 
+
+Wait, 1963 to 1964 is 1 year, so 1999 - 1963 = 36 years. Let me confirm: 1963 + 36 = 1999. Yes, 1963 + 30 = 1993, 1993 + 6 = 1999. So 36 years.
+
+So the time elapsed \( t = 36 \) years, half-life \( T = 31 \) years.
+
+We need to find the fraction remaining, which is \( \left( \frac{1}{2} \right)^{t / T} \).
+
+So that's \( (1/2)^{36 / 31} \). Let me compute that.
+
+First, 36 divided by 31 is approximately 1.16129. So we need to calculate \( 2^{-1.16129} \).
+
+Alternatively, using natural logarithm. Let's recall that \( (1/2)^{t/T} = e^{-(ln 2) \times t / T} \). So maybe that's a way to compute it.
+
+Let me try both ways. Let's see.
+
+First, let's compute the exponent: \( t / T = 36 / 31 ≈ 1.16129 \).
+
+So the fraction is \( (1/2)^{1.16129} \). Let's compute this.
+
+We know that \( (1/2)^1 = 0.5 \), \( (1/2)^{1.16129} \) is a bit less than that.
+
+Let's use the natural logarithm. Let me compute \( \ln(0.5) = -0.693147 \). So \( (1/2)^x = e^{x \ln(0.5)} \).
+
+So here, x = 36/31 ≈ 1.16129.
+
+So \( e^{1.16129 \times (-0.693147)} \).
+
+Let's compute 1.16129 * 0.693147. Let's do that multiplication.
+
+First, 1 * 0.693147 = 0.693147
+
+0.16129 * 0.693147 ≈ Let's compute 0.1 * 0.693147 = 0.0693147
+
+0.06 * 0.693147 ≈ 0.0415888
+
+0.00129 * 0.693147 ≈ approx 0.000894
+
+So adding up: 0.0693147 + 0.0415888 = 0.1109035 + 0.000894 ≈ 0.1117975
+
+So total 0.693147 + 0.1117975 ≈ 0.8049445
+
+So the exponent is -0.8049445
+
+Then e^(-0.8049445) ≈ Let's recall that e^-0.8 is approximately 0.4493 (since e^-0.7 ≈ 0.4966, e^-0.8 ≈ 0.4493, e^-0.8049 is a bit less).
+
+Let me check with calculator steps.
+
+Alternatively, use the formula:
+
+The fraction remaining is ",Extraction issue,,Extracted answer looks like prose instead of a clean final answer.,"Okay, let's see. The problem is about radioactive strontium-90 with a half-life of 31 years. We need to find what fraction remained in people's bones from 1963 to 1999.   First, I remember that half-life problems can be solved using the exponential decay formula. The general formula for exponential decay is:  \[ N(t) = N_0 \times e^{-kt} \]  But another way to write it, especially for half-life, is using the half-life directly. The formula can also be expressed as:  \[ N(t) = N_0 \times \left( \"
+10,True,"""E""",A,MCQ mismatch,,"Predicted option A, but gold option is E.","This is a complex or challenging question, and it is difficult to provide a direct and correct answer. I need to think about it. Well, so I need to compute this sum of floor(log base 2 of n) from n=1 to n=2018, and then find the remainder when that sum is divided by 1000. Hmm, floor functions with logs... I remember that floor(log2 n) is equal to m when 2^m ≤ n < 2^(m+1), right? Let me verify that first. For example, floor(log2 1) is 0 because log2 1 = 0, floor(log2 2) is 1 because log2 2=1, flo"
+11,True,"""G""",A,MCQ mismatch,,"Predicted option A, but gold option is G.","This is a complex or challenging question, and it is difficult to provide a direct and correct answer. I need to think about it. Well, so we have triangle ABC with sides 13, 14, 15. Wait, that's a classic triangle, right? I remember the 13-14-15 triangle has some nice properties, especially with the altitude. Maybe I should start by finding coordinates for all these points to make it easier. Coordinates might help here because we need to deal with feet of altitudes, points on BC, extensions to c"
+12,False,"[""380"", ""315"", ""13"", ""310""]","310.
+
+Wait, but let's go back to question 2 to make sure. The problem says ""12 years later"", so x=12, we calculated 32,420 /103≈314.757, so rounded to integer is 315. Let's check with calculator steps (even though I'm doing manually): 103*314=32,342; 32,420-32,342=78; 78/103≈0.757, so yes, 314.757≈315 when rounded to integer.
+
+Wait, but in question 3, we found that at x≈14.4375, the population is 314, so that's consistent with question 2 being 315 at x=12 (which is less than 14.4375, so population is increasing towards 310? Wait, hold on! Wait a second, is the population increasing or decreasing? Let's check the derivative or see the behavior.
+
+Wait, maybe I messed up the direction. Let's see: when x increases, does P(x) increase or decrease? Let's compute P(0)=380, P(12)≈315, P(14.4375)=314, P(1000)≈310. Wait, so actually the population is decreasing over time? Wait, 380 at x=0, then 315 at x=12, 314 at x≈14.4, 310 at x→∞. So it's decreasing towards 310. That makes sense for a horizontal asymptote at 310, which is less than the initial population.
+
+Wait, so in question 2, 12 years later, it's 315, which is less than 380, so decreasing, correct. Question 3: when does it reach 314? At x≈14.4, so after 14 years, it's about 314.1, so rounds to 14. Wait, but let's make sure about the rounding for question 3: 14.4375 is 14 and 0.4375, so rounds to 14 (since 0.4375 < 0.5).
+
+Let me recap all answers to make sure:
+
+1) This year: x=0, P(0)=2660/7=380. Correct, as 7*380=2660.
+
+2) 12 years later: x=12, P(12)= (2480*12 +2660)/(8*12 +7)= (29760 +2660)/103=32420/103≈314.757→315.
+
+3) When P(x)=314: solved to x=14.4375→14 years.
+
+4) Horizontal asymptote: 2480/8=310, so 310.
+
+Wait, but let's check question 3 again with x=14: as I did earlier, P(14)=37380/119≈314.117, which is 314.117, so at x=14, it's already above 314 (314.117), so when does it reach exactly 314? At x≈14.4375, so after 14 years, it's 314.117, so to get to 314, it's about 14.4 years, so rounded to integer, 14 (since 14.4 is closer to 14 than 15). If the problem had said ""after how many full years"", it might be different, but it says ""round to integer"", so 14.
+
+Wait, but let's check with x=14.4: compute P(14.4). Numerator:2480*14.4 +2660. 2480*14=34720, 2480*0.4=992, so total 34720+992=35712 +2660=38372. Denominator:8*14.4 +7=115.2 +7=122.2. 38372 /122.2≈ let's see, 122.2*314=122.2*(300+14)=36660 + 1710.8=38370.8. Oh, that's very close! So 122.2*314≈38370.8, and numerator is 38372, so P(14.4)",Extraction issue,,Extracted answer looks like prose instead of a clean final answer.,"This is a complex or challenging question, but I'll solve it step by step. Let's start with question 1.  **Question 1: How many deer live in this forest this year?**  Okay, so the problem says x is the number of years in the future. That means ""this year"" would be when x = 0, right? Because if x is years from now, then now is x=0. Let me confirm: if x is the number of years in the future, then yes, current year is x=0. So we need to plug x=0 into P(x).  Let's compute P(0) = (2480*0 + 2660)/(8*0 "
+14,True,"""F""",A,MCQ mismatch,,"Predicted option A, but gold option is F.","Okay, let's try to figure out the 25th derivative of y = 2x² sinx. Hmm, derivatives of products of polynomials and trigonometric functions... I remember that the nth derivative of x^k sinx or x^k cosx can be handled using Leibniz's formula, right? Since it's a product of x² and sinx, we can use the product rule repeatedly, but for the 25th derivative, Leibniz's formula might be the way to go.  First, let me recall Leibniz's formula: (fg)^(n) = Σ_{k=0}^n C(n,k) f^(k) g^(n−k). Here, f(x) = 2x² and"
+16,False,"[""atan(4.76)"", ""pi""]",2,Format error,,No boxed final answer appears after the reasoning section.,"Okay, let's see. The problem is to find all solutions for tan(θ) = 4.76, and express them as θ = [ANS] + [ANS]n, where n is any integer, and the first blank (the principal value) is between -π/2 and π/2.   First, I need to recall that the tangent function has a period of π, so the general solution for tan(θ) = k is θ = arctan(k) + nπ, where n is any integer. But wait, the problem says the value in each first blank lies between -π/2 and π/2. So the principal value (the arctan result) should be in"
+19,True,"""E""",I,MCQ mismatch,,"Predicted option I, but gold option is E.","This is a complex or challenging question, and it is difficult to provide a direct and correct answer. I need to think about it. Well, so we have this sequence defined by positive reals starting with a₀ = x, a₁ = y, and then the recurrence aₙ · aₙ₊₂ = aₙ₊₁ for n ≥ 0. Hmm, recurrence relations with products... maybe I can rewrite this as a ratio or find a pattern by computing the first few terms? Let's try that to see if it's a periodic sequence or something, or maybe a geometric sequence? Wait, "
+20,False,"[""-10"", ""100"", ""-9"", ""81"", ""1"", ""1"", ""3"", ""9"", ""7"", ""49"", ""8"", ""64"", ""304"", ""60.8"", ""7.79743547584717""]",22,Format error,,No boxed final answer appears after the reasoning section.,"Okay, let's see. I need to find the standard deviation of the data set: 22, 23, 33, 35, 39, 40. The problem says to use the table provided, so I should follow the steps as outlined. First, I need to calculate the mean (x-bar) because all the columns depend on that. Let me start by finding the mean.  The data set has 6 numbers, so N = 6. To find the mean, I sum all the numbers and divide by N. Let's compute the sum first.  22 + 23 + 33 + 35 + 39 + 40. Let me add them up step by step.  22 + 23 = 4"
+21,False,"[""3*t^1*(1-t)^2"", ""6*t^2*(1-t)^2"", ""10*t^3*(1-t)^2"", ""7*t^6*(1-t)^1"", ""70*t^4*(1-t)^4""]",5,Format error,,No boxed final answer appears after the reasoning section.,"Okay, let's try to figure out the Bernstein polynomials. First, I need to remember what Bernstein polynomials are. From what I recall, Bernstein polynomials of degree n are a set of polynomials that form a basis for the space of polynomials of degree at most n. They are used in Bézier curves and other areas of computer graphics and numerical analysis.  The general formula for the k-th Bernstein polynomial of degree n is given by:  B_{k,n}(t) = C(n, k) * t^k * (1 - t)^{n - k}  where C(n, k) is th"
+22,False,"[""1.6"", ""1.76"", ""0.16*p/16"", ""up"", ""1"", ""0.16""]","1.60, but probably written as 1.60 or 1.6? The problem says ""cost is rounded"", but for 160 it's exact, so $1.60.
+
+- 161 pages: 161 / 16 = 10.0625, so need 11 signatures (since 10 signatures cover 160 pages, 11th signature covers page 161), cost = 11 * 0.16 = $1.76.
+
+- For general p: C(p) = 0.16 * ceil(p / 16). The problem says ""the cost is rounded (up/down) for the next signature"". Since ceil rounds up, it's rounded up. So the direction is ""up"".
+
+Part (b): Domain and range.
+
+Domain: What values of p are in the domain? The problem says ""a book of p pages"", so p is a positive integer (since you can't have a fraction of a page in a book, and you need at least 1 page). But let's see the problem statement for part (b): ""Domain: all nonnegative integer multiples of (1 through 16) [ANS]"". Wait, no, maybe the user meant to say that the problem is asking for the domain and range, and the [ANS] is where we put the answer.
+
+Wait, the problem says: ""What are the domain and range of C(p)? Domain: [ANS] Range: [ANS]""
+
+So for domain: the input p must be a positive integer (number of pages), and since you can have a book with 1 page, 2 pages, ..., up to whatever, but the function is defined for all positive integers p? Wait, but the problem says ""the cost is rounded for the next signature"", so for any p ≥1, you can compute C(p). But let's check the problem's hint in the user's message: ""Domain: all nonnegative integer multiples of (1 through 16) [ANS]"". Wait, maybe the user is confused, but let's think.
+
+Wait, no, the domain of C(p) is all positive integers p (since you can't print a book with 0 pages? Wait, maybe 0 pages is allowed too, but let's see). Wait, the problem says ""a book of p pages"", so p ≥1, integer.
+
+But let's think about the function: for each p, C(p) is the cost, which is 0.16 times the ceiling of p/16. So for p=1 to 16: ceil(p/16)=1, so C(p)=0.16
+
+p=17 to 32: ceil(p/16)=2, so C(p)=0.32
+
+...
+
+p=16k+1 to 16(k+1): C(p)=0.16(k+1)
+
+So the domain is all positive integers p (or nonnegative integers, but probably positive integers for books).
+
+The range: what values does C(p) take? For each k ≥1 (number of signatures), C(p) = 0.16k, where k is a positive integer (since k=1 for p=1-16, k=2 for p=17-32, etc.). Wait, but 0.16k for k=1 is 0.16, k=2 is 0.32, ..., k=10 is 1.60, k=11 is 1.76, etc.
+
+Wait, but the problem says in the user's message: ""Range: all nonnegative integer multiples of (0.01 through 0.20) [ANS]"". Wait, 0.01 to 0.20 in steps of 0.01? Wait, 0.16, 0.32, 0.48, 0.64, 0.80, 0.96, 1.12, 1.28, 1.44, 1.60, 1.76, 1.92, 2.08, etc. Wait, but the problem says ""all nonnegative integer multiples of (0.01 through 0.20)"". Wait, no, maybe the user meant ""all nonnegative multiples of 0.16"" but that's not quite.
+
+Wait, let's take it step by step.
+
+For the domain: Since each signature is 16 pages, the number of pages p must be a positive integer (since you can't have a fraction of a page in a book), so domain is all positive integers p (p ∈ ℕ, p ≥1). But maybe the problem considers 0 pages? If p=0, cost is 0, but probably not. The problem says ""a book of p pages"", so p ≥1.
+
+For the range: As we saw, for each integer k ≥1, C(p) = 0.16k when p is in [16(k-1)+1, 16k]. So the range values are 0.16, 0.32, 0.48, 0.64, 0.80, 0.96, 1.12, 1.28, 1.44, 1.60, 1.76, 1.92, ... So these are all multiples of 0.16, starting from 0.16 upwards. So the range is all positive multiples of 0.16 (i.e., {0.16k | k ∈ ℕ, k ≥1}).
+
+But the problem's hint says: ""Range: all nonnegative integer multiples of (0.01 through 0.20) [ANS]"". Wait, 0.16 is a multiple of 0.01 (0.16=16*0.01), and 0.32=32*0.01, etc. So the range is all positive multiples of 0.01 that are multiples of 0.16? Wait, no, the problem says ""all nonnegative integer multiples of (0.01 through 0.20)"". Wait, maybe the user meant ""all nonnegative multiples of 0.01 that are in the range [0.16, ...]"" but no.
+
+Wait, let's check the problem statement again: ""the cost is rounded (up/down) for the next signature"". So for example, when p=16, cost=0.16; p=17, cost=0.32; ... p=32, cost=0.32 (wait, no: p=32 is 2 signatures, so 2*0.16=0.32, correct). Wait, p=16: 1 signature, 0.16; p=17 to 32: 2 signatures, 0.32; p=33 to 48: 3 signatures, 0.48, etc.
+
+So the range is all numbers of the form 0.16k where k is a positive integer (k=1,2,3,...). So in terms of multiples: each cost is 0.16 times an integer k≥1.
+
+But the problem's user wrote: ""Range: all nonnegative integer multiples of (0.01 through 0.20) [ANS]"". Maybe they mean the range is all numbers that are multiples of 0.01 (i.e., cents) starting from 0.16 up, but the problem says ""nonnegative integer multiples of (0.01 through 0.20)"". Wait, 0.01 is the smallest unit (since we're dealing with dollars, which are in cents), so the cost is in dollars, so 0.16 is 16 cents, etc.
+
+Wait, the problem says ""all nonnegative integer multiples of (0.01 through 0.20)"". Maybe the [ANS] for domain is ""16"" (since domain is all integers p where p is a multiple of 1? No, wait, the problem says: ""Domain: all nonnegative integer multiples of (1 through 16) [ANS]"". Wait, no, maybe the user intended to say that the problem is asking for the domain as all positive integers, and the range as all multiples of 0.16.
+
+Wait, let's look at the problem's part (",Extraction issue,,Extracted answer looks like prose instead of a clean final answer.,"This is a complex or challenging question, but I need to solve it step by step. Let's start with part (a).  First, the problem says each signature is 16 pages and costs $0.16. So a signature is 16 pages for $0.16. I need to figure out how many signatures are needed for different page counts.  For a book with 160 pages: how many signatures? Since each signature is 16 pages, 160 divided by 16 is 10. So exactly 10 signatures. Each costs $0.16, so total cost is 10 * 0.16 = $1.60. Wait, but let me ch"
+25,False,"[""18.8105"", ""11.3449"", ""Yes""]",,Extraction issue,,No final answer could be extracted from the response.,"Okay, let's tackle this problem step by step. First, I need to remember that this is a chi-square test for goodness of fit because we're checking if the distribution of correct answers is even. The null hypothesis here is that the correct answers are evenly distributed, and the alternative is that they are not (so we want to see if the observed counts differ from the expected counts).  First, let's recall the steps for a chi-square goodness of fit test.   1. **State the hypotheses**:    - Null h"
+27,False,"[""[ln(0.5)]/[ln(0.96584)]""]",1,Format error,,No boxed final answer appears after the reasoning section.,"Okay, let's see. I need to find the half-life of an element that decays by 3.416% each day. Hmm, half-life is the time it takes for half of the substance to decay, right? So first, I should remember the formula for exponential decay.   Exponential decay can be modeled by N(t) = N0 * (1 - r)^t, where N(t) is the amount remaining after time t, N0 is the initial amount, r is the daily decay rate (as a decimal), and t is time in days.   But wait, the problem says it decays by 3.416% each day. So tha"
+29,False,"[""442.857142857143"", ""332.142857142857""]","442.86, 332.14",Format error,,Multiple boxed answers were extracted for a problem that may expect one final answer.,"Okay, let's try to figure out this problem step by step. So, the problem says: ""Your weekly paycheck is 25% less than your coworker's. Your two paychecks total $775. Find the amount of each paycheck.""   First, let me make sure I understand the problem correctly. Let's denote the coworker's weekly paycheck as some amount, let's say C. Then my paycheck is 25% less than that. So, 25% less than C would be C minus 25% of C, right? So that's C - 0.25C, which simplifies to 0.75C. So my paycheck is 0.75"
+32,False,"[""7091.66666666667""]",7091.67,Arithmetic error,,The output is well-formatted but the numeric value does not match the gold answer.,"Okay, let's try to figure out this problem step by step. First, let me read it again to make sure I understand. So, there's an executive who earns a monthly salary plus a Christmas bonus of $7300. The total she earns per year is $92400. We need to find her monthly salary.   Hmm, right. Let's break it down. A year has 12 months, right? So her monthly salary is, let's say, S dollars per month. Then, each month she gets S, and then there's a Christmas bonus of $7300. Wait, but does the bonus happen"
+33,True,"""B""",E,MCQ mismatch,,"Predicted option E, but gold option is B.","Okay, let's try to figure out this problem. So, we have a standard deck of 52 cards, 26 red and 26 black. It's shuffled and dealt out one by one without replacement. We need to find the entropy H(X₁, X₂, ..., X₅₂) where each Xᵢ is the color of the i-th card.   First, I remember that entropy for a sequence of random variables is the expected value of the negative log of the probabilities of each outcome. Since the deck is shuffled, the sequence is a random permutation of the 26 red and 6 black? W"
+34,False,"[""14.5843461351483""]",\frac{504}{11\pi},Conceptual error,,"The output is readable and boxed, but the method or final conclusion is wrong.","Okay, let's see. The problem is about a circular arc with length 14 feet subtending a central angle of 55 degrees. We need to find the radius of the circle. Hmm, right. I remember that the formula for the length of a circular arc is related to the central angle and the radius. Let me recall...   I think the formula is: arc length (s) = r * θ, where θ is the central angle in radians. Oh, right! Because if the angle is in degrees, we have to convert it to radians first. Wait, let me make sure. Let"

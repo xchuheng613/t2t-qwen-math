@@ -1,0 +1,16 @@
+type,prompt,config,n,correct,acc
+free,baseline,sc_n3,20,15,0.75
+free,baseline,greedy_n1,20,14,0.7
+free,strict_format,greedy_n1,20,14,0.7
+free,verify,greedy_n1,20,12,0.6
+free,few_shot,greedy_n1,20,12,0.6
+free,strict_few_shot,greedy_n1,20,12,0.6
+free,concise,greedy_n1,20,11,0.55
+mcq,eliminate,greedy_n1,20,16,0.8
+mcq,match_back_few_shot,greedy_n1,20,16,0.8
+mcq,baseline,greedy_n1,20,15,0.75
+mcq,match_back,greedy_n1,20,15,0.75
+mcq,few_shot,greedy_n1,20,15,0.75
+mcq,strict_few_shot,greedy_n1,20,15,0.75
+mcq,eliminate,sc_n3,20,15,0.75
+mcq,strict_format,greedy_n1,20,14,0.7
