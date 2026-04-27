@@ -312,10 +312,8 @@ def main():
 
     llm = LLM(
         model=MODEL_ID,
-        quantization="bitsandbytes",
-        load_format="bitsandbytes",
         enable_prefix_caching=True,
-        gpu_memory_utilization=0.50,
+        gpu_memory_utilization=0.85,
         max_model_len=65536,
         trust_remote_code=True,
         max_num_seqs=256,
