@@ -147,8 +147,9 @@ def categorize(judger: Judger, item: dict, response: str,
     if correct:
         return "correct", ""
     is_mcq = bool(item.get("options"))
-    # Truncation = vLLM hit max_tokens, OR thinking model never closed </think>.
-    if finish_reason == "length" or "</think>" not in response:
+    # Truncation: trust vLLM's finish_reason. The "</think>" heuristic
+    # over-counts when the model legitimately skips the thinking block.
+    if finish_reason == "length":
         return "truncated", ""
     if is_mcq:
         try:
@@ -315,7 +316,7 @@ def main():
         load_format="bitsandbytes",
         enable_prefix_caching=True,
         gpu_memory_utilization=0.50,
-        max_model_len=16384,
+        max_model_len=65536,
         trust_remote_code=True,
         max_num_seqs=256,
         max_num_batched_tokens=32768,
