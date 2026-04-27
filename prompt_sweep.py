@@ -433,10 +433,6 @@ def parse_args() -> argparse.Namespace:
     free_names = [name for name, *_ in FREE_PROMPTS]
 
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--data-path", default=DATA_PATH)
-    parser.add_argument("--output-dir", default=str(OUTPUT_DIR))
-    parser.add_argument("--num-examples", type=int, default=SUBSET_SIZE)
-    parser.add_argument("--seed", type=int, default=RNG_SEED)
     parser.add_argument(
         "--qtype",
         choices=["all", "mcq", "free"],
@@ -461,20 +457,14 @@ def parse_args() -> argparse.Namespace:
         default=SWEEP_CFG.name,
         help="Sampling config to use.",
     )
-    parser.add_argument("--max-tokens", type=int, default=MAX_TOKENS)
-    parser.add_argument("--max-model-len", type=int, default=65536)
-    parser.add_argument("--gpu-memory-utilization", type=float, default=0.85)
-    parser.add_argument("--max-num-seqs", type=int, default=256)
-    parser.add_argument("--max-num-batched-tokens", type=int, default=32768)
     return parser.parse_args()
 
 
 def main():
     args = parse_args()
     cfg = CONFIGS[args.config]
-    output_dir = Path(args.output_dir)
-    output_dir.mkdir(parents=True, exist_ok=True)
-    mcq_items, free_items = load_subset(args.data_path, args.num_examples, args.seed)
+    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+    mcq_items, free_items = load_subset(DATA_PATH, SUBSET_SIZE, RNG_SEED)
 
     tokenizer = AutoTokenizer.from_pretrained(MODEL_ID)
     tokenizer.pad_token = tokenizer.eos_token
@@ -482,11 +472,11 @@ def main():
     llm = LLM(
         model=MODEL_ID,
         enable_prefix_caching=True,
-        gpu_memory_utilization=args.gpu_memory_utilization,
-        max_model_len=args.max_model_len,
+        gpu_memory_utilization=0.85,
+        max_model_len=65536,
         trust_remote_code=True,
-        max_num_seqs=args.max_num_seqs,
-        max_num_batched_tokens=args.max_num_batched_tokens,
+        max_num_seqs=256,
+        max_num_batched_tokens=32768,
     )
     judger = Judger(strict_extract=False)
 
@@ -500,7 +490,7 @@ def main():
         print(f"MCQ prompts on MCQ items ({cfg.name})")
         print("=" * 60)
         for name in mcq_prompt_names:
-            s = run_one(llm, tokenizer, judger, output_dir, "mcq", name, cfg, mcq_items, args.max_tokens)
+            s = run_one(llm, tokenizer, judger, "mcq", name, cfg, mcq_items)
             mcq_results.append(s); summaries.append(s)
         print_table("MCQ ranking", mcq_results)
 
@@ -512,11 +502,11 @@ def main():
         print(f"FREE prompts on FREE items ({cfg.name})")
         print("=" * 60)
         for name in free_prompt_names:
-            s = run_one(llm, tokenizer, judger, output_dir, "free", name, cfg, free_items, args.max_tokens)
+            s = run_one(llm, tokenizer, judger, "free", name, cfg, free_items)
             free_results.append(s); summaries.append(s)
         print_table("FREE ranking", free_results)
 
-    csv_path = write_summary(summaries, output_dir)
+    csv_path = write_summary(summaries)
     print_table("FINAL RANKING", summaries)
 
     # Combined best — projected accuracy if you used best_mcq for all MCQs and best_free for all free
