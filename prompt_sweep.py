@@ -32,7 +32,7 @@ MODEL_ID    = "Qwen/Qwen3-4B-Thinking-2507"
 GPU_ID      = "0"
 DATA_PATH   = "data/public.jsonl"
 OUTPUT_DIR  = Path("results/sweep")
-MAX_TOKENS  = 65536
+MAX_TOKENS  = 32768
 SUBSET_SIZE = 200          # stratified: ~100 MCQ + ~100 free-form
 RNG_SEED    = 42
 SC_NUM_SAMPLES   = 1       # self-consistency sample count (every prompt)
@@ -71,9 +71,78 @@ CONFIGS.setdefault(SWEEP_CFG.name, SWEEP_CFG)
 
 
 # ── Data loading + stratified subset ───────────────────────────────────────
+_OPTION_MARKER_RE = re.compile(r"(?<![A-Za-z0-9])([A-Z])[\.\)]\s+")
+
+
+def answer_values(item: dict) -> list[str]:
+    answer = item.get("answer")
+    values = answer if isinstance(answer, list) else [answer]
+    return [str(value).strip() for value in values]
+
+
+def single_letter_gold(item: dict) -> str:
+    values = answer_values(item)
+    if len(values) == 1 and re.fullmatch(r"[A-Z]", values[0]):
+        return values[0]
+    return ""
+
+
+def extract_embedded_options(question: str) -> tuple[str, list[str]] | None:
+    """Parse inline choices like '... [ANS] A. 1  B. 2  C. 3'."""
+    markers = list(_OPTION_MARKER_RE.finditer(question))
+    for start_idx, marker in enumerate(markers):
+        if marker.group(1) != "A":
+            continue
+
+        seq = []
+        expected = ord("A")
+        for candidate in markers[start_idx:]:
+            if ord(candidate.group(1)) != expected:
+                break
+            seq.append(candidate)
+            expected += 1
+
+        if len(seq) < 2:
+            continue
+
+        options = []
+        for idx, option_marker in enumerate(seq):
+            end = seq[idx + 1].start() if idx + 1 < len(seq) else len(question)
+            option = question[option_marker.end():end].strip()
+            if not option:
+                break
+            options.append(option)
+        else:
+            prompt = question[:seq[0].start()].replace("[ANS]", "").strip()
+            return prompt, options
+
+    return None
+
+
+def normalize_item(item: dict) -> dict:
+    """Move no-options rows with A/B/C/D gold into the MCQ bucket when possible."""
+    if item.get("options"):
+        return item
+
+    gold_letter = single_letter_gold(item)
+    parsed = extract_embedded_options(str(item.get("question", ""))) if gold_letter else None
+    if not parsed:
+        return item
+
+    question, options = parsed
+    if ord(gold_letter) - ord("A") >= len(options):
+        return item
+
+    normalized = dict(item)
+    normalized["question"] = question
+    normalized["options"] = options
+    normalized["_embedded_options"] = True
+    return normalized
+
+
 def load_subset(path: str, k: int, seed: int) -> tuple[list[dict], list[dict]]:
     rng = random.Random(seed)
-    data = [json.loads(line) for line in open(path)]
+    data = [normalize_item(json.loads(line)) for line in open(path)]
     mcq  = [d for d in data if d.get("options")]
     free = [d for d in data if not d.get("options")]
     rng.shuffle(mcq); rng.shuffle(free)
@@ -133,16 +202,65 @@ def extract_letter(text: str, options: Optional[list], judger: Judger) -> str:
     return matches[-1] if matches else ""
 
 
-def score_one(judger: Judger, item: dict, response: str) -> bool:
-    is_mcq = bool(item.get("options"))
-    gold   = item["answer"]
-    if is_mcq:
-        return extract_letter(response, item.get("options"), judger) == str(gold).strip().upper()
-    gold_list = gold if isinstance(gold, list) else [gold]
+def is_mcq_like(item: dict) -> bool:
+    return bool(item.get("options")) or bool(single_letter_gold(item))
+
+
+def answers_equivalent(judger: Judger, pred: str, gold: str) -> bool:
+    pairs = [(str(pred).strip(), str(gold).strip())]
     try:
-        return judger.auto_judge(pred=response, gold=gold_list, options=[[]] * len(gold_list))
+        pairs.append((judger.norm_ans_str(pred), judger.norm_ans_str(gold)))
+    except Exception:
+        pass
+
+    for pred_item, gold_item in pairs:
+        if pred_item == gold_item:
+            return True
+        try:
+            if judger.is_equal(pred_item, gold_item):
+                return True
+        except Exception:
+            pass
+    return False
+
+
+def score_free_response(judger: Judger, item: dict, response: str) -> bool:
+    gold_list = answer_values(item)
+    try:
+        if judger.auto_judge(pred=response, gold=gold_list, options=[[]] * len(gold_list)):
+            return True
+    except Exception:
+        pass
+
+    try:
+        extracted = judger.extract_ans(response) or ""
     except Exception:
         return False
+    if not extracted:
+        return False
+
+    # Fallback for single gold answers that are list/tuple-like, e.g. gold "(5, -4)"
+    # while the model writes "\boxed{5, -4}".
+    if len(gold_list) == 1 and answers_equivalent(judger, extracted, gold_list[0]):
+        return True
+
+    try:
+        pred_parts = judger.split_by_comma(extracted)
+    except Exception:
+        pred_parts = [extracted]
+    if len(pred_parts) != len(gold_list):
+        return False
+
+    return all(
+        answers_equivalent(judger, pred_part, gold_part)
+        for pred_part, gold_part in zip(pred_parts, gold_list)
+    )
+
+
+def score_one(judger: Judger, item: dict, response: str) -> bool:
+    if is_mcq_like(item):
+        return extract_letter(response, item.get("options"), judger) == answer_values(item)[0].upper()
+    return score_free_response(judger, item, response)
 
 
 # Error taxonomy. Mutually exclusive; aggregated per (type, prompt, config)
@@ -155,12 +273,11 @@ def categorize(judger: Judger, item: dict, response: str,
     """Return (error_type, extracted_answer_str). Order of checks matters."""
     if correct:
         return "correct", ""
-    is_mcq = bool(item.get("options"))
     # Truncation: trust vLLM's finish_reason. The "</think>" heuristic
     # over-counts when the model legitimately skips the thinking block.
     if finish_reason == "length":
         return "truncated", ""
-    if is_mcq:
+    if is_mcq_like(item):
         try:
             extracted = extract_letter(response, item.get("options"), judger)
         except Exception:
@@ -183,8 +300,7 @@ def categorize(judger: Judger, item: dict, response: str,
 
 def majority_vote(responses: list[str], item: dict, judger: Judger) -> tuple[str, int]:
     """Return (chosen_text, chosen_idx) so caller can fetch its finish_reason."""
-    is_mcq = bool(item.get("options"))
-    if is_mcq:
+    if is_mcq_like(item):
         keys = [extract_letter(r, item.get("options"), judger) for r in responses]
     else:
         keys = []
@@ -223,15 +339,15 @@ def render_prompts(tokenizer, qtype: str, prompt_name: str, items: list[dict]) -
     return out
 
 
-def run_one(llm, tokenizer, judger: Judger, qtype: str, prompt_name: str,
-            cfg: SamplingConfig, items: list[dict]) -> dict:
+def run_one(llm, tokenizer, judger: Judger, output_dir: Path, qtype: str, prompt_name: str,
+            cfg: SamplingConfig, items: list[dict], max_tokens: int) -> dict:
     if not items:
         return {"type": qtype, "prompt": prompt_name, "config": cfg.name,
                 "n": 0, "correct": 0, "acc": 0.0}
 
     prompts = render_prompts(tokenizer, qtype, prompt_name, items)
     sampling = SamplingParams(
-        max_tokens=MAX_TOKENS,
+        max_tokens=max_tokens,
         temperature=cfg.temperature,
         top_p=cfg.top_p,
         top_k=cfg.top_k,
@@ -277,8 +393,8 @@ def run_one(llm, tokenizer, judger: Judger, qtype: str, prompt_name: str,
     for et in ERROR_TYPES:
         summary[f"err_{et}"] = err_counts.get(et, 0)
 
-    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-    out_path = OUTPUT_DIR / f"{qtype}__{prompt_name}__{cfg.name}.jsonl"
+    output_dir.mkdir(parents=True, exist_ok=True)
+    out_path = output_dir / f"{qtype}__{prompt_name}__{cfg.name}.jsonl"
     with open(out_path, "w", encoding="utf-8") as f:
         for r in records:
             f.write(json.dumps(r, ensure_ascii=False) + "\n")
@@ -289,8 +405,8 @@ def run_one(llm, tokenizer, judger: Judger, qtype: str, prompt_name: str,
 
 
 # ── Main ───────────────────────────────────────────────────────────────────
-def write_summary(summaries: list[dict]) -> Path:
-    csv_path = OUTPUT_DIR / "summary.csv"
+def write_summary(summaries: list[dict], output_dir: Path) -> Path:
+    csv_path = output_dir / "summary.csv"
     fields = ["type", "prompt", "config", "n", "correct", "acc"] + [f"err_{et}" for et in ERROR_TYPES]
     with open(csv_path, "w", newline="", encoding="utf-8") as f:
         w = csv.DictWriter(f, fieldnames=fields)
@@ -317,6 +433,10 @@ def parse_args() -> argparse.Namespace:
     free_names = [name for name, *_ in FREE_PROMPTS]
 
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--data-path", default=DATA_PATH)
+    parser.add_argument("--output-dir", default=str(OUTPUT_DIR))
+    parser.add_argument("--num-examples", type=int, default=SUBSET_SIZE)
+    parser.add_argument("--seed", type=int, default=RNG_SEED)
     parser.add_argument(
         "--qtype",
         choices=["all", "mcq", "free"],
@@ -341,14 +461,20 @@ def parse_args() -> argparse.Namespace:
         default=SWEEP_CFG.name,
         help="Sampling config to use.",
     )
+    parser.add_argument("--max-tokens", type=int, default=MAX_TOKENS)
+    parser.add_argument("--max-model-len", type=int, default=65536)
+    parser.add_argument("--gpu-memory-utilization", type=float, default=0.85)
+    parser.add_argument("--max-num-seqs", type=int, default=256)
+    parser.add_argument("--max-num-batched-tokens", type=int, default=32768)
     return parser.parse_args()
 
 
 def main():
     args = parse_args()
     cfg = CONFIGS[args.config]
-    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-    mcq_items, free_items = load_subset(DATA_PATH, SUBSET_SIZE, RNG_SEED)
+    output_dir = Path(args.output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    mcq_items, free_items = load_subset(args.data_path, args.num_examples, args.seed)
 
     tokenizer = AutoTokenizer.from_pretrained(MODEL_ID)
     tokenizer.pad_token = tokenizer.eos_token
@@ -356,11 +482,11 @@ def main():
     llm = LLM(
         model=MODEL_ID,
         enable_prefix_caching=True,
-        gpu_memory_utilization=0.85,
-        max_model_len=73728,
+        gpu_memory_utilization=args.gpu_memory_utilization,
+        max_model_len=args.max_model_len,
         trust_remote_code=True,
-        max_num_seqs=256,
-        max_num_batched_tokens=32768,
+        max_num_seqs=args.max_num_seqs,
+        max_num_batched_tokens=args.max_num_batched_tokens,
     )
     judger = Judger(strict_extract=False)
 
@@ -374,7 +500,7 @@ def main():
         print(f"MCQ prompts on MCQ items ({cfg.name})")
         print("=" * 60)
         for name in mcq_prompt_names:
-            s = run_one(llm, tokenizer, judger, "mcq", name, cfg, mcq_items)
+            s = run_one(llm, tokenizer, judger, output_dir, "mcq", name, cfg, mcq_items, args.max_tokens)
             mcq_results.append(s); summaries.append(s)
         print_table("MCQ ranking", mcq_results)
 
@@ -386,11 +512,11 @@ def main():
         print(f"FREE prompts on FREE items ({cfg.name})")
         print("=" * 60)
         for name in free_prompt_names:
-            s = run_one(llm, tokenizer, judger, "free", name, cfg, free_items)
+            s = run_one(llm, tokenizer, judger, output_dir, "free", name, cfg, free_items, args.max_tokens)
             free_results.append(s); summaries.append(s)
         print_table("FREE ranking", free_results)
 
-    csv_path = write_summary(summaries)
+    csv_path = write_summary(summaries, output_dir)
     print_table("FINAL RANKING", summaries)
 
     # Combined best — projected accuracy if you used best_mcq for all MCQs and best_free for all free

@@ -36,6 +36,15 @@ SYS_FREE_CONCISE = (
     "For multiple sub-answers, comma-separate inside one box: \\boxed{3, 7}."
 )
 
+SYS_FREE_MULTI_ANSWER = (
+    "You are an expert mathematician. Solve the problem carefully.\n"
+    "Before the final answer, count how many [ANS] blanks or requested outputs the problem has.\n"
+    "Your final line must contain exactly one \\boxed{...}.\n"
+    "Inside that box, write one answer for each [ANS] blank/requested output, in the same order, "
+    "separated by commas. Do not omit earlier parts. Do not include labels, units, words, or extra boxes.\n"
+    "For equations or models, include the full equation if the problem asks for one."
+)
+
 
 # ── MCQ system prompts ──────────────────────────────────────────────────────
 SYS_MCQ_BASELINE = (
@@ -109,6 +118,7 @@ FREE_PROMPTS = [
     ("strict_format",       SYS_FREE_STRICT_FORMAT,  None),
     ("verify",              SYS_FREE_VERIFY,         None),
     ("concise",             SYS_FREE_CONCISE,        None),
+    ("multi_answer",        SYS_FREE_MULTI_ANSWER,   None),
     ("few_shot",            SYS_FREE_BASELINE,       FEW_SHOT_FREE),
     ("strict_few_shot",     SYS_FREE_STRICT_FORMAT,  FEW_SHOT_FREE),
 ]
