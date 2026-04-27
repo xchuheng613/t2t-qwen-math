@@ -29,7 +29,7 @@ MODEL_ID    = "Qwen/Qwen3-4B-Thinking-2507"
 GPU_ID      = "0"
 DATA_PATH   = "data/public.jsonl"
 OUTPUT_DIR  = Path("results/sweep")
-MAX_TOKENS  = 32768
+MAX_TOKENS  = 65536
 SUBSET_SIZE = 200          # stratified: ~100 MCQ + ~100 free-form
 RNG_SEED    = 42
 SC_NUM_SAMPLES   = 1       # self-consistency sample count (every prompt)
@@ -314,7 +314,7 @@ def main():
         model=MODEL_ID,
         enable_prefix_caching=True,
         gpu_memory_utilization=0.85,
-        max_model_len=65536,
+        max_model_len=73728,
         trust_remote_code=True,
         max_num_seqs=256,
         max_num_batched_tokens=32768,
