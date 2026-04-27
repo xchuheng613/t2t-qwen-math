@@ -32,7 +32,7 @@ OUTPUT_DIR  = Path("results/sweep")
 MAX_TOKENS  = 32768
 SUBSET_SIZE = 200          # stratified: ~100 MCQ + ~100 free-form
 RNG_SEED    = 42
-SC_NUM_SAMPLES   = 3       # self-consistency sample count (every prompt)
+SC_NUM_SAMPLES   = 1       # self-consistency sample count (every prompt)
 
 os.environ["CUDA_VISIBLE_DEVICES"] = GPU_ID
 
