@@ -10,9 +10,12 @@ Outputs:
 
 Run:
   python prompt_sweep.py
+  python prompt_sweep.py --qtype free --free-prompt baseline --config sc_n3
+  python prompt_sweep.py --qtype mcq --mcq-prompt eliminate --config greedy_n1
 """
 from __future__ import annotations
 
+import argparse
 import csv
 import json
 import os
@@ -59,6 +62,12 @@ class SamplingConfig:
 SWEEP_CFG = SamplingConfig(name=f"sc_n{SC_NUM_SAMPLES}",
                            temperature=0.7, top_p=0.95, top_k=20,
                            n=SC_NUM_SAMPLES, vote=True)
+CONFIGS = {
+    "greedy_n1": SamplingConfig(name="greedy_n1", temperature=0.0, top_p=1.0, top_k=-1, n=1),
+    "sc_n1": SamplingConfig(name="sc_n1", temperature=0.7, top_p=0.95, top_k=20, n=1),
+    "sc_n3": SamplingConfig(name="sc_n3", temperature=0.7, top_p=0.95, top_k=20, n=3, vote=True),
+}
+CONFIGS.setdefault(SWEEP_CFG.name, SWEEP_CFG)
 
 
 # ── Data loading + stratified subset ───────────────────────────────────────
@@ -303,7 +312,41 @@ def print_table(title: str, rows: list[dict]):
               f"{s.get('err_judge_error', 0):>6}")
 
 
+def parse_args() -> argparse.Namespace:
+    mcq_names = [name for name, *_ in MCQ_PROMPTS]
+    free_names = [name for name, *_ in FREE_PROMPTS]
+
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--qtype",
+        choices=["all", "mcq", "free"],
+        default="all",
+        help="Which problem type to run. Default runs both MCQ and free-form.",
+    )
+    parser.add_argument(
+        "--mcq-prompt",
+        action="append",
+        choices=mcq_names,
+        help="MCQ prompt to run. Repeat this flag for multiple prompts. Omit to run all MCQ prompts.",
+    )
+    parser.add_argument(
+        "--free-prompt",
+        action="append",
+        choices=free_names,
+        help="Free-form prompt to run. Repeat this flag for multiple prompts. Omit to run all free-form prompts.",
+    )
+    parser.add_argument(
+        "--config",
+        choices=sorted(CONFIGS),
+        default=SWEEP_CFG.name,
+        help="Sampling config to use.",
+    )
+    return parser.parse_args()
+
+
 def main():
+    args = parse_args()
+    cfg = CONFIGS[args.config]
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     mcq_items, free_items = load_subset(DATA_PATH, SUBSET_SIZE, RNG_SEED)
 
@@ -323,25 +366,29 @@ def main():
 
     summaries: list[dict] = []
 
-    # ── MCQ prompts on MCQ items (sc_n3) ──
-    print("\n" + "=" * 60)
-    print(f"MCQ prompts on MCQ items (sc_n{SC_NUM_SAMPLES}, majority vote)")
-    print("=" * 60)
+    # ── MCQ prompts on MCQ items ──
     mcq_results = []
-    for name, *_ in MCQ_PROMPTS:
-        s = run_one(llm, tokenizer, judger, "mcq", name, SWEEP_CFG, mcq_items)
-        mcq_results.append(s); summaries.append(s)
-    print_table("MCQ ranking", mcq_results)
+    if args.qtype in ("all", "mcq"):
+        mcq_prompt_names = args.mcq_prompt or [name for name, *_ in MCQ_PROMPTS]
+        print("\n" + "=" * 60)
+        print(f"MCQ prompts on MCQ items ({cfg.name})")
+        print("=" * 60)
+        for name in mcq_prompt_names:
+            s = run_one(llm, tokenizer, judger, "mcq", name, cfg, mcq_items)
+            mcq_results.append(s); summaries.append(s)
+        print_table("MCQ ranking", mcq_results)
 
-    # ── FREE prompts on FREE items (sc_n3) ──
-    print("\n" + "=" * 60)
-    print(f"FREE prompts on FREE items (sc_n{SC_NUM_SAMPLES}, majority vote)")
-    print("=" * 60)
+    # ── FREE prompts on FREE items ──
     free_results = []
-    for name, *_ in FREE_PROMPTS:
-        s = run_one(llm, tokenizer, judger, "free", name, SWEEP_CFG, free_items)
-        free_results.append(s); summaries.append(s)
-    print_table("FREE ranking", free_results)
+    if args.qtype in ("all", "free"):
+        free_prompt_names = args.free_prompt or [name for name, *_ in FREE_PROMPTS]
+        print("\n" + "=" * 60)
+        print(f"FREE prompts on FREE items ({cfg.name})")
+        print("=" * 60)
+        for name in free_prompt_names:
+            s = run_one(llm, tokenizer, judger, "free", name, cfg, free_items)
+            free_results.append(s); summaries.append(s)
+        print_table("FREE ranking", free_results)
 
     csv_path = write_summary(summaries)
     print_table("FINAL RANKING", summaries)
