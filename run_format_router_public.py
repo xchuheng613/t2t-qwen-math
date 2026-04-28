@@ -167,8 +167,16 @@ def main() -> None:
     groups = build_format_routed_groups(rows)
     route_counts = Counter(route.format_type for group in groups.values() for _item, route in group)
 
-    print(f"Public set: {len(all_rows)} total; evaluating {len(rows)}")
-    print("Format counts: " + ", ".join(f"{name}={count}" for name, count in sorted(route_counts.items())))
+    print(f"Public set: {len(all_rows)} total; evaluating {len(rows)}", flush=True)
+    print(
+        "Format counts: " + ", ".join(f"{name}={count}" for name, count in sorted(route_counts.items())),
+        flush=True,
+    )
+    print("Generation groups:", flush=True)
+    for index, ((prompt_name, config_name), group) in enumerate(sorted(groups.items()), start=1):
+        prompt_counts = Counter(route.format_type for _item, route in group)
+        prompt_summary = ", ".join(f"{name}={count}" for name, count in sorted(prompt_counts.items()))
+        print(f"  {index}. {prompt_name} / {config_name}: {len(group)} ({prompt_summary})", flush=True)
 
     tokenizer = AutoTokenizer.from_pretrained(args.model, trust_remote_code=True)
     tokenizer.pad_token = tokenizer.eos_token

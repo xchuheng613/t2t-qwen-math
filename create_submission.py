@@ -94,7 +94,7 @@ def vote_key(response: str, item: dict[str, Any], route: Any, judger: Any) -> st
             response,
             item,
             multi=route.format_type == FORMAT_MULTI_SELECT,
-            judger=judger,
+            judger=None if route.format_type == FORMAT_ALGORITHM_SEQUENCE else judger,
         )
     try:
         answer = judger.extract_ans(response)
@@ -162,8 +162,12 @@ def generate_group(
 
     route_names = Counter(route.format_type for route in routes)
     route_summary = ", ".join(f"{name}={count}" for name, count in sorted(route_names.items()))
-    print(f"[{prompt_name} / {config.name}] generating {len(items)} prompts x n={config.n} ({route_summary}) ...")
+    print(
+        f"[{prompt_name} / {config.name}] generating {len(items)} prompts x n={config.n} ({route_summary}) ...",
+        flush=True,
+    )
     outputs = llm.generate(prompts, sampling_params=sampling)
+    print(f"[{prompt_name} / {config.name}] generation finished; post-processing ...", flush=True)
 
     records = []
     fallback_indices: list[int] = []
@@ -200,7 +204,10 @@ def generate_group(
         fallback_items = [items[idx] for idx in fallback_indices]
         fallback_routes = [routes[idx] for idx in fallback_indices]
         fallback_prompts = render_prompts(tokenizer, prompt_name, fallback_items, fallback=True)
-        print(f"  fallback: retrying {len(fallback_items)} truncated/no-answer prompts with short no-reasoning prompt ...")
+        print(
+            f"  fallback: retrying {len(fallback_items)} truncated/no-answer prompts with short no-reasoning prompt ...",
+            flush=True,
+        )
         fallback_outputs = llm.generate(
             fallback_prompts,
             sampling_params=_fallback_sampling_params(fallback_max_tokens),
@@ -218,6 +225,7 @@ def generate_group(
                 record["raw_response"] = fallback_raw
                 record["response"] = fallback_clean
                 record["vote_key"] = vote_key(fallback_raw, item, route, judger)
+    print(f"[{prompt_name} / {config.name}] done.", flush=True)
     return records
 
 

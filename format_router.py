@@ -443,7 +443,7 @@ def clean_final_response(
             response,
             item,
             multi=route.format_type == FORMAT_MULTI_SELECT,
-            judger=judger,
+            judger=None if route.format_type == FORMAT_ALGORITHM_SEQUENCE else judger,
         )
         if letters:
             return final_answer_block([letters])
