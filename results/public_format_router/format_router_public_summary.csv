@@ -1,0 +1,9 @@
+group,n,correct,acc,fallback_used
+overall,50,32,0.64,2
+format:free_response,12,8,0.6666666666666666,0
+format:mcq,14,9,0.6428571428571429,2
+format:multi_blank,24,15,0.625,0
+prompt:baseline,11,7,0.6363636363636364,0
+prompt:calculus_prompt,1,1,1.0,0
+prompt:general_mcq_eliminate,14,9,0.6428571428571429,2
+prompt:multi_blank_free_response,24,15,0.625,0

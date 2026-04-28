@@ -3,6 +3,8 @@
 Joins each wrong record (correct == false) with the original question from
 data/public.jsonl by id, then writes one HTML file per result file plus an
 index. LaTeX in questions and responses is rendered via MathJax.
+
+Also includes public format-router outputs from results/public_format_router/.
 """
 
 from __future__ import annotations
@@ -16,6 +18,9 @@ ROOT = Path(__file__).resolve().parent.parent
 DATA_FILE = ROOT / "data" / "public.jsonl"
 RESULT_DIR = ROOT / "result_analyze"
 OUT_DIR = RESULT_DIR / "visualizations"
+EXTRA_RESULT_DIRS = [
+    ROOT / "results" / "public_format_router",
+]
 
 BOXED_RE = re.compile(r"\\boxed\{([^{}]*)\}")
 ANS_RE = re.compile(r"\[ANS\]\s*([^\n]+)")
@@ -347,11 +352,27 @@ window.MathJax = {
 """
 
 
+def record_kind(rec: dict) -> str:
+    route = rec.get("route") or {}
+    if rec.get("format_type"):
+        return str(rec["format_type"])
+    if route.get("format_type"):
+        return str(route["format_type"])
+    return "mcq" if rec.get("is_mcq", False) else "free_response"
+
+
 def render_case(rec: dict, q: dict | None) -> tuple[str, str]:
     rid = rec["id"]
-    is_mcq = rec.get("is_mcq", False)
+    kind = record_kind(rec)
+    is_mcq = rec.get("is_mcq", False) or kind in {"mcq", "multi_select", "true_false"}
     error_type = rec.get("error_type", "")
+    if not error_type and rec.get("correct") is False:
+        error_type = "wrong"
     finish_reason = rec.get("finish_reason", "")
+    if not finish_reason:
+        finish_reasons = rec.get("finish_reasons") or []
+        if finish_reasons:
+            finish_reason = ",".join(str(x) for x in finish_reasons if x)
     gold = render_gold(rec.get("gold"))
     pred = html.escape(extract_predicted(rec))
 
@@ -359,10 +380,20 @@ def render_case(rec: dict, q: dict | None) -> tuple[str, str]:
     cat_label = CATEGORY_LABELS.get(category, category)
     cat_color = CATEGORY_COLORS.get(category, "#eee")
 
-    tag_kind = '<span class="tag tag-mcq">MCQ</span>' if is_mcq else '<span class="tag tag-free">Free</span>'
+    tag_class = "tag-mcq" if is_mcq else "tag-free"
+    tag_kind = f'<span class="tag {tag_class}">{html.escape(kind)}</span>'
     tag_err = f'<span class="tag tag-err">{html.escape(error_type)}</span>' if error_type else ""
     tag_finish = f'<span class="tag">finish: {html.escape(finish_reason)}</span>' if finish_reason and finish_reason != "stop" else ""
     tag_cat = f'<span class="cat-pill" style="background:{cat_color}">{html.escape(cat_label)}</span>'
+    tag_prompt = ""
+    if rec.get("prompt"):
+        tag_prompt = f'<span class="tag">prompt: {html.escape(str(rec["prompt"]))}</span>'
+    tag_config = ""
+    if rec.get("config"):
+        tag_config = f'<span class="tag">config: {html.escape(str(rec["config"]))}</span>'
+    tag_fallback = ""
+    if rec.get("fallback_used"):
+        tag_fallback = '<span class="tag tag-err">fallback</span>'
 
     if q is None:
         q_html = '<em>(question id not found in data/public.jsonl)</em>'
@@ -391,6 +422,22 @@ def render_case(rec: dict, q: dict | None) -> tuple[str, str]:
         f'<pre class="response">{html.escape(response)}</pre></details>'
     )
 
+    raw_response = rec.get("raw_response")
+    raw_response_html = ""
+    if raw_response and raw_response != response:
+        raw_response_html = (
+            '<details><summary>Raw response before formatting/router cleanup</summary>'
+            f'<pre class="response">{html.escape(raw_response)}</pre></details>'
+        )
+
+    fallback_raw = rec.get("fallback_raw_response")
+    fallback_html = ""
+    if fallback_raw and fallback_raw != raw_response:
+        fallback_html = (
+            '<details><summary>Fallback raw response</summary>'
+            f'<pre class="response">{html.escape(fallback_raw)}</pre></details>'
+        )
+
     diag_html = f"""
   <div class="diag" style="background:{cat_color}; border-left-color:{cat_color}">
     <div class="diag-label">Likely cause &middot; advice</div>
@@ -401,7 +448,7 @@ def render_case(rec: dict, q: dict | None) -> tuple[str, str]:
 
     section = f"""
 <section class="case" id="q{rid}">
-  <h2>#{rid} {tag_kind}{tag_err}{tag_finish}{tag_cat}</h2>
+  <h2>#{rid} {tag_kind}{tag_err}{tag_prompt}{tag_config}{tag_fallback}{tag_finish}{tag_cat}</h2>
   <div class="question">{q_html}</div>
   {opts_html}
   <div class="answers">
@@ -410,6 +457,8 @@ def render_case(rec: dict, q: dict | None) -> tuple[str, str]:
   </div>
   {diag_html}
   {response_html}
+  {raw_response_html}
+  {fallback_html}
   {samples_html}
 </section>
 """
@@ -490,12 +539,20 @@ def render_index(files: list[tuple[str, int, int]]) -> str:
 """
 
 
+def result_files() -> list[Path]:
+    files = {jf.resolve(): jf for jf in RESULT_DIR.glob("*.jsonl")}
+    for extra_dir in EXTRA_RESULT_DIRS:
+        if extra_dir.exists():
+            files.update({jf.resolve(): jf for jf in extra_dir.glob("*.jsonl")})
+    return sorted(files.values(), key=lambda p: p.stem)
+
+
 def main() -> None:
     OUT_DIR.mkdir(exist_ok=True)
     questions = load_questions()
     summary: list[tuple[str, int, int]] = []
 
-    for jf in sorted(RESULT_DIR.glob("*.jsonl")):
+    for jf in result_files():
         name = jf.stem
         records: list[dict] = []
         with jf.open("r", encoding="utf-8") as fh:
