@@ -44,3 +44,21 @@ python run_prompt_experiments.py --experiments verify --num-examples 100 --mcq-s
 ```
 
 Use `--num-examples -1` for the full public set. Results and a 20-wrong-example error-analysis sheet are written to `results/prompt_experiments/`.
+
+To run the full format router on labeled public data and score immediately:
+
+```bash
+python run_format_router_public.py --num-examples 100
+```
+
+Use `--num-examples -1` for the full public set. Results are written to `results/public_format_router/`.
+
+## Private submission
+
+The default submission path now uses format-first routing, cleaned `FINAL_ANSWERS` blocks, and short fallback prompts for truncated/no-answer generations:
+
+```bash
+python create_submission.py
+```
+
+Use `--routing-mode legacy` to run the older MCQ/free split with explicit `--mcq-prompt`, `--free-prompt`, and config flags.

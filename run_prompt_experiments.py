@@ -29,12 +29,22 @@ ERROR_TYPES = [
     "Extraction issue",
 ]
 
+FINAL_ANSWERS_RULES = """Important formatting rule:
+After solving, output only the final answer block:
+FINAL_ANSWERS:
+\\boxed{answer1}
+\\boxed{answer2}
+
+Use one box per [ANS] blank, in order. For one blank, use one box.
+Do not include labels, units, [ANS], reasoning, or text after the boxes.
+Keep intervals, ordered pairs, and confidence intervals inside one box.
+Do not round unless the problem explicitly asks for rounding.
+Prefer exact symbolic or WebWork-style notation when appropriate, with * for multiplication."""
+
 
 STARTER_MATH = (
     "You are an expert mathematician. Solve the problem step-by-step. "
-    "Put your final answer inside \\boxed{}. "
-    "If the problem has multiple sub-answers, separate them by commas inside a single \\boxed{}, "
-    "e.g. \\boxed{3, 7}."
+    + FINAL_ANSWERS_RULES
 )
 
 STARTER_MCQ = (
@@ -47,11 +57,7 @@ STRICT_MATH = """You are a careful mathematical reasoning model.
 
 Solve the problem step by step. Check your arithmetic and logic before giving the final answer.
 
-Important formatting rule:
-At the very end, write the final answer on its own line in exactly this format:
-\\boxed{answer}
-
-Do not write anything after the boxed answer."""
+""" + FINAL_ANSWERS_RULES
 
 STRICT_MCQ = """You are a careful mathematical reasoning model.
 
@@ -67,11 +73,7 @@ VERIFY_MATH = """You are a careful mathematical reasoning model.
 
 Solve the problem step by step. Before giving the final answer, verify that your result satisfies the original question. Check for arithmetic mistakes, sign errors, and whether the requested format is a number, expression, set, or option letter.
 
-Important formatting rule:
-The final line must contain only:
-\\boxed{answer}
-
-Do not write anything after the boxed answer."""
+""" + FINAL_ANSWERS_RULES
 
 VERIFY_MCQ = """You are a careful mathematical reasoning model.
 
@@ -87,11 +89,7 @@ DETAILED_MATH = """You are a careful mathematical reasoning model.
 
 Solve the problem carefully using step-by-step reasoning. For algebra or arithmetic, show intermediate steps. Before giving the final answer, check your work.
 
-Important formatting rule:
-The final line must contain only:
-\\boxed{answer}
-
-Do not write anything after the boxed answer."""
+""" + FINAL_ANSWERS_RULES
 
 DETAILED_MCQ = """You are a careful mathematical reasoning model.
 
@@ -107,11 +105,7 @@ CONCISE_MATH = """You are a careful mathematical reasoning model.
 
 Solve the problem efficiently. Avoid unnecessary explanation. Focus on getting the correct final answer.
 
-Important formatting rule:
-The final line must contain only:
-\\boxed{answer}
-
-Do not write anything after the boxed answer."""
+""" + FINAL_ANSWERS_RULES
 
 CONCISE_MCQ = """You are a careful mathematical reasoning model.
 
@@ -129,11 +123,7 @@ A proposed answer is given below. Check whether it is correct for the problem. I
 
 Before giving the final answer, briefly verify that the answer satisfies the original question.
 
-Important formatting rule:
-The final line must contain only:
-\\boxed{answer}
-
-Do not write anything after the boxed answer."""
+""" + FINAL_ANSWERS_RULES
 
 VALIDATE_MCQ = """You are a careful mathematical reasoning verifier.
 
@@ -151,11 +141,7 @@ SPLIT_CONCISE_MATH = """You are solving a math problem.
 
 Solve it efficiently. Show only the necessary reasoning. Avoid unnecessary long explanations or changing your answer after reaching a valid result.
 
-Final formatting rule:
-The last line must contain only the final answer in this format:
-\\boxed{answer}
-
-Do not write anything after the boxed answer."""
+""" + FINAL_ANSWERS_RULES
 
 SPLIT_CONCISE_MCQ = """You are solving a multiple-choice math problem.
 
@@ -581,11 +567,12 @@ def classify_error(row: dict[str, Any]) -> tuple[str, str]:
     if repeated_single_answer(prediction):
         return "Format error", "The same answer was boxed more than once, so it was read as multiple answers."
 
-    if len(boxed) > 1 and "," in prediction:
-        return "Format error", "Multiple boxed answers were extracted for a problem that may expect one final answer."
-
     gold = row.get("gold")
     gold_values = gold if isinstance(gold, list) else [gold]
+
+    if len(boxed) > 1 and len(gold_values) == 1 and "," in prediction:
+        return "Format error", "Multiple boxed answers were extracted for a problem that may expect one final answer."
+
     if all(numericish(value) for value in gold_values) and all(
         numericish(part.strip()) for part in prediction.split(",") if part.strip()
     ):

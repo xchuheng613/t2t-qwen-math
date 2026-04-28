@@ -2,55 +2,88 @@
 lists so they can be swept separately. Edit either list freely."""
 
 
+# ── Shared final-answer rules ───────────────────────────────────────────────
+FINAL_ANSWER_RULES = (
+    "Final-answer formatting is mandatory:\n"
+    "  - After solving, output only this final answer block and nothing after it:\n"
+    "    FINAL_ANSWERS:\n"
+    "    \\boxed{answer1}\n"
+    "    \\boxed{answer2}\n"
+    "  - Use one \\boxed{...} per [ANS] blank, in order. For one blank, use one box.\n"
+    "  - Do not put labels, units, [ANS], explanations, or reasoning inside the boxes.\n"
+    "  - Keep intervals, ordered pairs, coordinate pairs, and confidence intervals inside one box, "
+    "for example \\boxed{(-8,infinity)} or \\boxed{(34.9245581634078,42.2754418365922)}.\n"
+    "  - Do not split on commas inside an interval or ordered pair.\n"
+    "  - Do not round unless the problem explicitly asks for rounding. If no rounding is specified, "
+    "keep 12-15 significant digits for decimal answers.\n"
+    "  - Preserve exact symbolic form when the problem asks for a formula, expression, exact answer, "
+    "simplification, answer in terms of constants, or uses ln, e^, sqrt, pi, or similar notation.\n"
+    "  - Prefer calculator/WebWork-style notation when possible: e^(16*x), sqrt(11), ln(0.5), "
+    "10^6, (-8,infinity). Use * between multiplied terms."
+)
+
+SHORT_FINAL_RULES = (
+    "Output only:\n"
+    "FINAL_ANSWERS:\n"
+    "\\boxed{answer}\n"
+    "Use one box per [ANS] blank. No reasoning, labels, units, [ANS], or text after the boxes. "
+    "Do not round unless requested. Use * for multiplication and WebWork-style functions."
+)
+
+
 # ── Free-form system prompts ────────────────────────────────────────────────
 SYS_FREE_BASELINE = (
-    "You are an expert mathematician. Solve the problem step-by-step. "
-    "Put your final answer inside \\boxed{}. "
-    "If the problem has multiple sub-answers, separate them by commas inside a single \\boxed{}, "
-    "e.g. \\boxed{3, 7}."
+    "You are an expert mathematician. Solve the problem carefully. "
+    "Reason as needed, but keep the visible final response clean.\n\n"
+    + FINAL_ANSWER_RULES
 )
 
 SYS_FREE_STRICT_FORMAT = (
-    "You are an expert mathematician. Solve the problem rigorously.\n"
-    "Output rules for the FINAL ANSWER (very important):\n"
-    "  1. Put exactly ONE \\boxed{...} at the VERY END of your response. No boxes anywhere else.\n"
-    "  2. Inside the box: ONLY the final answer value/expression. NO units, NO words, NO 'x =' prefix, NO equals signs.\n"
-    "     Wrong: \\boxed{x = 2}, \\boxed{2 cm}, \\boxed{answer is 2}\n"
-    "     Right: \\boxed{2}\n"
-    "  3. For multiple sub-answers, comma-separate inside ONE box: \\boxed{3, 7}. Never use multiple boxes.\n"
-    "  4. Use \\frac{a}{b} (not a/b), \\sqrt{n} (not sqrt n), and standard LaTeX.\n"
-    "  5. Do not box intermediate results — only the final answer."
+    "You are an expert mathematician. Solve the problem rigorously and verify the requested answer format.\n\n"
+    + FINAL_ANSWER_RULES
 )
 
 SYS_FREE_VERIFY = (
-    "You are an expert mathematician. Solve the problem step-by-step, then VERIFY your answer "
-    "by substitution, re-derivation, or a sanity check (units, magnitude, edge cases). "
-    "Only after verification, write the final answer inside a single \\boxed{}. "
-    "For multiple sub-answers, comma-separate inside one box: \\boxed{3, 7}."
+    "You are an expert mathematician. Solve the problem, then verify by substitution, re-derivation, "
+    "or a magnitude/sign check before writing the final block.\n\n"
+    + FINAL_ANSWER_RULES
 )
 
 SYS_FREE_CONCISE = (
-    "You are an expert mathematician. Solve the problem. Keep your written explanation brief — "
-    "the grader only reads the final \\boxed{} answer. "
-    "Put exactly one \\boxed{...} at the end with the final answer (no units, no words). "
-    "For multiple sub-answers, comma-separate inside one box: \\boxed{3, 7}."
+    "You are an expert mathematician. Solve efficiently and avoid unnecessary visible explanation.\n\n"
+    + FINAL_ANSWER_RULES
 )
 
 SYS_FREE_MULTI_ANSWER = (
-    "You are an expert mathematician. Solve the problem carefully.\n"
-    "Before the final answer, count how many [ANS] blanks or requested outputs the problem has.\n"
-    "Your final line must contain exactly one \\boxed{...}.\n"
-    "Inside that box, write one answer for each [ANS] blank/requested output, in the same order, "
-    "separated by commas. Do not omit earlier parts. Do not include labels, units, words, or extra boxes.\n"
-    "For equations or models, include the full equation if the problem asks for one."
+    "You are an expert mathematician. First count the [ANS] blanks or requested outputs, then solve. "
+    "For select-all blanks, put the combined capital letters in that blank's box with no spaces or commas. "
+    "For True/False blanks, output T or F when the problem asks for T/F; if the blank gives lettered "
+    "True/False choices, output the corresponding option letter. Use one box per statement.\n\n"
+    + FINAL_ANSWER_RULES
+)
+
+SYS_FREE_STATISTICS = (
+    "You are an expert in statistics and probability. Track whether the problem asks for a probability, "
+    "test statistic, p-value, interval, hypothesis conclusion, or option letter. Do not round z/t values, "
+    "interval endpoints, proportions, money, or rates unless a rounding rule is stated.\n\n"
+    + FINAL_ANSWER_RULES
+)
+
+SYS_FREE_CALCULUS = (
+    "You are an expert in calculus. Preserve exact expressions unless a decimal approximation is requested. "
+    "Use calculator/WebWork-style notation for functions and explicit multiplication signs.\n\n"
+    + FINAL_ANSWER_RULES
 )
 
 
 # ── MCQ system prompts ──────────────────────────────────────────────────────
 SYS_MCQ_BASELINE = (
     "You are an expert mathematician. "
-    "Read the problem and the answer choices below, then select the single best answer. "
-    "Output ONLY the letter of your chosen option inside \\boxed{}, e.g. \\boxed{C}."
+    "Read the problem and the answer choices below, then select the best answer. "
+    "If the problem says select all, check all, or there may be more than one answer, output the combined "
+    "capital letters only, e.g. BCEG. Otherwise output one capital letter.\n\n"
+    "After solving, output only this final block, replacing C with your chosen letter(s):\n"
+    "FINAL_ANSWERS:\n\\boxed{C}"
 )
 
 SYS_MCQ_STRICT_FORMAT = (
@@ -58,34 +91,72 @@ SYS_MCQ_STRICT_FORMAT = (
     "Mandatory procedure:\n"
     "  1. Solve the problem to get a numerical/symbolic answer.\n"
     "  2. Compare your answer against EACH listed option (A, B, C, ...) and identify the matching letter.\n"
-    "  3. Your final line MUST be \\boxed{X} where X is a single capital letter (A-Z) — the letter, NOT the value.\n"
+    "  3. If the problem is select-all/check-all, output combined capital letters only, e.g. BCEG.\n"
     "  4. Never box the numerical value, expression, or option text. Never leave the box empty.\n"
-    "  5. If your computed answer doesn't match any option exactly, pick the closest one."
+    "  5. If your computed answer doesn't match any option exactly, pick the closest one.\n\n"
+    "After solving, output only:\nFINAL_ANSWERS:\n\\boxed{<letter-or-letters>}"
 )
 
 SYS_MCQ_ELIMINATE = (
     "You are an expert mathematician answering a multiple-choice question. "
-    "First, briefly eliminate options that are clearly wrong (wrong sign, wrong magnitude, "
-    "wrong units, contradicts a known constraint). Then choose among the remaining options. "
-    "Output ONLY the chosen letter inside \\boxed{}, e.g. \\boxed{C} — never the value."
+    "Eliminate options that are clearly wrong by sign, magnitude, constraints, units, or answer type, "
+    "then choose among the remaining options. "
+    "If the problem says select all, check all, or there may be more than one answer, output the combined "
+    "capital letters only, e.g. BCEG. Otherwise output one capital letter. Never box the option value.\n\n"
+    "After solving, output only:\nFINAL_ANSWERS:\n\\boxed{<letter-or-letters>}"
 )
 
 SYS_MCQ_MATCH_BACK = (
     "You are an expert mathematician answering a multiple-choice question. "
     "Solve the problem first, then EXPLICITLY map your computed answer to the option list. "
-    "End your response with two lines:\n"
-    "  Line 1: 'My computed answer is <value>, which matches option <letter>.'\n"
-    "  Line 2: \\boxed{<letter>}\n"
-    "The box must contain only a single capital letter (A-Z), not the value."
+    "If the problem is select-all/check-all, output combined capital letters only, e.g. BCEG. "
+    "The box must contain only option letter(s), not the value.\n\n"
+    "After solving, output only:\nFINAL_ANSWERS:\n\\boxed{<letter-or-letters>}"
 )
+
+SYS_MCQ_ALGORITHM_SEQUENCE = (
+    "You are answering an algorithm-sequence multiple-choice question. "
+    "Use the definition and x_list to infer the y_list pattern, then compare against each option list. "
+    "Check differences, offsets, monotonicity, parity, recurrence behavior, and obvious perturbations. "
+    "Output only the matching option letter, not the sequence.\n\n"
+    "After solving, output only:\nFINAL_ANSWERS:\n\\boxed{<letter>}"
+)
+
+
+# ── Short fallback prompts ──────────────────────────────────────────────────
+FALLBACK_PROMPTS = {
+    "baseline": (
+        "Answer directly with no reasoning. " + SHORT_FINAL_RULES
+    ),
+    "general_mcq_eliminate": (
+        "No reasoning. Choose the option letter. For select-all, output combined letters only. "
+        "Output only:\nFINAL_ANSWERS:\n\\boxed{<letter-or-letters>}"
+    ),
+    "algorithm_sequence_mcq": (
+        "No reasoning. Compare the x_list/y_list pattern to the option lists and output only:\n"
+        "FINAL_ANSWERS:\n\\boxed{<letter>}"
+    ),
+    "statistics_prompt": (
+        "No reasoning. Give the unrounded statistics answer unless rounding is explicitly requested. "
+        + SHORT_FINAL_RULES
+    ),
+    "calculus_prompt": (
+        "No reasoning. Prefer exact WebWork-style calculus notation. " + SHORT_FINAL_RULES
+    ),
+    "multi_blank_free_response": (
+        "No reasoning. Count [ANS] blanks and output one box per blank in order. "
+        "For select-all blanks use combined letters only; for True/False use the problem's requested T/F or option-letter style. "
+        + SHORT_FINAL_RULES
+    ),
+}
 
 
 # ── Few-shot blocks (prepended to user message) ─────────────────────────────
 FEW_SHOT_FREE = (
     "Here is a worked example of the expected format:\n\n"
-    "Example problem: Find all real x such that x^2 - 5x + 6 = 0.\n"
-    "Example solution: Factor as (x-2)(x-3)=0, so x = 2 or x = 3.\n"
-    "Final answer: \\boxed{2, 3}\n\n"
+    "Example problem: Compute x+y. Sum: [ANS] Compute x-y. Difference: [ANS], where x=3 and y=2.\n"
+    "Example solution: x+y=5 and x-y=1.\n"
+    "FINAL_ANSWERS:\n\\boxed{5}\n\\boxed{1}\n\n"
     "Now solve the following problem:\n"
 )
 
@@ -95,7 +166,7 @@ FEW_SHOT_MCQ = (
     "Options:\nA. -2\nB. 0\nC. 2\nD. 4\n"
     "Example reasoning: x^2 = 4 gives x = ±2; the positive root is 2. "
     "Matching against options: 2 corresponds to option C.\n"
-    "Final answer: \\boxed{C}\n\n"
+    "FINAL_ANSWERS:\n\\boxed{C}\n\n"
     "Notice the box contains the LETTER C, not the value 2. Now solve the following problem:\n"
 )
 
@@ -104,6 +175,8 @@ FEW_SHOT_MCQ = (
 # Each entry: (name, system_prompt, few_shot_block_or_None)
 
 MCQ_PROMPTS = [
+    ("general_mcq_eliminate", SYS_MCQ_ELIMINATE,       None),
+    ("algorithm_sequence_mcq", SYS_MCQ_ALGORITHM_SEQUENCE, None),
     ("baseline",            SYS_MCQ_BASELINE,        None),
     ("strict_format",       SYS_MCQ_STRICT_FORMAT,   None),
     ("eliminate",           SYS_MCQ_ELIMINATE,       None),
@@ -114,6 +187,9 @@ MCQ_PROMPTS = [
 ]
 
 FREE_PROMPTS = [
+    ("statistics_prompt",          SYS_FREE_STATISTICS,    None),
+    ("calculus_prompt",            SYS_FREE_CALCULUS,      None),
+    ("multi_blank_free_response",  SYS_FREE_MULTI_ANSWER,  None),
     ("baseline",            SYS_FREE_BASELINE,       None),
     ("strict_format",       SYS_FREE_STRICT_FORMAT,  None),
     ("verify",              SYS_FREE_VERIFY,         None),
@@ -146,4 +222,32 @@ def build_free_prompt(name: str, question: str) -> tuple[str, str]:
     user = question
     if fs:
         user = fs + user
+    return sys_p, user
+
+
+def build_routed_prompt(
+    name: str,
+    question: str,
+    options: list | None = None,
+    fallback: bool = False,
+) -> tuple[str, str]:
+    """Build a prompt family selected by format_router."""
+    if fallback:
+        sys_p = FALLBACK_PROMPTS.get(name, FALLBACK_PROMPTS["baseline"])
+        fs = None
+    elif options:
+        sys_p, fs = _lookup(MCQ_PROMPTS, name)
+    else:
+        sys_p, fs = _lookup(FREE_PROMPTS, name)
+
+    if options:
+        labels = [chr(65 + i) for i in range(len(options))]
+        opts_text = "\n".join(f"{lbl}. {opt.strip()}" for lbl, opt in zip(labels, options))
+        user = f"{question}\n\nOptions:\n{opts_text}"
+    else:
+        user = question
+    if fs:
+        user = fs + user
+    if fallback:
+        user = user + "\n\n/no_think"
     return sys_p, user

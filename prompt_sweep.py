@@ -490,7 +490,7 @@ def main():
         print(f"MCQ prompts on MCQ items ({cfg.name})")
         print("=" * 60)
         for name in mcq_prompt_names:
-            s = run_one(llm, tokenizer, judger, "mcq", name, cfg, mcq_items)
+            s = run_one(llm, tokenizer, judger, OUTPUT_DIR, "mcq", name, cfg, mcq_items, MAX_TOKENS)
             mcq_results.append(s); summaries.append(s)
         print_table("MCQ ranking", mcq_results)
 
@@ -502,11 +502,11 @@ def main():
         print(f"FREE prompts on FREE items ({cfg.name})")
         print("=" * 60)
         for name in free_prompt_names:
-            s = run_one(llm, tokenizer, judger, "free", name, cfg, free_items)
+            s = run_one(llm, tokenizer, judger, OUTPUT_DIR, "free", name, cfg, free_items, MAX_TOKENS)
             free_results.append(s); summaries.append(s)
         print_table("FREE ranking", free_results)
 
-    csv_path = write_summary(summaries)
+    csv_path = write_summary(summaries, OUTPUT_DIR)
     print_table("FINAL RANKING", summaries)
 
     # Combined best — projected accuracy if you used best_mcq for all MCQs and best_free for all free
