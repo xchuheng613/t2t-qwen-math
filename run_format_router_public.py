@@ -52,7 +52,7 @@ def score_record(item: dict[str, Any], record: dict[str, Any], judger: Any) -> t
 
     if route.format_type in {FORMAT_MCQ, FORMAT_ALGORITHM_SEQUENCE, FORMAT_MULTI_SELECT}:
         multi = route.format_type == FORMAT_MULTI_SELECT
-        prediction = extract_choice_prediction(response, item, multi=multi, judger=judger)
+        prediction = extract_choice_prediction(response, item, multi=multi, judger=None)
         if not prediction:
             prediction = str(record.get("vote_key") or "").strip().upper()
 

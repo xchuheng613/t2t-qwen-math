@@ -94,7 +94,7 @@ def vote_key(response: str, item: dict[str, Any], route: Any, judger: Any) -> st
             response,
             item,
             multi=route.format_type == FORMAT_MULTI_SELECT,
-            judger=None if route.format_type == FORMAT_ALGORITHM_SEQUENCE else judger,
+            judger=None,
         )
     try:
         answer = judger.extract_ans(response)
@@ -144,6 +144,7 @@ def generate_group(
     enable_fallback: bool,
 ) -> list[dict[str, Any]]:
     from format_router import clean_final_response
+    from tqdm import tqdm
     from vllm import SamplingParams
 
     if not routed_items:
@@ -171,7 +172,13 @@ def generate_group(
 
     records = []
     fallback_indices: list[int] = []
-    for idx, (item, route, output) in enumerate(zip(items, routes, outputs)):
+    for idx, (item, route, output) in enumerate(
+        tqdm(
+            zip(items, routes, outputs),
+            total=len(items),
+            desc=f"Post-processing {prompt_name}",
+        )
+    ):
         responses = [choice.text.strip() for choice in output.outputs]
         finishes = [getattr(choice, "finish_reason", None) for choice in output.outputs]
         if config.vote and len(responses) > 1:
