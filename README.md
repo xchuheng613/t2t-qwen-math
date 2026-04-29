@@ -45,13 +45,25 @@ python run_prompt_experiments.py --experiments verify --num-examples 100 --mcq-s
 
 Use `--num-examples -1` for the full public set. Results and a 20-wrong-example error-analysis sheet are written to `results/prompt_experiments/`.
 
-To run the full format router on labeled public data and score immediately:
+The legacy sweep scripts default to `prompt_variants.py`. To try the updated routed free-response prompts without changing the old prompts:
 
 ```bash
-python run_format_router_public.py --num-examples 100
+python prompt_sweep.py --prompt-module prompt_variant_updated --qtype free --free-prompt routed_v2 --config sc_n3
 ```
 
-Use `--num-examples -1` for the full public set. Results are written to `results/public_format_router/`.
+To run the current problem-type-separated prompt package on labeled public data:
+
+```bash
+python run_32gb_balanced.py --mode submission_response_mode \
+  --data-path data/public.jsonl \
+  --output-dir results/32gb_balanced_public
+```
+
+Then verify it with:
+
+```bash
+.venv/bin/python verify_public.py results/32gb_balanced_public
+```
 
 ## Verify public runs
 
@@ -65,10 +77,10 @@ This writes `result_analyze/<run_name>.jsonl`, appends to `result_analyze/public
 
 ## Private submission
 
-The default submission path now uses format-first routing, cleaned `FINAL_ANSWERS` blocks, and short fallback prompts for truncated/no-answer generations:
+The default submission path uses the latest problem-type-separated prompt package from `run_math_prompts.py`:
 
 ```bash
 python create_submission.py
 ```
 
-Use `--routing-mode legacy` to run the older MCQ/free split with explicit `--mcq-prompt`, `--free-prompt`, and config flags.
+Use `--routing-mode legacy` to run the older MCQ/free split with explicit `--mcq-prompt`, `--free-prompt`, `--prompt-module`, and config flags.

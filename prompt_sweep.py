@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import importlib
 import json
 import os
 import random
@@ -45,7 +46,25 @@ from tqdm import tqdm
 
 sys.path.insert(0, ".")
 from judger import Judger
-from prompt_variants import MCQ_PROMPTS, FREE_PROMPTS, build_mcq_prompt, build_free_prompt
+
+DEFAULT_PROMPT_MODULE = "prompt_variants"
+MCQ_PROMPTS = []
+FREE_PROMPTS = []
+build_mcq_prompt = None
+build_free_prompt = None
+
+
+def set_prompt_module(module_name: str) -> None:
+    """Load a prompt module exposing the prompt_variants API."""
+    global MCQ_PROMPTS, FREE_PROMPTS, build_mcq_prompt, build_free_prompt
+    module = importlib.import_module(module_name)
+    MCQ_PROMPTS = module.MCQ_PROMPTS
+    FREE_PROMPTS = module.FREE_PROMPTS
+    build_mcq_prompt = module.build_mcq_prompt
+    build_free_prompt = module.build_free_prompt
+
+
+set_prompt_module(DEFAULT_PROMPT_MODULE)
 
 
 # ── Sampling configs ───────────────────────────────────────────────────────
@@ -429,10 +448,15 @@ def print_table(title: str, rows: list[dict]):
 
 
 def parse_args() -> argparse.Namespace:
-    mcq_names = [name for name, *_ in MCQ_PROMPTS]
-    free_names = [name for name, *_ in FREE_PROMPTS]
-
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--prompt-module",
+        default=DEFAULT_PROMPT_MODULE,
+        help=(
+            "Prompt module to use. Defaults to prompt_variants; use "
+            "prompt_variant_updated to opt into the new routed free prompts."
+        ),
+    )
     parser.add_argument(
         "--qtype",
         choices=["all", "mcq", "free"],
@@ -442,13 +466,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--mcq-prompt",
         action="append",
-        choices=mcq_names,
         help="MCQ prompt to run. Repeat this flag for multiple prompts. Omit to run all MCQ prompts.",
     )
     parser.add_argument(
         "--free-prompt",
         action="append",
-        choices=free_names,
         help="Free-form prompt to run. Repeat this flag for multiple prompts. Omit to run all free-form prompts.",
     )
     parser.add_argument(
@@ -462,8 +484,19 @@ def parse_args() -> argparse.Namespace:
 
 def main():
     args = parse_args()
+    set_prompt_module(args.prompt_module)
+    mcq_names = {name for name, *_ in MCQ_PROMPTS}
+    free_names = {name for name, *_ in FREE_PROMPTS}
+    bad_mcq = sorted(set(args.mcq_prompt or []) - mcq_names)
+    bad_free = sorted(set(args.free_prompt or []) - free_names)
+    if bad_mcq:
+        raise SystemExit(f"Unknown MCQ prompt(s) for {args.prompt_module}: {bad_mcq}")
+    if bad_free:
+        raise SystemExit(f"Unknown free prompt(s) for {args.prompt_module}: {bad_free}")
+
     cfg = CONFIGS[args.config]
-    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+    output_dir = OUTPUT_DIR if args.prompt_module == DEFAULT_PROMPT_MODULE else OUTPUT_DIR / args.prompt_module
+    output_dir.mkdir(parents=True, exist_ok=True)
     mcq_items, free_items = load_subset(DATA_PATH, SUBSET_SIZE, RNG_SEED)
 
     tokenizer = AutoTokenizer.from_pretrained(MODEL_ID)
@@ -490,7 +523,7 @@ def main():
         print(f"MCQ prompts on MCQ items ({cfg.name})")
         print("=" * 60)
         for name in mcq_prompt_names:
-            s = run_one(llm, tokenizer, judger, OUTPUT_DIR, "mcq", name, cfg, mcq_items, MAX_TOKENS)
+            s = run_one(llm, tokenizer, judger, output_dir, "mcq", name, cfg, mcq_items, MAX_TOKENS)
             mcq_results.append(s); summaries.append(s)
         print_table("MCQ ranking", mcq_results)
 
@@ -502,11 +535,11 @@ def main():
         print(f"FREE prompts on FREE items ({cfg.name})")
         print("=" * 60)
         for name in free_prompt_names:
-            s = run_one(llm, tokenizer, judger, OUTPUT_DIR, "free", name, cfg, free_items, MAX_TOKENS)
+            s = run_one(llm, tokenizer, judger, output_dir, "free", name, cfg, free_items, MAX_TOKENS)
             free_results.append(s); summaries.append(s)
         print_table("FREE ranking", free_results)
 
-    csv_path = write_summary(summaries, OUTPUT_DIR)
+    csv_path = write_summary(summaries, output_dir)
     print_table("FINAL RANKING", summaries)
 
     # Combined best — projected accuracy if you used best_mcq for all MCQs and best_free for all free

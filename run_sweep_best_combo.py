@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import importlib
 import json
 import os
 import random
@@ -25,6 +26,7 @@ DEFAULT_DATA_PATH = "data/public.jsonl"
 DEFAULT_OUTPUT_DIR = "results/sweep_best100"
 DEFAULT_MCQ_PROMPT = "eliminate"
 DEFAULT_FREE_PROMPT = "baseline"
+DEFAULT_PROMPT_MODULE = "prompt_variants"
 DEFAULT_SEED = 42
 
 
@@ -65,8 +67,19 @@ def load_stratified_subset(path: Path, k: int, seed: int) -> tuple[list[dict[str
     return mcq[:n_mcq], free[:n_free]
 
 
-def render_prompts(tokenizer: Any, qtype: str, prompt_name: str, items: list[dict[str, Any]]) -> list[str]:
-    from prompt_variants import build_free_prompt, build_mcq_prompt
+def load_prompt_module(module_name: str) -> Any:
+    return importlib.import_module(module_name)
+
+
+def render_prompts(
+    tokenizer: Any,
+    qtype: str,
+    prompt_name: str,
+    items: list[dict[str, Any]],
+    prompt_module: Any,
+) -> list[str]:
+    build_free_prompt = prompt_module.build_free_prompt
+    build_mcq_prompt = prompt_module.build_mcq_prompt
 
     prompts = []
     for item in items:
@@ -166,10 +179,11 @@ def run_one(
     config: SamplingConfig,
     items: list[dict[str, Any]],
     max_tokens: int,
+    prompt_module: Any,
 ) -> dict[str, Any]:
     from vllm import SamplingParams
 
-    prompts = render_prompts(tokenizer, qtype, prompt_name, items)
+    prompts = render_prompts(tokenizer, qtype, prompt_name, items, prompt_module)
     sampling = SamplingParams(
         max_tokens=max_tokens,
         temperature=config.temperature,
@@ -238,6 +252,14 @@ def write_summary(output_dir: Path, summaries: list[dict[str, Any]]) -> Path:
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--prompt-module",
+        default=DEFAULT_PROMPT_MODULE,
+        help=(
+            "Prompt module to use. Defaults to prompt_variants; use "
+            "prompt_variant_updated to opt into the new routed free prompts."
+        ),
+    )
     parser.add_argument("--data-path", default=DEFAULT_DATA_PATH)
     parser.add_argument("--output-dir", default=DEFAULT_OUTPUT_DIR)
     parser.add_argument("--model", default=DEFAULT_MODEL_ID)
@@ -263,6 +285,14 @@ def main() -> None:
     from vllm import LLM
 
     output_dir = Path(args.output_dir)
+    prompt_module = load_prompt_module(args.prompt_module)
+    mcq_names = {name for name, *_ in prompt_module.MCQ_PROMPTS}
+    free_names = {name for name, *_ in prompt_module.FREE_PROMPTS}
+    if args.mcq_prompt not in mcq_names:
+        raise SystemExit(f"Unknown MCQ prompt for {args.prompt_module}: {args.mcq_prompt}")
+    if args.free_prompt not in free_names:
+        raise SystemExit(f"Unknown free prompt for {args.prompt_module}: {args.free_prompt}")
+
     mcq_config = CONFIGS[args.mcq_config]
     free_config = CONFIGS[args.free_config]
     mcq_items, free_items = load_stratified_subset(Path(args.data_path), args.num_examples, args.seed)
@@ -286,8 +316,30 @@ def main() -> None:
     judger = Judger(strict_extract=False)
 
     summaries = [
-        run_one(llm, tokenizer, judger, output_dir, "mcq", args.mcq_prompt, mcq_config, mcq_items, args.max_tokens),
-        run_one(llm, tokenizer, judger, output_dir, "free", args.free_prompt, free_config, free_items, args.max_tokens),
+        run_one(
+            llm,
+            tokenizer,
+            judger,
+            output_dir,
+            "mcq",
+            args.mcq_prompt,
+            mcq_config,
+            mcq_items,
+            args.max_tokens,
+            prompt_module,
+        ),
+        run_one(
+            llm,
+            tokenizer,
+            judger,
+            output_dir,
+            "free",
+            args.free_prompt,
+            free_config,
+            free_items,
+            args.max_tokens,
+            prompt_module,
+        ),
     ]
     summary_path = write_summary(output_dir, summaries)
     total_correct = sum(row["correct"] for row in summaries)

@@ -1,22 +1,20 @@
 #!/usr/bin/env python3
 """Generate a private-set submission CSV.
 
-The CSV has exactly the competition-required columns:
-
-    id,response
-
-By default, rows are routed by answer format first, then generated in prompt
-family/config groups. The submitted `response` is a cleaned FINAL_ANSWERS block
-derived from the chosen model output. A JSONL audit file with raw samples,
-routes, and fallback details is also written next to the CSV.
+The default submission path uses the current problem-type-separated prompt
+package in :mod:`prompts.math_reasoning_prompts`, matching the pipeline used
+for the full-public 32GB balanced run. The older MCQ/free split is still
+available with ``--routing-mode legacy`` and defaults to ``prompt_variants``.
 """
 
 from __future__ import annotations
 
 import argparse
 import csv
+import importlib
 import json
 import os
+import re
 import sys
 from collections import Counter
 from dataclasses import dataclass
@@ -27,8 +25,19 @@ from typing import Any
 DEFAULT_MODEL_ID = "Qwen/Qwen3-4B-Thinking-2507"
 DEFAULT_DATA_PATH = "data/private.jsonl"
 DEFAULT_OUTPUT_DIR = "results/private_submission"
+DEFAULT_SUBMISSION_NAME = "submission.csv"
 DEFAULT_MCQ_PROMPT = "general_mcq_eliminate"
 DEFAULT_FREE_PROMPT = "baseline"
+DEFAULT_PROMPT_MODULE = "prompt_variants"
+
+FORMAT_MCQ = "mcq"
+FORMAT_FREE_RESPONSE = "free_response"
+
+_LETTER_RE = re.compile(r"\\boxed\{\s*([A-Za-z])\s*\}")
+_LETTER_PHRASE_RE = re.compile(
+    r"(?:option|choice|answer\s+is)\s*[:\s]*\(?([A-Z])\)?\b",
+    re.IGNORECASE,
+)
 
 
 @dataclass(frozen=True)
@@ -41,6 +50,26 @@ class SamplingConfig:
     vote: bool = False
 
 
+@dataclass(frozen=True)
+class Route:
+    format_type: str
+    prompt_family: str
+    config_name: str
+    expected_answers: int
+    has_options: bool = False
+    notes: tuple[str, ...] = ()
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "format_type": self.format_type,
+            "prompt_family": self.prompt_family,
+            "config_name": self.config_name,
+            "expected_answers": self.expected_answers,
+            "has_options": self.has_options,
+            "notes": list(self.notes),
+        }
+
+
 CONFIGS = {
     "greedy_n1": SamplingConfig("greedy_n1", temperature=0.0, top_p=1.0, top_k=-1, n=1),
     "sc_n1": SamplingConfig("sc_n1", temperature=0.7, top_p=0.95, top_k=20, n=1),
@@ -49,23 +78,24 @@ CONFIGS = {
 
 
 def load_private(path: Path) -> tuple[list[dict[str, Any]], list[int]]:
-    from format_router import normalize_item
-
-    rows = [normalize_item(json.loads(line)) for line in path.open()]
+    rows = [json.loads(line) for line in path.open(encoding="utf-8")]
     return rows, [int(row["id"]) for row in rows]
 
 
-def render_prompts(
+def load_prompt_module(module_name: str) -> Any:
+    return importlib.import_module(module_name)
+
+
+def render_legacy_prompts(
     tokenizer: Any,
     prompt_name: str,
     items: list[dict[str, Any]],
+    prompt_module: Any,
     fallback: bool = False,
 ) -> list[str]:
-    from prompt_variants import build_routed_prompt
-
     prompts = []
     for item in items:
-        system, user = build_routed_prompt(
+        system, user = prompt_module.build_routed_prompt(
             prompt_name,
             item["question"],
             item.get("options") or None,
@@ -81,21 +111,102 @@ def render_prompts(
     return prompts
 
 
-def vote_key(response: str, item: dict[str, Any], route: Any, judger: Any) -> str:
-    from format_router import (
-        FORMAT_ALGORITHM_SEQUENCE,
-        FORMAT_MCQ,
-        FORMAT_MULTI_SELECT,
-        extract_choice_prediction,
-    )
+def _tail_after_think(text: str) -> str:
+    think_end = text.rfind("</think>")
+    return text[think_end + len("</think>") :] if think_end >= 0 else text
 
-    if route.format_type in {FORMAT_MCQ, FORMAT_ALGORITHM_SEQUENCE, FORMAT_MULTI_SELECT}:
-        return extract_choice_prediction(
-            response,
-            item,
-            multi=route.format_type == FORMAT_MULTI_SELECT,
-            judger=None,
-        )
+
+def extract_letter(text: str, options: list[str] | None, judger: Any) -> str:
+    tail = _tail_after_think(text)
+
+    match = _LETTER_RE.search(tail) or _LETTER_RE.search(text)
+    if match:
+        return match.group(1).upper()
+
+    if options:
+        try:
+            boxed_contents = judger.extract_all_boxed(tail) or judger.extract_all_boxed(text)
+        except Exception:
+            boxed_contents = []
+        if boxed_contents:
+            candidate = boxed_contents[-1]
+            try:
+                candidate_norm = judger.norm_ans_str(candidate)
+            except Exception:
+                candidate_norm = candidate
+            for idx, option in enumerate(options):
+                option_text = str(option).strip()
+                if candidate.strip() == option_text or candidate_norm == option_text:
+                    return chr(65 + idx)
+                try:
+                    if judger.is_equal(candidate_norm, judger.norm_ans_str(option_text)):
+                        return chr(65 + idx)
+                except Exception:
+                    pass
+
+    phrase_matches = list(_LETTER_PHRASE_RE.finditer(tail))
+    if phrase_matches:
+        return phrase_matches[-1].group(1).upper()
+
+    valid = {chr(65 + idx) for idx in range(len(options or []))}
+    matches = [letter for letter in re.findall(r"\b([A-Z])\b", tail.upper()) if not valid or letter in valid]
+    return matches[-1] if matches else ""
+
+
+def _clean_answer_text(prompt_module: Any, answer: str) -> str:
+    cleaner = getattr(prompt_module, "clean_answer_text", None)
+    if cleaner:
+        return cleaner(answer)
+    return re.sub(r"\s+", " ", str(answer)).strip()
+
+
+def _rebuild_final_response(prompt_module: Any, answers: list[str]) -> str:
+    rebuilder = getattr(prompt_module, "rebuild_final_response", None)
+    if rebuilder:
+        return rebuilder(answers)
+    boxes = "\n".join(f"\\boxed{{{_clean_answer_text(prompt_module, answer)}}}" for answer in answers)
+    return "FINAL_ANSWERS:\n" + boxes
+
+
+def clean_legacy_final_response(
+    response: str,
+    item: dict[str, Any],
+    route: Route,
+    judger: Any,
+    prompt_module: Any,
+) -> str:
+    if route.format_type == FORMAT_MCQ:
+        letter = extract_letter(response, item.get("options"), judger)
+        return _rebuild_final_response(prompt_module, [letter]) if letter else ""
+
+    tail = _tail_after_think(response)
+    try:
+        answers = judger.extract_all_boxed(tail) or judger.extract_all_boxed(response)
+    except Exception:
+        answers = []
+
+    if len(answers) == 1 and route.expected_answers > 1:
+        try:
+            split_answers = judger.split_by_comma(answers[0])
+        except Exception:
+            split_answers = answers
+        if len(split_answers) == route.expected_answers:
+            answers = split_answers
+
+    if not answers:
+        try:
+            extracted = judger.extract_ans(response)
+        except Exception:
+            extracted = ""
+        if extracted:
+            answers = [extracted]
+
+    return _rebuild_final_response(prompt_module, answers) if answers else ""
+
+
+def vote_key(response: str, item: dict[str, Any], route: Route, judger: Any) -> str:
+    if route.format_type == FORMAT_MCQ:
+        return extract_letter(response, item.get("options"), judger)
     try:
         answer = judger.extract_ans(response)
         return judger.norm_ans_str(answer) if answer else ""
@@ -106,7 +217,7 @@ def vote_key(response: str, item: dict[str, Any], route: Any, judger: Any) -> st
 def choose_majority(
     responses: list[str],
     item: dict[str, Any],
-    route: Any,
+    route: Route,
     judger: Any,
 ) -> tuple[str, int, str]:
     keys = [vote_key(response, item, route, judger) for response in responses]
@@ -132,18 +243,18 @@ def _fallback_sampling_params(max_tokens: int) -> Any:
     )
 
 
-def generate_group(
+def generate_legacy_group(
     llm: Any,
     tokenizer: Any,
     judger: Any,
     prompt_name: str,
     config: SamplingConfig,
-    routed_items: list[tuple[dict[str, Any], Any]],
+    routed_items: list[tuple[dict[str, Any], Route]],
     max_tokens: int,
     fallback_max_tokens: int,
     enable_fallback: bool,
+    prompt_module: Any,
 ) -> list[dict[str, Any]]:
-    from format_router import clean_final_response
     from tqdm import tqdm
     from vllm import SamplingParams
 
@@ -152,7 +263,7 @@ def generate_group(
 
     items = [item for item, _route in routed_items]
     routes = [route for _item, route in routed_items]
-    prompts = render_prompts(tokenizer, prompt_name, items)
+    prompts = render_legacy_prompts(tokenizer, prompt_name, items, prompt_module)
     sampling = SamplingParams(
         max_tokens=max_tokens,
         temperature=config.temperature,
@@ -164,11 +275,12 @@ def generate_group(
     route_names = Counter(route.format_type for route in routes)
     route_summary = ", ".join(f"{name}={count}" for name, count in sorted(route_names.items()))
     print(
-        f"[{prompt_name} / {config.name}] generating {len(items)} prompts x n={config.n} ({route_summary}) ...",
+        f"[legacy {prompt_name} / {config.name}] generating {len(items)} prompts x n={config.n} "
+        f"({route_summary}) ...",
         flush=True,
     )
     outputs = llm.generate(prompts, sampling_params=sampling)
-    print(f"[{prompt_name} / {config.name}] generation finished; post-processing ...", flush=True)
+    print(f"[legacy {prompt_name} / {config.name}] generation finished; post-processing ...", flush=True)
 
     records = []
     fallback_indices: list[int] = []
@@ -187,7 +299,7 @@ def generate_group(
             chosen, chosen_idx = responses[0], 0
             winning_key = vote_key(responses[0], item, route, judger)
 
-        clean_response = clean_final_response(chosen, item, route, judger)
+        clean_response = clean_legacy_final_response(chosen, item, route, judger, prompt_module)
         finish_reason = finishes[chosen_idx] if chosen_idx < len(finishes) else None
         record = {
             "id": int(item["id"]),
@@ -210,7 +322,13 @@ def generate_group(
     if fallback_indices:
         fallback_items = [items[idx] for idx in fallback_indices]
         fallback_routes = [routes[idx] for idx in fallback_indices]
-        fallback_prompts = render_prompts(tokenizer, prompt_name, fallback_items, fallback=True)
+        fallback_prompts = render_legacy_prompts(
+            tokenizer,
+            prompt_name,
+            fallback_items,
+            prompt_module,
+            fallback=True,
+        )
         print(
             f"  fallback: retrying {len(fallback_items)} truncated/no-answer prompts with short no-reasoning prompt ...",
             flush=True,
@@ -222,7 +340,7 @@ def generate_group(
         for record_idx, item, route, output in zip(fallback_indices, fallback_items, fallback_routes, fallback_outputs):
             fallback_raw = output.outputs[0].text.strip()
             fallback_finish = getattr(output.outputs[0], "finish_reason", None)
-            fallback_clean = clean_final_response(fallback_raw, item, route, judger)
+            fallback_clean = clean_legacy_final_response(fallback_raw, item, route, judger, prompt_module)
             record = records[record_idx]
             record["fallback_used"] = True
             record["fallback_raw_response"] = fallback_raw
@@ -232,20 +350,8 @@ def generate_group(
                 record["raw_response"] = fallback_raw
                 record["response"] = fallback_clean
                 record["vote_key"] = vote_key(fallback_raw, item, route, judger)
-    print(f"[{prompt_name} / {config.name}] done.", flush=True)
+    print(f"[legacy {prompt_name} / {config.name}] done.", flush=True)
     return records
-
-
-def build_format_routed_groups(
-    rows: list[dict[str, Any]],
-) -> dict[tuple[str, str], list[tuple[dict[str, Any], Any]]]:
-    from format_router import route_item
-
-    groups: dict[tuple[str, str], list[tuple[dict[str, Any], Any]]] = {}
-    for item in rows:
-        route = route_item(item)
-        groups.setdefault((route.prompt_family, route.config_name), []).append((item, route))
-    return groups
 
 
 def build_legacy_groups(
@@ -254,10 +360,8 @@ def build_legacy_groups(
     free_prompt: str,
     mcq_config: str,
     free_config: str,
-) -> dict[tuple[str, str], list[tuple[dict[str, Any], Any]]]:
-    from format_router import FORMAT_FREE_RESPONSE, FORMAT_MCQ, Route
-
-    groups: dict[tuple[str, str], list[tuple[dict[str, Any], Any]]] = {}
+) -> dict[tuple[str, str], list[tuple[dict[str, Any], Route]]]:
+    groups: dict[tuple[str, str], list[tuple[dict[str, Any], Route]]] = {}
     for item in rows:
         if item.get("options"):
             route = Route(
@@ -287,7 +391,7 @@ def write_outputs(
     original_ids: list[int],
 ) -> tuple[Path, Path]:
     output_dir.mkdir(parents=True, exist_ok=True)
-    by_id = {record["id"]: record for record in records}
+    by_id = {int(record["id"]): record for record in records}
     missing = [row_id for row_id in original_ids if row_id not in by_id]
     if missing:
         raise RuntimeError(f"Missing predictions for ids: {missing[:10]} (count={len(missing)})")
@@ -306,56 +410,9 @@ def write_outputs(
     return submission_path, audit_path
 
 
-def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--data-path", default=DEFAULT_DATA_PATH)
-    parser.add_argument("--output-dir", default=DEFAULT_OUTPUT_DIR)
-    parser.add_argument("--submission-name", default="submission_format_router.csv")
-    parser.add_argument("--model", default=DEFAULT_MODEL_ID)
-    parser.add_argument("--gpu-id", default="0")
-    parser.add_argument("--routing-mode", choices=["format", "legacy"], default="format")
-    parser.add_argument("--mcq-prompt", default=DEFAULT_MCQ_PROMPT)
-    parser.add_argument("--free-prompt", default=DEFAULT_FREE_PROMPT)
-    parser.add_argument("--mcq-config", default="greedy_n1", choices=sorted(CONFIGS))
-    parser.add_argument("--free-config", default="sc_n3", choices=sorted(CONFIGS))
-    parser.add_argument("--max-tokens", type=int, default=16384)
-    parser.add_argument("--fallback-max-tokens", type=int, default=2048)
-    parser.add_argument("--no-fallback", action="store_true")
-    parser.add_argument("--max-model-len", type=int, default=32768)
-    parser.add_argument("--gpu-memory-utilization", type=float, default=0.78)
-    parser.add_argument("--max-num-seqs", type=int, default=16)
-    parser.add_argument("--max-num-batched-tokens", type=int, default=8192)
-    parser.add_argument("--enforce-eager", action="store_true")
-    return parser.parse_args()
-
-
-def main() -> None:
-    args = parse_args()
-    os.environ["CUDA_VISIBLE_DEVICES"] = args.gpu_id
-    sys.path.insert(0, ".")
-
-    from judger import Judger
+def make_llm(args: argparse.Namespace) -> tuple[Any, Any]:
     from transformers import AutoTokenizer
     from vllm import LLM
-
-    output_dir = Path(args.output_dir)
-    submission_path = output_dir / args.submission_name
-    rows, original_ids = load_private(Path(args.data_path))
-    if args.routing_mode == "format":
-        groups = build_format_routed_groups(rows)
-    else:
-        groups = build_legacy_groups(
-            rows,
-            args.mcq_prompt,
-            args.free_prompt,
-            args.mcq_config,
-            args.free_config,
-        )
-
-    route_counts = Counter(route.format_type for group in groups.values() for _item, route in group)
-    print(f"Private set: {len(original_ids)} total")
-    print("Format counts: " + ", ".join(f"{name}={count}" for name, count in sorted(route_counts.items())))
-    print(f"Routing mode: {args.routing_mode}")
 
     tokenizer = AutoTokenizer.from_pretrained(args.model, trust_remote_code=True)
     tokenizer.pad_token = tokenizer.eos_token
@@ -369,12 +426,61 @@ def main() -> None:
         max_num_batched_tokens=args.max_num_batched_tokens,
         enforce_eager=args.enforce_eager,
     )
+    return llm, tokenizer
+
+
+def run_problem_type_submission(args: argparse.Namespace, rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    from run_math_prompts import run_submission
+
+    llm, tokenizer = make_llm(args)
+    config = CONFIGS[args.config]
+    print(
+        f"[problem_type / {config.name}] generating {len(rows)} prompts with "
+        "prompts.math_reasoning_prompts ...",
+        flush=True,
+    )
+    return run_submission(
+        rows,
+        llm,
+        tokenizer,
+        config,
+        args.max_tokens,
+        include_few_shot=args.include_few_shot,
+        math_type=args.math_type,
+        enable_repair=not args.no_repair and not args.no_fallback,
+        normalize_free_final_answers=args.normalize_free_final_answers,
+        rank_free_samples=args.rank_free_samples,
+    )
+
+
+def run_legacy_submission(args: argparse.Namespace, rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    from judger import Judger
+
+    prompt_module = load_prompt_module(args.prompt_module)
+    mcq_names = {name for name, *_ in prompt_module.MCQ_PROMPTS}
+    free_names = {name for name, *_ in prompt_module.FREE_PROMPTS}
+    if args.mcq_prompt not in mcq_names:
+        raise SystemExit(f"Unknown MCQ prompt for {args.prompt_module}: {args.mcq_prompt}")
+    if args.free_prompt not in free_names:
+        raise SystemExit(f"Unknown free prompt for {args.prompt_module}: {args.free_prompt}")
+
+    groups = build_legacy_groups(
+        rows,
+        args.mcq_prompt,
+        args.free_prompt,
+        args.mcq_config,
+        args.free_config,
+    )
+    route_counts = Counter(route.format_type for group in groups.values() for _item, route in group)
+    print("Legacy format counts: " + ", ".join(f"{name}={count}" for name, count in sorted(route_counts.items())))
+
+    llm, tokenizer = make_llm(args)
     judger = Judger(strict_extract=False)
 
     records = []
     for (prompt_name, config_name), group in sorted(groups.items()):
         records.extend(
-            generate_group(
+            generate_legacy_group(
                 llm,
                 tokenizer,
                 judger,
@@ -384,8 +490,75 @@ def main() -> None:
                 args.max_tokens,
                 args.fallback_max_tokens,
                 not args.no_fallback,
+                prompt_module,
             )
         )
+    return records
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--data-path", default=DEFAULT_DATA_PATH)
+    parser.add_argument("--output-dir", default=DEFAULT_OUTPUT_DIR)
+    parser.add_argument("--submission-name", default=DEFAULT_SUBMISSION_NAME)
+    parser.add_argument("--model", default=DEFAULT_MODEL_ID)
+    parser.add_argument("--gpu-id", default="0")
+    parser.add_argument(
+        "--routing-mode",
+        choices=["problem_type", "legacy", "format"],
+        default="problem_type",
+        help="'problem_type' uses the latest separated prompt package. 'format' is a deprecated alias.",
+    )
+    parser.add_argument("--config", default="sc_n3", choices=sorted(CONFIGS))
+    parser.add_argument("--prompt-module", default=DEFAULT_PROMPT_MODULE)
+    parser.add_argument("--mcq-prompt", default=DEFAULT_MCQ_PROMPT)
+    parser.add_argument("--free-prompt", default=DEFAULT_FREE_PROMPT)
+    parser.add_argument("--mcq-config", default="greedy_n1", choices=sorted(CONFIGS))
+    parser.add_argument("--free-config", default="sc_n3", choices=sorted(CONFIGS))
+    parser.add_argument("--max-tokens", type=int, default=16384)
+    parser.add_argument("--fallback-max-tokens", type=int, default=2048)
+    parser.add_argument("--no-fallback", action="store_true")
+    parser.add_argument("--no-repair", action="store_true")
+    parser.add_argument("--math-type", default=None)
+    parser.add_argument("--include-few-shot", action="store_true")
+    parser.add_argument(
+        "--normalize-free-final-answers",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="Normalize non-option final boxed answers to plain ASCII in problem_type mode.",
+    )
+    parser.add_argument(
+        "--rank-free-samples",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="For non-option n>1 problem_type runs, choose the best formatted/precision sample.",
+    )
+    parser.add_argument("--max-model-len", type=int, default=32768)
+    parser.add_argument("--gpu-memory-utilization", type=float, default=0.85)
+    parser.add_argument("--max-num-seqs", type=int, default=32)
+    parser.add_argument("--max-num-batched-tokens", type=int, default=16384)
+    parser.add_argument("--enforce-eager", action="store_true")
+    return parser.parse_args()
+
+
+def main() -> None:
+    args = parse_args()
+    os.environ["CUDA_VISIBLE_DEVICES"] = args.gpu_id
+    sys.path.insert(0, ".")
+
+    output_dir = Path(args.output_dir)
+    submission_path = output_dir / args.submission_name
+    rows, original_ids = load_private(Path(args.data_path))
+    routing_mode = "problem_type" if args.routing_mode == "format" else args.routing_mode
+
+    print(f"Private set: {len(original_ids)} total")
+    print(f"Routing mode: {routing_mode}")
+    if routing_mode == "problem_type":
+        print("Prompt pipeline: prompts.math_reasoning_prompts submission_response_mode")
+        records = run_problem_type_submission(args, rows)
+    else:
+        print(f"Prompt pipeline: legacy split via {args.prompt_module}")
+        records = run_legacy_submission(args, rows)
 
     csv_path, audit_path = write_outputs(output_dir, submission_path, records, original_ids)
     print(f"Submission written to {csv_path}")
