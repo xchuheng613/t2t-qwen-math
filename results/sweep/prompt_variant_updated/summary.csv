@@ -1,0 +1,2 @@
+type,prompt,config,n,correct,acc,err_correct,err_truncated,err_no_answer,err_out_of_range,err_wrong,err_judge_error
+free,routed_v2,sc_n3,100,73,0.73,73,1,0,0,26,0
