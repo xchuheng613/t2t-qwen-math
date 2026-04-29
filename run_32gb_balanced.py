@@ -15,6 +15,8 @@ Defaults vs. ``run_math_prompts.py``:
   - sampling                  : sc_n3 (3 samples, majority pick of valid)
   - few-shot                  : disabled
   - repair                    : enabled (default)
+  - free final-answer cleanup : enabled
+  - free sample ranking       : enabled
 
 CLI args from ``run_math_prompts`` are still accepted and override these
 defaults. Example:
@@ -44,6 +46,8 @@ PRESET_DEFAULTS: dict[str, object] = {
     "config": "sc_n3",
     "include_few_shot": False,
     "no_repair": False,
+    "normalize_free_final_answers": True,
+    "rank_free_samples": True,
 }
 
 
@@ -70,11 +74,19 @@ def _apply_preset() -> None:
         extra += ["--include-few-shot"]
     if "--no-repair" not in flags and PRESET_DEFAULTS["no_repair"]:
         extra += ["--no-repair"]
+    if "--normalize-free-final-answers" not in flags and PRESET_DEFAULTS["normalize_free_final_answers"]:
+        extra += ["--normalize-free-final-answers"]
+    if "--rank-free-samples" not in flags and PRESET_DEFAULTS["rank_free_samples"]:
+        extra += ["--rank-free-samples"]
 
     sys.argv[1:] = extra + user_argv
 
 
 if __name__ == "__main__":
     _apply_preset()
-    print("[preset] 32GB BALANCED  config=sc_n3  max_tokens=16384  max_model_len=32768", flush=True)
+    print(
+        "[preset] 32GB BALANCED  config=sc_n3  max_tokens=16384  "
+        "max_model_len=32768  free_postprocess=default-on",
+        flush=True,
+    )
     main()

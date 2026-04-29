@@ -97,8 +97,11 @@ Mode-specific output (the runtime sets exactly one of these):
 - submission_response_mode: output concise natural-language reasoning, then
   end on its own line with one of:
       Final answer: \\boxed{<answer>}
-      Final answers, in order: \\boxed{<a>,\\ <b>,\\ <c>}
+      Final answers, in order: \\boxed{<a>, <b>, <c>}
   For multiple choice, the boxed answer must be the option LETTER.
+  Inside the box, use plain ASCII answer text: `20/(5+3*cos(t))`,
+  `(-8,infinity)`, `sqrt(2)`, `pi/4`, `e^2`. Do not use LaTeX answer
+  syntax such as `\\frac`, `\\infty`, `\\cos`, or `\\theta`.
 
 Things never to do:
 - Never emit hidden chain-of-thought tags such as `<think>...</think>`,
@@ -138,14 +141,13 @@ Value formatting:
   answer.
 - Prefer the form the problem requests. If the problem says "as a decimal or
   fraction", a fraction like "5/8" is fine. If it says "exact value", prefer
-  symbolic forms like "5/8", "\\sqrt{2}", "\\pi/4", "e^{2}".
-- For fractions, both "5/8" and "\\frac{5}{8}" are accepted by the validator;
-  prefer the simpler "5/8" form unless LaTeX is clearer.
+  plain symbolic forms like "5/8", "sqrt(2)", "pi/4", "e^2".
+- For fractions, use the plain "5/8" form, not "\\frac{5}{8}".
 - Use `*` between multiplied factors, `^` for powers in plain-text answers,
   `sqrt(...)`, `ln(...)`, `pi`, `e^(...)` — calculator/WebWork-style.
 - For decimals, keep 12-15 significant figures unless rounding is requested.
 - For ordered pairs, intervals, and sets, keep them as a single string element
-  ("(2, 5)", "(-\\infty, 3]", "{1, 2, 3}") — do not split commas inside.
+  ("(2, 5)", "(-infinity, 3]", "{1, 2, 3}") — do not split commas inside.
 """
 
 
@@ -157,13 +159,12 @@ submission CSV. The CSV columns are exactly `id,response` and `id` is copied
 from the input row by the runner — only the `response` text is your job.
 
 Required structure:
-1. Two to six sentences of concise reasoning (a few key formulas / steps).
-   No `<think>` tags. No bullet-point pyrotechnics. Write it like a textbook
-   solution.
+1. One to three short sentences of concise reasoning (only the key formula or
+   step). No `<think>` tags. No bullets.
 2. A blank line.
 3. The final-answer line, exactly one of:
        Final answer: \\boxed{<answer>}
-       Final answers, in order: \\boxed{<a>,\\ <b>,\\ <c>}
+       Final answers, in order: \\boxed{<a>, <b>, <c>}
    Use the singular form for one answer (single-blank, free-response, or
    multiple choice). Use the plural form when the problem has multiple [ANS]
    blanks; preserve the order.
@@ -174,9 +175,14 @@ Hard requirements:
   option text.
 - Nothing comes after the final-answer line. The boxed expression is the last
   thing in the response.
-- Inside the box, separate multiple answers with `,\\ ` (comma + LaTeX thin
-  space) so a downstream parser can split safely. Do NOT split commas inside
-  intervals or ordered pairs.
+- Inside the box, use plain ASCII answer text. Do not put LaTeX commands in
+  the answer: write `20/(5+3*cos(t))`, `(-8,infinity)`, `sqrt(2)`, `pi/4`,
+  not `\\frac{20}{5+3\\cos\\theta}` or `[-8, \\infty)`.
+- Preserve the problem's variable names in final expressions: if the problem
+  uses `t`, answer with `t`, not `theta`.
+- For multiple answers, separate items with comma + normal space: `, `. Do
+  not emit `,\\ ` or any stray backslash before later answers. Do NOT split
+  commas inside intervals or ordered pairs.
 - Keep units out of the box unless the problem asks for them in the answer.
 """
 
@@ -323,7 +329,7 @@ FORMAT_PROMPTS: dict[str, FormatPrompt] = {
         ),
         submission_rules=(
             "Single blank: `Final answer: \\boxed{<LETTER>}`. "
-            "Multi-blank: `Final answers, in order: \\boxed{<L1>,\\ <L2>}`."
+            "Multi-blank: `Final answers, in order: \\boxed{<L1>, <L2>}`."
         ),
         common_mistakes=(
             "Treating `A.` as a label and answering with the option text. "
@@ -335,7 +341,7 @@ FORMAT_PROMPTS: dict[str, FormatPrompt] = {
             "Submission: f(45) is the number of items sold when p=45, which "
             "matches G. f^{-1}(40) is the price at which 40 items will be "
             "sold, which matches B.\n\n"
-            "Final answers, in order: \\boxed{G,\\ B}"
+            "Final answers, in order: \\boxed{G, B}"
         ),
     ),
 
@@ -352,8 +358,8 @@ FORMAT_PROMPTS: dict[str, FormatPrompt] = {
         warnings=(
             "Some [ANS] blanks have a form hint nearby ('Enter as a decimal "
             "or fraction.', 'Round to two decimal places.'). Honor it. The "
-            "validator normalizes `5/8` <-> `\\frac{5}{8}` and compares "
-            "numerics with 1e-8 tolerance."
+            "validator normalizes equivalent fractions and compares numerics "
+            "with 1e-8 tolerance. Prefer plain `5/8`, not LaTeX `\\frac`."
         ),
         internal_rules=(
             'Output {"answer": ["<value>"]}. ALWAYS an array of length 1, even '
@@ -398,8 +404,8 @@ FORMAT_PROMPTS: dict[str, FormatPrompt] = {
         ),
         submission_rules=(
             "Use the plural marker: "
-            "`Final answers, in order: \\boxed{<a1>,\\ <a2>,\\ <a3>}`. "
-            "Inside the box, separate items with `,\\ `. Do NOT split commas "
+            "`Final answers, in order: \\boxed{<a1>, <a2>, <a3>}`. "
+            "Inside the box, separate items with `, `. Do NOT split commas "
             "inside an interval, ordered pair, or set."
         ),
         common_mistakes=(
@@ -414,8 +420,8 @@ FORMAT_PROMPTS: dict[str, FormatPrompt] = {
             "Submission: Convert 145°F. Celsius = (145-32)*5/9 = "
             "62.7777777777778. Kelvin adds 273.15 -> 335.927777777778. "
             "Rankine = 145+459.67 = 604.67.\n\n"
-            "Final answers, in order: \\boxed{62.7777777777778,\\ "
-            "335.927777777778,\\ 604.67}"
+            "Final answers, in order: \\boxed{62.7777777777778, "
+            "335.927777777778, 604.67}"
         ),
     ),
 
@@ -442,7 +448,7 @@ FORMAT_PROMPTS: dict[str, FormatPrompt] = {
         submission_rules=(
             "Single value:   `Final answer: \\boxed{<value>}`.\n"
             "Multiple values: "
-            "`Final answers, in order: \\boxed{<v1>,\\ <v2>}`."
+            "`Final answers, in order: \\boxed{<v1>, <v2>}`."
         ),
         common_mistakes=(
             "Wrapping a single answer in an array unnecessarily. Mixing "
@@ -566,8 +572,8 @@ DOMAIN_PROMPTS: dict[str, DomainPrompt] = {
             "through by a variable; missing the trivial solution."
         ),
         precision_notes=(
-            "Prefer exact symbolic answers (e.g. `5/8`, `\\sqrt{3}`). "
-            "Rationalize denominators when natural."
+            "Prefer exact plain symbolic answers (e.g. `5/8`, `sqrt(3)`). "
+            "Rationalize denominators when natural; avoid LaTeX in final answers."
         ),
         combine_notes=(
             "Plain answers go directly in the box / JSON value. For multiple "
@@ -587,8 +593,8 @@ DOMAIN_PROMPTS: dict[str, DomainPrompt] = {
             "required; missing the case where the triangle is obtuse / right."
         ),
         precision_notes=(
-            "Areas/volumes often want exact symbolic forms with `\\pi` or "
-            "`\\sqrt{}`. Avoid premature rounding."
+            "Areas/volumes often want exact symbolic forms with `pi` or "
+            "`sqrt(...)`. Avoid premature rounding."
         ),
         combine_notes=(
             "When the answer is `(x, y)` coordinates, keep parens inside ONE "
@@ -880,11 +886,10 @@ Decision rules:
     specifies rounding. Do not strip trailing significant zeros.
 
   - Symbolic forms: When the problem requests an "exact" answer or
-    contains `\\sqrt`, `\\pi`, `e`, `ln`, fractions are preferred over
-    decimals. Use `5/8` over `0.625` unless decimals are required.
+    contains sqrt/pi/e/ln notation, fractions are preferred over decimals.
+    Use `5/8` over `0.625` unless decimals are required.
 
-  - Fractions: `5/8` and `\\frac{5}{8}` are both accepted. Default to
-    `5/8`. Use the LaTeX form only when other LaTeX is already present.
+  - Fractions: use `5/8`, not `\\frac{5}{8}`.
 
   - Equivalent forms: The validator normalizes spaces, `\\dfrac/\\tfrac`
     -> `\\frac`, `\\left/\\right`, `\\cdot/\\times` -> `*`, and compares
@@ -908,7 +913,7 @@ CSV format:
 
 Response body:
 
-  - Two to six sentences of concise reasoning. Plain prose. No bullets,
+  - One to three short sentences of concise reasoning. Plain prose. No bullets,
     no markdown headers, no JSON, no `<think>` tags.
   - One blank line between the reasoning and the final-answer line.
 
@@ -917,15 +922,19 @@ Final-answer line (must be the LAST line of the response):
   - One answer:
         Final answer: \\boxed{<answer>}
   - Multiple answers (one per [ANS] blank, in order):
-        Final answers, in order: \\boxed{<a1>,\\ <a2>,\\ <a3>}
+        Final answers, in order: \\boxed{<a1>, <a2>, <a3>}
 
 Boxing rules:
 
   - The boxed value for multiple choice is the LETTER (e.g. `\\boxed{F}`),
     not the option text.
-  - For multiple answers, separate items with `,\\ ` (comma + LaTeX
-    thin-space). Keep intervals, ordered pairs, and sets inside ONE box
-    item — do NOT split commas inside `(2, 5)` or `\\{1, 2\\}`.
+  - Inside the box, use plain ASCII answer text. Use `20/(5+3*cos(t))`,
+    `(-8,infinity)`, `sqrt(2)`, `pi/4`, `e^2`; do not use `\\frac`,
+    `\\infty`, `\\cos`, or other LaTeX answer commands.
+    Preserve the problem's variable names: `t` stays `t`.
+  - For multiple answers, separate items with comma + normal space: `, `.
+    Keep intervals, ordered pairs, and sets inside ONE box item — do NOT
+    split commas inside `(2, 5)` or `{1, 2}`.
   - Do not put units inside the box unless the problem asks for them in
     the answer.
   - The boxed expression is the last token of the response. Nothing comes
@@ -984,15 +993,17 @@ Repair procedure:
      from scratch.
   2. Remove `<think>...</think>` and any other hidden-reasoning tags.
      Remove any stray JSON blocks. Remove markdown fences and headers.
-  3. Compress the reasoning to two-to-six clear sentences, finishing on its
+  3. Compress the reasoning to one-to-three clear sentences, finishing on its
      own line.
   4. Add a blank line, then the final-answer marker:
         - one answer:       Final answer: \\boxed{<answer>}
         - multiple answers: Final answers, in order:
-                             \\boxed{<a1>,\\ <a2>,\\ <a3>}
+                             \\boxed{<a1>, <a2>, <a3>}
   5. For multiple choice, the boxed value MUST be the option LETTER, not the
      option's text. Force letters to uppercase.
-  6. The boxed expression is the LAST thing in the output. Nothing after it.
+  6. Use plain ASCII inside the box; remove LaTeX answer commands such as
+     `\\frac`, `\\infty`, and `\\cos` when a plain form is available.
+  7. The boxed expression is the LAST thing in the output. Nothing after it.
 
 Do not output JSON. Do not add any commentary about the repair.
 """
@@ -1143,7 +1154,7 @@ FEW_SHOT_EXAMPLES: list[FewShot] = [
             "Kelvin = Celsius + 273.15 = 335.927777777778. "
             "Rankine = 145 + 459.67 = 604.67.\n\n"
             "Final answers, in order: "
-            "\\boxed{62.7777777777778,\\ 335.927777777778,\\ 604.67}"
+            "\\boxed{62.7777777777778, 335.927777777778, 604.67}"
         ),
     ),
 ]

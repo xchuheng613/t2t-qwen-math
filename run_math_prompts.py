@@ -115,10 +115,190 @@ _FINAL_MARKER_RE = re.compile(
     re.IGNORECASE,
 )
 _LETTER_RE = re.compile(r"^[A-Z]+$")
+_LATEX_ANSWER_CMD_RE = re.compile(
+    r"\\(?:d?frac|tfrac|infty|sin|cos|tan|cot|sec|csc|sqrt|pi|theta)\b"
+)
+_ROUNDING_HINT_RE = re.compile(
+    r"\b(round|rounded|nearest|decimal places?|significant figures?|"
+    r"to \d+ places?|to the nearest)\b",
+    re.IGNORECASE,
+)
+_EXACT_HINT_RE = re.compile(
+    r"\b(exact|formula|expression|function|model|in terms of|symbolic|"
+    r"simplify|closed form)\b",
+    re.IGNORECASE,
+)
+_TOP_LEVEL_BRACKETS = {"(": ")", "[": "]", "{": "}", "<": ">"}
 
 
 def strip_think_tags(text: str) -> str:
     return _THINK_RE.sub("", text).strip()
+
+
+def is_free_response_row(row: dict[str, Any]) -> bool:
+    """Rows without an explicit options field benefit from free-answer cleanup."""
+    return not bool(row.get("options"))
+
+
+def expected_answer_count(row: dict[str, Any]) -> int | None:
+    blanks = n_blanks(str(row.get("question", "")))
+    return blanks if blanks >= 1 else None
+
+
+def split_top_level_commas(expr: str) -> list[str]:
+    """Split on commas outside brackets/braces, preserving intervals/pairs."""
+    parts: list[str] = []
+    stack: list[str] = []
+    start = 0
+    i = 0
+    while i < len(expr):
+        char = expr[i]
+        if char == "\\" and i + 1 < len(expr):
+            i += 2
+            continue
+        if char in _TOP_LEVEL_BRACKETS:
+            stack.append(_TOP_LEVEL_BRACKETS[char])
+        elif stack and char == stack[-1]:
+            stack.pop()
+        elif char == "," and not stack:
+            parts.append(expr[start:i].strip())
+            start = i + 1
+        i += 1
+    tail = expr[start:].strip()
+    if tail:
+        parts.append(tail)
+    return parts or [expr.strip()]
+
+
+def preferred_theta_name(row: dict[str, Any]) -> str:
+    question = str(row.get("question", ""))
+    if re.search(r"(?<![A-Za-z])t(?![A-Za-z])", question):
+        return "t"
+    return "theta"
+
+
+def _compound_ascii(expr: str) -> bool:
+    return bool(re.search(r"[+\-*/^]", expr.strip()))
+
+
+def _wrap_if_compound(expr: str) -> str:
+    expr = expr.strip()
+    if not expr:
+        return expr
+    if (expr.startswith("(") and expr.endswith(")")) or (
+        expr.startswith("[") and expr.endswith("]")
+    ):
+        return expr
+    return f"({expr})" if _compound_ascii(expr) else expr
+
+
+def _replace_simple_latex_fraction(text: str) -> str:
+    frac_re = re.compile(r"\\(?:dfrac|tfrac|frac)\s*\{([^{}]+)\}\s*\{([^{}]+)\}")
+
+    def repl(match: re.Match[str]) -> str:
+        num = _wrap_if_compound(match.group(1))
+        den = _wrap_if_compound(match.group(2))
+        return f"{num}/{den}"
+
+    previous = None
+    current = text
+    while previous != current:
+        previous = current
+        current = frac_re.sub(repl, current)
+    return current
+
+
+def _replace_latex_functions(text: str) -> str:
+    # Braced functions: \sqrt{2}, \ln{x}, \cos{t}
+    for name in ("sqrt", "ln", "log", "sin", "cos", "tan", "cot", "sec", "csc"):
+        text = re.sub(rf"\\{name}\s*\{{([^{{}}]+)\}}", rf"{name}(\1)", text)
+    # Space functions: \cos t, \sin theta
+    for name in ("ln", "log", "sin", "cos", "tan", "cot", "sec", "csc"):
+        text = re.sub(rf"\\{name}\s+([A-Za-z][A-Za-z0-9_]*)", rf"{name}(\1)", text)
+    # Bare commands that may already have parenthesized arguments.
+    for name in ("ln", "log", "sin", "cos", "tan", "cot", "sec", "csc"):
+        text = text.replace(f"\\{name}", name)
+    return text
+
+
+def normalize_answer_atom(answer: str, row: dict[str, Any]) -> str:
+    """Convert common LaTeX final-answer syntax to plain ASCII."""
+    text = answer.strip().strip("$")
+    text = text.replace("\\left", "").replace("\\right", "")
+    text = text.replace("\\,", "").replace("\\;", "").replace("\\:", "")
+    text = text.replace("\\!", "").replace("\\ ", " ")
+    text = text.replace("\\{", "{").replace("\\}", "}")
+    text = text.replace("\\langle", "<").replace("\\rangle", ">")
+    text = text.replace("\\infty", "infinity").replace("∞", "infinity")
+    text = text.replace("\\pi", "pi")
+    text = text.replace("\\theta", preferred_theta_name(row))
+    text = re.sub(r"\\(?=\d)", "", text)
+    text = _replace_latex_functions(text)
+    text = _replace_simple_latex_fraction(text)
+    text = re.sub(r"e\^\{([^{}]+)\}", r"e^(\1)", text)
+    text = re.sub(r"([A-Za-z0-9_)])\^\{([^{}]+)\}", r"\1^(\2)", text)
+    text = re.sub(r"\s*\*\s*", "*", text)
+    text = re.sub(r"\s*/\s*", "/", text)
+    text = re.sub(r"\s*\^\s*", "^", text)
+    text = re.sub(r"\s*\+\s*", "+", text)
+    text = re.sub(r"\s+-\s*", "-", text)
+    text = re.sub(r"(?<=\d)(?=(?:sin|cos|tan|cot|sec|csc|ln|log|sqrt)\()", "*", text)
+    text = re.sub(r"(?<=\d)\s+(?=(?:sin|cos|tan|cot|sec|csc|ln|log|sqrt)\()", "*", text)
+    text = re.sub(r"(?<=[A-Za-z0-9_)])\s+(?=[A-Za-z]\()", "*", text)
+    text = re.sub(r"\s*,\s*", ",", text) if text[:1] in "([{" and text[-1:] in ")]}" else text
+    text = re.sub(r"\s+", " ", text).strip()
+    return text
+
+
+def normalize_answer_inner(inner: str, row: dict[str, Any]) -> str:
+    parts = split_top_level_commas(inner)
+    normalized = [normalize_answer_atom(part, row) for part in parts]
+    return ", ".join(part for part in normalized if part)
+
+
+def normalize_submission_final_answer(text: str, row: dict[str, Any]) -> tuple[str, bool]:
+    boxed = last_boxed_only_string(text)
+    inner = remove_boxed(boxed) if boxed else None
+    if inner is None:
+        return text, False
+    normalized_inner = normalize_answer_inner(inner, row)
+    if normalized_inner == inner:
+        return text, False
+    idx = text.rfind(boxed)
+    if idx < 0:
+        return text, False
+    normalized_boxed = f"\\boxed{{{normalized_inner}}}"
+    return text[:idx] + normalized_boxed + text[idx + len(boxed) :], True
+
+
+def final_answer_inner(text: str) -> str:
+    boxed = last_boxed_only_string(text)
+    return remove_boxed(boxed) or ""
+
+
+def free_submission_candidate_score(text: str, row: dict[str, Any], valid: bool) -> int:
+    inner = final_answer_inner(text)
+    parts = split_top_level_commas(inner) if inner else []
+    question = str(row.get("question", ""))
+    expected = expected_answer_count(row)
+    score = 1000 if valid else 0
+
+    if expected is not None:
+        score += 120 if len(parts) == expected else -160 * abs(len(parts) - expected)
+    if inner:
+        score -= 30 * len(_LATEX_ANSWER_CMD_RE.findall(inner))
+        score -= 8 * inner.count("\\")
+        if ",\\" in inner:
+            score -= 80
+    if not _ROUNDING_HINT_RE.search(question):
+        decimal_digits = [len(match.group(1)) for match in re.finditer(r"\d+\.(\d+)", inner)]
+        score += min(sum(decimal_digits), 60)
+        score -= 20 * sum(1 for digits in decimal_digits if digits and digits < 3)
+    if _EXACT_HINT_RE.search(question) and re.fullmatch(r"[-+]?\d+(?:\.\d+)?", inner.strip()):
+        score -= 40
+    # Prefer concise valid responses after answer-quality features tie.
+    score -= min(len(text) // 1000, 40)
+    return score
 
 
 # ── Internal mode parsing ──────────────────────────────────────────────────
@@ -299,17 +479,78 @@ def pick_best_internal(
 
 
 def pick_best_submission(
-    samples: list[str], row: dict[str, Any]
-) -> tuple[str, bool, str]:
-    """Pick the first sample that passes validation; otherwise return the first."""
-    for sample in samples:
+    samples: list[str],
+    row: dict[str, Any],
+    *,
+    normalize_free_final_answers: bool = False,
+    rank_free_samples: bool = False,
+) -> tuple[str, bool, str, int, bool, list[dict[str, Any]]]:
+    """Pick a submission sample.
+
+    Default behavior is the original "first valid sample" policy. When the
+    balanced preset enables free-response post-processing, non-option rows get
+    final-box ASCII normalization and n>1 samples are ranked by formatting /
+    precision signals.
+    """
+    candidates: list[dict[str, Any]] = []
+    free_row = is_free_response_row(row)
+
+    for idx, sample in enumerate(samples):
         cleaned = clean_submission_text(sample)
-        ok, msg = validate_submission(cleaned, row)
-        if ok:
-            return cleaned, True, ""
-    raw = clean_submission_text(samples[0]) if samples else ""
-    ok, msg = validate_submission(raw, row)
-    return raw, ok, msg
+        normalized = cleaned
+        normalized_used = False
+        if free_row and normalize_free_final_answers:
+            normalized, normalized_used = normalize_submission_final_answer(cleaned, row)
+        ok, msg = validate_submission(normalized, row)
+        candidates.append(
+            {
+                "idx": idx,
+                "text": normalized,
+                "valid": ok,
+                "error": "" if ok else msg,
+                "normalized": normalized_used,
+                "score": free_submission_candidate_score(normalized, row, ok)
+                if free_row and rank_free_samples
+                else (1000 if ok else 0),
+            }
+        )
+
+    if not candidates:
+        raw = ""
+        ok, msg = validate_submission(raw, row)
+        return raw, ok, msg, 0, False, []
+
+    if free_row and rank_free_samples:
+        best = max(candidates, key=lambda c: (c["score"], c["valid"], -c["idx"]))
+        return (
+            str(best["text"]),
+            bool(best["valid"]),
+            "" if best["valid"] else str(best["error"]),
+            int(best["idx"]),
+            bool(best["normalized"]),
+            candidates,
+        )
+
+    for candidate in candidates:
+        if candidate["valid"]:
+            return (
+                str(candidate["text"]),
+                True,
+                "",
+                int(candidate["idx"]),
+                bool(candidate["normalized"]),
+                candidates,
+            )
+
+    first = candidates[0]
+    return (
+        str(first["text"]),
+        bool(first["valid"]),
+        str(first["error"]),
+        int(first["idx"]),
+        bool(first["normalized"]),
+        candidates,
+    )
 
 
 def run_internal(
@@ -376,6 +617,8 @@ def run_submission(
     include_few_shot: bool,
     math_type: str | None,
     enable_repair: bool,
+    normalize_free_final_answers: bool,
+    rank_free_samples: bool,
 ) -> list[dict[str, Any]]:
     pairs = build_pairs(rows, Mode.SUBMISSION, include_few_shot, math_type)
     print(f"[submission] generating {len(pairs)} prompts (n={config.n}) ...", flush=True)
@@ -384,11 +627,28 @@ def run_submission(
     records: list[dict[str, Any]] = []
     repair_indices: list[int] = []
     for idx, (row, samples) in enumerate(zip(rows, all_samples)):
-        chosen, valid, err = pick_best_submission(samples, row)
+        chosen, valid, err, chosen_idx, normalized, candidates = pick_best_submission(
+            samples,
+            row,
+            normalize_free_final_answers=normalize_free_final_answers,
+            rank_free_samples=rank_free_samples,
+        )
         record = {
             "id": int(row["id"]),
             "response": chosen,
             "all_samples": samples if config.n > 1 else None,
+            "chosen_idx": chosen_idx if config.n > 1 else None,
+            "free_postprocess_used": normalized,
+            "candidate_scores": [
+                {
+                    "idx": c["idx"],
+                    "valid": c["valid"],
+                    "score": c["score"],
+                    "normalized": c["normalized"],
+                    "error": c["error"],
+                }
+                for c in candidates
+            ] if config.n > 1 and rank_free_samples and is_free_response_row(row) else None,
             "valid": valid,
             "validation_error": err,
             "repair_used": False,
@@ -409,10 +669,14 @@ def run_submission(
         )
         for idx, samples in zip(repair_indices, repair_samples):
             raw = clean_submission_text(samples[0] if samples else "")
+            normalized = False
+            if is_free_response_row(rows[idx]) and normalize_free_final_answers:
+                raw, normalized = normalize_submission_final_answer(raw, rows[idx])
             ok, msg = validate_submission(raw, rows[idx])
             records[idx].update(
                 repair_used=True,
                 repair_raw=raw,
+                repair_free_postprocess_used=normalized,
                 response=raw if ok else records[idx]["response"],
                 valid=ok,
                 validation_error="" if ok else msg,
@@ -497,6 +761,12 @@ def parse_args() -> argparse.Namespace:
                         help="Prepend few-shot examples to each prompt.")
     parser.add_argument("--no-repair", action="store_true",
                         help="Disable the one-shot repair pass on invalid rows.")
+    parser.add_argument("--normalize-free-final-answers", action=argparse.BooleanOptionalAction,
+                        default=False,
+                        help="Normalize non-option final boxed answers to plain ASCII.")
+    parser.add_argument("--rank-free-samples", action=argparse.BooleanOptionalAction,
+                        default=False,
+                        help="For non-option n>1 runs, choose the best formatted/precision sample.")
     parser.add_argument("--dry-run", action="store_true",
                         help="Print built prompts and exit without loading a model.")
     parser.add_argument("--model", default=DEFAULT_MODEL_ID, help="HF model id for vLLM.")
@@ -556,6 +826,8 @@ def main() -> None:
             rows, llm, tokenizer, config, max_tokens,
             args.include_few_shot, args.math_type,
             enable_repair=not args.no_repair,
+            normalize_free_final_answers=args.normalize_free_final_answers,
+            rank_free_samples=args.rank_free_samples,
         )
         write_submission_outputs(out_dir, records)
 

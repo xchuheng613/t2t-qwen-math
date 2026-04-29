@@ -53,6 +53,16 @@ python run_format_router_public.py --num-examples 100
 
 Use `--num-examples -1` for the full public set. Results are written to `results/public_format_router/`.
 
+## Verify public runs
+
+Score a public-set output directory or submission file and refresh the wrong-answer HTML report:
+
+```bash
+.venv/bin/python verify_public.py results/32gb_balanced_public_smoke
+```
+
+This writes `result_analyze/<run_name>.jsonl`, appends to `result_analyze/public_verification_summary.csv`, and refreshes `result_analyze/visualizations/<run_name>.html`.
+
 ## Private submission
 
 The default submission path now uses format-first routing, cleaned `FINAL_ANSWERS` blocks, and short fallback prompts for truncated/no-answer generations:

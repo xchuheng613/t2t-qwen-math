@@ -19,7 +19,10 @@ FINAL_ANSWER_RULES = (
     "  - Preserve exact symbolic form when the problem asks for a formula, expression, exact answer, "
     "simplification, answer in terms of constants, or uses ln, e^, sqrt, pi, or similar notation.\n"
     "  - Prefer calculator/WebWork-style notation when possible: e^(16*x), sqrt(11), ln(0.5), "
-    "10^6, (-8,infinity). Use * between multiplied terms."
+    "10^6, (-8,infinity). Use * between multiplied terms.\n"
+    "  - Use plain ASCII inside boxes: write 20/(5+3*cos(t)), infinity, sqrt(2), pi/4. "
+    "Do not use LaTeX answer commands like \\frac, \\infty, \\cos, or \\theta; preserve "
+    "the problem's variable names."
 )
 
 SHORT_FINAL_RULES = (
@@ -27,7 +30,8 @@ SHORT_FINAL_RULES = (
     "FINAL_ANSWERS:\n"
     "\\boxed{answer}\n"
     "Use one box per [ANS] blank. No reasoning, labels, units, [ANS], or text after the boxes. "
-    "Do not round unless requested. Use * for multiplication and WebWork-style functions."
+    "Do not round unless requested. Use plain ASCII, * for multiplication, and WebWork-style functions. "
+    "Do not use LaTeX answer commands like \\frac, \\infty, or \\cos."
 )
 
 
