@@ -33,6 +33,7 @@ FREE_FINAL_RULES_V2 = (
     "If the problem says 'at least' N digits, give more digits, not fewer. "
     "Do not pad exact integers with .000 unless fixed decimal places are explicitly required. "
     "Use ASCII: sqrt(...), pi, ln(...), exp(...), *, infinity."
+    "If no [ANS] appears, output exactly one \boxed{} for the requested final answer. "
 )
 
 
