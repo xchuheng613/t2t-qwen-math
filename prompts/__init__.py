@@ -5,8 +5,9 @@ two output modes (``internal_answer_json_mode`` and
 ``submission_response_mode``), a classifier prompt, format/domain prompt
 fragments, repair prompts, validator notes, and builder helpers.
 
-The legacy single-mode prompt constants in :mod:`prompt_variants` are still
-used by ``prompt_sweep.py`` and ``create_submission.py``; this package is
+The legacy single-mode prompt constants in :mod:`prompts.legacy_prompts` are
+still used by ``scripts/prompt_sweep.py`` and ``scripts/create_submission.py``;
+this package is
 meant to be imported alongside (or to gradually replace) them.
 """
 
