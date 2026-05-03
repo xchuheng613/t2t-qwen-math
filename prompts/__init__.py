@@ -32,6 +32,13 @@ from .math_reasoning_prompts import (
     build_repair_internal_prompt,
     build_repair_submission_prompt,
 )
+from .compact_prompt_pack import (
+    BASE_SYSTEM,
+    MCQ_SYSTEM,
+    FREE_SYSTEM,
+    SUFFIXES,
+    route_prompt,
+)
 
 __all__ = [
     "GLOBAL_SYSTEM_PROMPT",
@@ -53,4 +60,9 @@ __all__ = [
     "build_submission_prompt",
     "build_repair_internal_prompt",
     "build_repair_submission_prompt",
+    "BASE_SYSTEM",
+    "MCQ_SYSTEM",
+    "FREE_SYSTEM",
+    "SUFFIXES",
+    "route_prompt",
 ]

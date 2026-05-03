@@ -77,6 +77,10 @@ python scripts/create_submission.py --routing-mode legacy \
 # Try the updated routed free-response prompts:
 python scripts/create_submission.py --routing-mode legacy \
   --prompt-module prompts.legacy_prompts_v2
+# Run the compact judge-compatible prompt pack:
+python scripts/create_submission.py --routing-mode legacy \
+  --prompt-module prompts.compact_prompt_pack \
+  --mcq-prompt compact --free-prompt compact
 ```
 
 ### 3. Sweep prompts on a stratified public subset
@@ -116,6 +120,7 @@ The HTML lands in `analysis/visualizations/`.
 | `prompts.math_reasoning_prompts`        | New unified prompt package: two output modes (internal JSON / submission text), classifier prompt, format and math-domain profiles, repair prompts, validator notes. |
 | `prompts.legacy_prompts`                | Original `FINAL_ANSWERS:` prompt families used by `prompt_sweep`, `create_submission --routing-mode legacy`, and `run_sweep_best_combo`. |
 | `prompts.legacy_prompts_v2`             | Drop-in replacement for `legacy_prompts` with refined free-response routing; opt in via `--prompt-module prompts.legacy_prompts_v2`. |
+| `prompts.compact_prompt_pack`           | Compact judge-compatible prompt pack with broad suffix routing; opt in via `--prompt-module prompts.compact_prompt_pack --mcq-prompt compact --free-prompt compact`. |
 
 The runner scripts that take a `--prompt-module` flag default to
 `prompts.legacy_prompts`; all dynamic loads use `importlib.import_module`,
