@@ -1,0 +1,7 @@
+type,prompt,config,n,correct,acc,err_correct,err_truncated,err_no_answer,err_out_of_range,err_wrong,err_judge_error
+free,best,greedy_n1,50,34,0.68,34,2,0,0,14,0
+free,baseline,greedy_n1,50,29,0.58,29,2,0,0,19,0
+free,blank,greedy_n1,50,15,0.3,15,1,0,0,34,0
+mcq,best,greedy_n1,50,38,0.76,38,2,0,0,10,0
+mcq,blank,greedy_n1,50,37,0.74,37,8,0,0,5,0
+mcq,baseline,greedy_n1,50,36,0.72,36,8,0,0,6,0

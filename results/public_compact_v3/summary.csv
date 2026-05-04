@@ -1,0 +1,4 @@
+type,prompt,config,n,correct,acc,path,avg_response_chars,finish_non_stop,postprocess_used,err_correct,err_truncated,err_no_answer,err_out_of_range,err_count_mismatch,err_wrong,err_judge_error
+combined,mcq_compact__free_compact,mcq_greedy_n1__free_greedy_n1,1126,729,0.6474245115452931,,11699.216696269983,47,0,729,46,0,0,7,344,0
+mcq,compact,greedy_n1,375,276,0.736,results/public_compact_v3/mcq__compact__greedy_n1.jsonl,17685.586666666666,29,0,276,28,0,0,0,71,0
+free,compact,greedy_n1,751,453,0.6031957390146472,results/public_compact_v3/free__compact__greedy_n1.jsonl,8710.017310252995,18,0,453,18,0,0,7,273,0
