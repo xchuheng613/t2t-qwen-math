@@ -1,86 +1,197 @@
+% =======> To use this template:
+% => Edit authors in this file.
+% => Edit the paper's content itself in the respective sections. Edit as needed
+% => Add any references to references.bib (cite with \cite or \citet)
+% =================================================
+
 \documentclass{article}
 
-\PassOptionsToPackage{numbers,compress}{natbib}
-\usepackage[preprint]{neurips_2024}
+% to avoid loading the natbib package, add option nonatbib:
+% \usepackage[nonatbib]{neurips_2024}
+% \PassOptionsToPackage{square,comma,sort,numbers}{natbib}
+\PassOptionsToPackage{numbers, compress}{natbib}
+% \usepackage[numbers]{natbib}
 
-\usepackage[utf8]{inputenc}
+% to compile a preprint version, e.g., for submission to arXiv, add add the
+% [preprint] option:
+\usepackage[preprint]{neurips_2024}
+% \usepackage[nonatbib, preprint]{neurips_2024}
+
+\usepackage[utf8]{inputenc} % allow utf-8 input
+% \usepackage[T1]{fontenc}    % use 8-bit T1 fonts
+% For maths/theorems and such
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{mathtools}
 \usepackage{amsthm}
 \usepackage{float}
+% Use DeclareMathOperator and/or \newcommand to define abbreviations, e.g.:
+\DeclareMathOperator{\R}{\mathbb{R}} % real numbers
+% Recommended, but optional, packages for figures and better typesetting:
 \usepackage{microtype}
 \usepackage{graphicx}
-\usepackage{booktabs}
-\usepackage{algorithm}
+\usepackage{subfigure}
+\usepackage{subcaption}
+\usepackage{booktabs} % for professional tables (https://www.ctan.org/pkg/booktabs)
+\usepackage{algorithm}  % For algorithms
 \usepackage{algorithmic}
-\usepackage{hyperref}
-\usepackage[capitalize,noabbrev]{cleveref}
+\usepackage{hyperref} % hyperref makes hyperlinks in the resulting PDF.
+\usepackage{wrapfig}  % For wrapping figures with text
+\usepackage[capitalize,noabbrev]{cleveref}   % For \cref
 \RequirePackage{doi}
-\usepackage{xcolor,colortbl}
-
-\definecolor{darkblue}{rgb}{0.19,0.19,0.62}
+% Color references and URLs
+\usepackage{xcolor, colortbl}
+\definecolor{darkblue}{rgb}{0.19, 0.19, 0.62}
 \hypersetup{
-  colorlinks=true,
-  citecolor=darkblue,
-  filecolor=darkblue,
-  urlcolor=darkblue
+  colorlinks = true,
+  citecolor  = darkblue,
+  filecolor  = darkblue,
+  urlcolor   = darkblue,
+    % linkcolor  = myred,
 }
+% Todonotes is useful during development; simply uncomment the next line
+%    and comment out the line below the next line to turn off comments
+%\usepackage[disable,textsize=tiny]{todonotes}
+\usepackage[textsize=tiny]{todonotes}
 
-\newcommand{\model}{Qwen3-4B-Thinking-2507}
-\newcommand{\modelhf}{\texttt{Qwen/Qwen3-4B-Thinking-2507}}
-\newcommand{\answerextract}{\mathcal{E}}
-\newcommand{\scorefn}{\mathcal{J}}
+% \input{_macros}
+
+
 
 \title{
-CSE 151B/251B Final Project Report\\
-{\large Model-Intrinsic Improvement of Qwen3-4B for Mathematical Reasoning}
-}
+CSE 151B/251B Milestone Final Report
+\\
+% {\small $<$Your-accessible-and-up-to-date-GitHub-URL$>$} % Note: You can put it in your abstracts or as a footnote in the first page, if you prefer. Note 2: Use \href or \url to link your URL.
+} 
 
 \author{%
-  Chuheng Xi, Jeffery Thi, Lin Nie\\
+  Chuheng Xi, Jeffery Thi, Lin Nie
+  % \thanks{Use footnote for providing further information about author (webpage, alternative address)}
+  \\
   Department of Computer Science\\
   University of California San Diego\\
-  \texttt{cxi@ucsd.edu, jthi@ucsd.edu, y1nie@ucsd.edu}
+  \texttt{cxi@ucsd.edu, jthi@ucsd.edu, y1nie@ucsd.edu} \\
+  % examples of more authors
+  % \And
+  % Coauthor \\
+  % Affiliation \\
+  % Address \\
+  % \texttt{email} \\
+  % \AND
+  % Coauthor \\
+  % Affiliation \\
+  % Address \\
+  % \texttt{email} \\
+  % \And
+  % Coauthor \\
+  % Affiliation \\
+  % Address \\
+  % \texttt{email} \\
 }
-
 \begin{document}
 \maketitle
 
+
 \begin{abstract}
-This project studies how far a small open-weight reasoning model, \model, can be pushed on diverse mathematical reasoning tasks without external tools at inference time. The competition setting is challenging because it mixes high-school, undergraduate, and graduate-level problems, and it requires the same 4B-parameter model to answer both multiple-choice and free-response questions. Our current system improves the starter pipeline through model-intrinsic methods: problem-type-specific prompts, strict final-answer formatting, robust answer extraction, self-consistency voting, and error analysis. On the public labeled data, our first mixed 100-problem prompt experiments reached 44.0\% local accuracy, compared with 41.0\% for the starter-style prompt on the same subset. A later stratified prompt sweep reached 77.0\% on 100 multiple-choice examples with a match-back few-shot prompt and 67.0\% on 100 free-response examples with a multi-answer self-consistency prompt. Our best combined balanced-subset run reached 68/100 = 68.0\% local accuracy, using an MCQ elimination prompt with greedy decoding and a free-response baseline prompt with three-sample voting. The current Kaggle public leaderboard score reported by our team is 60.7\%. These results show that careful alignment between prompt format, answer extraction, and decoding strategy can substantially improve a small reasoning model before any parameter updates. The next stage is to use the collected failure cases to build supervised fine-tuning data and train a LoRA adapter.
+This project studies how far a small open-weight reasoning model, can be pushed on diverse mathematical reasoning tasks without external tools at inference time. The competition setting is challenging because it mixes high-school, undergraduate, and graduate-level problems, and it requires the same 4B-parameter model to answer both multiple-choice and free-response questions. Our current system improves the starter pipeline through model-intrinsic methods: problem-type-specific prompts, strict final-answer formatting, robust answer extraction, self-consistency voting, and error analysis. On the public labeled data, our first mixed 100-problem prompt experiments reached 44.0\% local accuracy, compared with 41.0\% for the starter-style prompt on the same subset. A later stratified prompt sweep reached 77.0\% on 100 multiple-choice examples with a match-back few-shot prompt and 67.0\% on 100 free-response examples with a multi-answer self-consistency prompt. Our best combined balanced-subset run reached 68/100 = 68.0\% local accuracy, using an MCQ elimination prompt with greedy decoding and a free-response baseline prompt with three-sample voting. The current Kaggle public leaderboard score reported by our team is 60.7\%. These results show that careful alignment between prompt format, answer extraction, and decoding strategy can substantially improve a small reasoning model before any parameter updates. The next stage is to use the collected failure cases to build supervised fine-tuning data and train a LoRA adapter. \textbf{[Add final private leaderboard score and/or rank in the final report.]}
 \end{abstract}
 
-\section{Introduction}
-\label{sec:intro}
-
-\paragraph{Problem definition.}
-The task is mathematical answer generation with a fixed language model. Each input is a problem statement $x_i$. Some examples also include a set of answer options $O_i = \{o_{i,A}, o_{i,B}, \ldots\}$, in which case the required output is a single option letter. Other examples are free-response problems whose output may be a number, symbolic expression, equation, interval, ordered list, unordered list, or multiple values corresponding to several \texttt{[ANS]} blanks. The model must generate a textual solution $y_i$, and the grader extracts a final answer $\hat{a}_i = \answerextract(y_i)$ from that text. A prediction is correct when the extracted answer matches the gold answer under the competition-style judger $\scorefn$.
-
-Unlike standard classification, this task combines reasoning, generation, and formatting. The model must understand the problem, choose a method, perform multi-step calculations, and express the final answer in a form that the evaluator can parse. For multiple-choice questions, it is not enough to compute the correct value; the model must map that value back to the option list and output the corresponding letter. For free-response questions, it must decide whether the expected answer should be exact or approximate, how many sub-answers are required, and how to write those answers in a single final box.
-
-\paragraph{Problem significance.}
-Reliable mathematical reasoning is important because many real applications require exact quantitative logic rather than fluent explanation alone. A stronger small math model could support tutoring, homework feedback, scientific calculation, data analysis, financial reasoning, and engineering design. In these settings, a superficially plausible answer is often not useful; the final numeric or symbolic result must be correct.
-
-Small models are especially important for deployment. Larger models can be expensive to run and difficult to use on consumer hardware. Our project focuses on \model, a 4B-parameter model, because improving this model would make math reasoning more accessible on limited GPUs. A strong result would show that some reasoning gains come from better prompting, extraction, sampling, and targeted fine-tuning rather than only from scaling model size.
-
-\paragraph{Technical challenge.}
-The main technical difficulty is that the benchmark is heterogeneous. The public set contains 1126 labeled problems: 375 multiple-choice problems and 751 free-response problems. The private set contains 943 unlabeled problems: 300 multiple-choice and 643 free-response. The JSON rows only expose \texttt{id}, \texttt{question}, \texttt{options}, and, for public data, \texttt{answer}. They do not provide explicit topic, difficulty, or answer-type labels, so the system must infer the needed behavior from the text itself.
-
-Evaluation is also fragile. Many incorrect local scores are caused not only by wrong reasoning, but also by answer extraction mismatches. We observed cases where the model derived the right relation but omitted one requested blank, rounded an exact answer too aggressively, boxed the numeric value instead of the option letter, or used a notation that was mathematically equivalent but not accepted by the scorer. This makes prompt and post-processing design part of the modeling problem.
-
-Finally, the engineering budget is constrained. The final responses must come from \model, and the team runs experiments on local hardware with 32GB of VRAM. Multi-sample decoding improves robustness but multiplies runtime: generating roughly 1000 private-set answers with three samples per problem can take several hours. This forces us to use small, repeatable validation sweeps before committing to full private-set submissions.
-
-\paragraph{Contributions.}
-Our work improves the starter code in five ways.
+\section*{Formatting instructions (remove this section in your submission)}
+Please read the instructions below carefully and follow them faithfully. You can keep the section headers but delete the instructional texts.
+\paragraph{Hints on writing}
 \begin{itemize}
-  \item We built a reproducible vLLM-based inference pipeline around \modelhf, including scripts for public-set prompt experiments, stratified prompt sweeps, best-combination sweeps, and private CSV generation.
-  \item We separated multiple-choice and free-response prompting. This matters because MCQ examples require compute-then-match behavior, while free-response examples require exact answer formatting and multi-answer handling.
-  \item We implemented prompt families for baseline, strict formatting, verification, concise reasoning, few-shot formatting, option elimination, match-back selection, and multi-answer free-response generation.
-  \item We added robust local extraction and scoring logic: MCQ predictions are recovered from boxed letters, option phrases, or boxed option values; free-response predictions are compared through the project judger and normalized before self-consistency voting.
-  \item We performed systematic error analysis and used it to guide later prompts. The main observed failures were MCQ letter mismatch, format/extraction errors, overthinking, arithmetic mistakes, rounding mismatch, and missing or misaligned multi-answer outputs.
+    \item Each paragraph should convey one main message, typically in the beginning sentence of the paragraph (topical sentence).
+    \item  Use simple sentences with fewer compounds or clauses. The simpler, the better. Avoid passive tense and use active tense.
+    \item Use PDF for your figures to ensure the resolution of your images.
+    \item The captions of Figures and Tables should contain sufficient details to be self-explanatory (readers can understand the figure without referring to the text).
 \end{itemize}
 
+
+Figures and tables must be appropriately referenced and discussed in the main text (tip: Use \textbackslash label\{fig:xyz\} and \textbackslash cref\{fig:xyz\}; example:~\cref{fig:example}). Captions must strive to be self-contained.
+\paragraph{Figures.}
+% \begin{figure}[h]  % Use figure or wrapfigure as needed.
+\begin{wrapfigure}{r}{0.4\textwidth} % Example: occupy 40% of text width
+  \vspace{-4mm}  % Force moving the figure up by a little bit
+  \centering
+  \fbox{\rule[-.5cm]{0cm}{4cm} \rule[-.5cm]{4cm}{0cm}}
+  \caption{Sample figure caption.}
+  \label{fig:example}
+\end{wrapfigure}
+% \end{figure}
+
+
+All artwork must be neat, clean, and legible. Lines should be dark enough for
+purposes of reproduction. The figure number and caption always appear after the figure. The figure caption should be lowercase (except for the first word and
+proper nouns); figures are numbered consecutively. Captions should be written clearly and, ideally, allow the reader to understand the key message of the figure without having to read the main text.
+
+
+\paragraph{Tables.}
+All tables must be centered, neat, clean, and legible.  The table number and
+title always appear before the table. See~\cref{sample-table} for an example.
+Captions should be written clearly and, ideally, allow the reader to understand the key message of the table without having to read the main text.
+\begin{table}[h]
+  \caption{Sample table title}
+  \label{sample-table}
+  \centering
+  \begin{tabular}{lll}
+    \toprule
+    \multicolumn{2}{c}{Part}                   \\
+    \cmidrule(r){1-2}
+    Name     & Description     & Size ($\mu$m) \\
+    \midrule
+    Dendrite & Input terminal  & $\sim$100     \\
+    Axon     & Output terminal & $\sim$10      \\
+    Soma     & Cell body       & up to $10^6$  \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+% % % === Introduction
+\section{Introduction}
+\label{sec:intro}
+Introduce the problem that you are trying to solve and write 1-2 paragraphs for each of the sub-sections.  Provide a high-level summary in this section instead of detailed descriptions.
+\paragraph{Problem Definition.}
+Describe in your own words what the deep learning task is.  You may use figures to help your explanation.
+\hline
+
+This project focuses on improving the mathematical reasoning ability of a small-sized language model, specifically Qwen/Qwen3-4B-Thinking-2507. The task is to generate correct final answers for mathematical problems ranging from high-school level to graduate-level difficulty. Given a math problem as input, the model must understand the problem statement, perform multi-step reasoning, and produce an accurate final response.
+
+Unlike standard classification or regression tasks, this is a language generation task that requires both reasoning and answer formatting. The model is expected to solve problems involving algebra, geometry, probability, calculus, number theory, and other mathematical topics. Since the competition requires all final responses to be generated using Qwen3-4B, our goal is not to replace the model with a larger or stronger model, but to improve its performance through model-intrinsic methods such as prompt engineering, supervised fine-tuning, and reinforcement learning.
+
+\paragraph{Problem Significance.}
+Explain  why is your problem important. Provide some real-world examples where successfully solving this task can have a great impact on our daily life and society. 
+\hline
+Reliable mathematical reasoning is an important capability for language models because many real-world problems require precise quantitative thinking. A model that can solve math problems accurately can be useful in education, scientific research, engineering, finance, and data analysis. For example, students could use such a model as an accessible tutoring tool, researchers could use it to assist with symbolic or numerical reasoning, and professionals could use it to automate parts of complex quantitative workflows.
+
+This problem is especially important for small-sized language models. Large models often achieve strong reasoning performance, but they are expensive to run and difficult to deploy on limited hardware. Improving the reasoning ability of a 4B-parameter model can make advanced mathematical problem-solving more efficient, affordable, and accessible. If successful, this project can show that smaller models can become more capable through better training strategies and inference methods, rather than simply relying on larger model size.
+
+\paragraph{Technical Challenge.}
+Why is this project that you are proposing difficult? Think about challenges from (1) data processing (2) model design (3) implementation (4) engineering (5) evaluation. 
+\hline
+This project is challenging because mathematical reasoning requires more than surface-level language understanding. The model must identify relevant information, choose the correct mathematical method, carry out multi-step calculations, and avoid small errors that can lead to an incorrect final answer. Even if the reasoning process is mostly correct, a single arithmetic mistake, wrong assumption, or formatting error can cause the final response to be marked incorrect.
+
+Another challenge is the limitation of using only Qwen3-4B for final responses. Since alternative models are not allowed for generation, we must improve performance using methods that work within the given model. Prompt engineering may improve reasoning behavior but can be sensitive to wording and problem type. Supervised fine-tuning can teach the model better solution patterns, but it depends heavily on the quality and diversity of training data. Reinforcement learning may further improve answer accuracy, but it is more difficult to implement and evaluate reliably. In addition, evaluation is challenging because the benchmark covers a wide range of math topics and difficulty levels, so improvements on one type of problem may not generalize to all problems.
+
+\paragraph{Contributions.}
+ On a high level, explain what the starter code does and what its limitations/issues are. Describe how your current solution effectively addresses (some) of these limitations/issues. Be very precise and clear. Any empirical claims must be justified by your results. You may find it useful to explicitly enumerate your key contributions (e.g., a better architecture/loss function or a more suitable problem/data setup relative to the starter code, an insightful finding/result, an innovative technique or combination of existing techniques, etc.) as follows:
+
+% Find and cite (use \href{https://www.overleaf.com/learn/latex/Bibliography_management_with_bibtex}{BibTex
+% }) state-of-the-art works or papers that have tried to solve a similar problem (use \href{https://scholar.google.com/}{Google Scholar} to search). Point out the limitations of the state-of-the-art.
+The starter code provides a basic pipeline for generating answers with Qwen3-4B and submitting predictions to the competition. However, the starter approach is limited because it mainly depends on the original model behavior and may not fully optimize the model for mathematical reasoning. It may also lack systematic prompt design, fine-tuning, error analysis, and validation strategies for different math categories.
+
+Our current solution improves upon the starter code by exploring model-intrinsic techniques to make Qwen3-4B more reliable on mathematical reasoning tasks. We focus on improving the model’s ability to follow structured reasoning steps, reduce calculation mistakes, and produce final answers in the required format. We also compare different strategies using validation performance and Kaggle leaderboard results to determine which methods provide the most consistent improvement.
+
+Our main contributions are:
+\begin{itemize}
+  \item Contribution A: We developed and tested improved prompting strategies to encourage Qwen3-4B to perform step-by-step mathematical reasoning before producing the final answer.
+  \item Contribution B: We explored supervised fine-tuning using math problem-solution data to adapt the model toward more reliable reasoning patterns and answer formatting.
+  \item Contribution C: We analyzed common failure cases, such as arithmetic mistakes, incorrect problem interpretation, and incomplete reasoning, and used these observations to guide our model and prompt improvements.
+  \item Contribution D: We built a more systematic evaluation pipeline to compare the starter model, prompt-engineered model, and fine-tuned model using validation accuracy and Kaggle leaderboard performance.
+    % etc.
+\end{itemize}
+
+
+% % % === Related Work
 \section{Related Work}
 \label{sec:relatedwork}
 
@@ -88,11 +199,11 @@ Our work improves the starter code in five ways.
 Chain-of-thought prompting encourages language models to write intermediate reasoning steps before the final answer, and it has been shown to improve performance on multi-step reasoning tasks \citep{wei2022chain}. Our system uses this idea, but the experiments show that more reasoning is not always better. Long verification prompts sometimes increased overthinking and truncation, while concise prompts often performed better on the same local subset.
 
 \paragraph{Self-consistency.}
-Self-consistency samples several reasoning paths and chooses the most common final answer \citep{wang2023selfconsistency}. This is directly relevant to our project because \model{} can produce different answers under stochastic decoding. We apply self-consistency at the extracted-answer level instead of voting over raw text. For free-response problems, this means normalizing each extracted answer before voting; for MCQ, this means voting over letters.
+Self-consistency samples several reasoning paths and chooses the most common final answer \citep{wang2023selfconsistency}. This is directly relevant to our project because \model{Qwen4} can produce different answers under stochastic decoding. We apply self-consistency at the extracted-answer level instead of voting over raw text. For free-response problems, this means normalizing each extracted answer before voting; for MCQ, this means voting over letters.
 
 \paragraph{Math reasoning benchmarks and fine-tuning.}
 Datasets such as GSM8K and MATH helped establish mathematical reasoning as a major language-model benchmark \citep{cobbe2021training,hendrycks2021measuring}. These works motivate our focus on both final-answer accuracy and failure analysis. For future parameter-efficient training, we plan to use LoRA, which adapts a frozen base model through low-rank trainable matrices instead of updating all parameters \citep{hu2022lora}. This is a practical fit for our hardware budget.
-
+% % % === Methods
 \section{Methods}
 \label{sec:methods}
 
@@ -134,7 +245,7 @@ Each response is converted into a vote key $v_i^{(k)}$. For MCQ, the key is the 
 \label{alg:sc}
 \begin{algorithmic}[1]
 \STATE Build a chat prompt $T_p(x_i,O_i)$ using an MCQ or free-response template.
-\STATE Generate $K$ responses from \model{} with the selected sampling configuration.
+\STATE Generate $K$ responses from $ model{}$ with the selected sampling configuration.
 \STATE Extract an answer key from each response.
 \STATE Normalize keys using letter extraction for MCQ and the math judger for free response.
 \STATE Choose the most frequent non-empty key.
@@ -147,144 +258,175 @@ Our extraction logic is designed to match the competition metric more closely th
 
 We also label failures. The prompt experiment script writes a 20-example wrong-answer sheet for each run and classifies failures as format error, arithmetic error, conceptual error, overthinking, MCQ mismatch, or extraction issue. The sweep script records a simpler taxonomy: correct, truncated, no-answer, out-of-range, wrong, or judge error. These labels are useful because they separate modeling failures from interface failures.
 
+% \paragraph{Method Description.}
+% Describe and motivate any relevant design or architectural choices that you explored.  
+% If helpful, include a picture/sketch of your approach or architecture.
+
+% How did you split the training and validation data? How did you normalize inputs and outputs? Detail any deviations from the starter code. If valuable, you may include visualizations of the data or diagrams/sketches of your approach.
+
+
+
+% % % === Experiments
 \section{Experiments}
 \label{sec:experiments}
-
+% 
+In this section, clearly describe your empirical exploration of the problem and associated results. Provide evidence for your claims.
+Analyse and discuss your results.
+Note: Whenever you make claims such as \textit{Approach A performs ``better'' than approach B}, please be very specific in terms of \emph{what} it is better at and by \emph{how much}. Be transparent if it is only better on certain metrics, but not all.
 \subsection{Baselines}
 \label{sec:baselines}
+Describe all the baselines excluding the starter code. You should always start with simple models (such as a multi-layer Perceptron or linear regression) and gradually increase the complexity. You may use the starter code as a baseline, too.
+Use an itemized list to briefly summarize each of the models, their architecture, and parameters, and provide the correct reference if possible.
 
-We compare against the starter-style prompt and several inference-time baselines. The starter baseline uses a shared step-by-step instruction and requires a final boxed answer. The prompt-engineered baselines are shown below.
+We compare with the following baselines:
 \begin{itemize}
-  \item \textbf{Strict format}: requires exactly one boxed final answer and forbids units, labels, or intermediate boxes.
-  \item \textbf{Verify}: asks the model to solve, then check the result by substitution, re-derivation, or a sanity check.
-  \item \textbf{Concise}: asks for short reasoning to reduce overthinking and truncation.
-  \item \textbf{Few-shot}: prepends a small example showing the expected final-answer format.
-  \item \textbf{MCQ eliminate}: asks the model to eliminate clearly wrong options before selecting a letter.
-  \item \textbf{MCQ match-back}: asks the model to map the computed answer to the option list before boxing the letter.
-  \item \textbf{Free multi-answer}: asks the model to count all requested blanks and output all answers in order.
+    \item \textbf{Baseline A}: 40\% accuracy on default model as seen in Kaggle Submission by other users.  
+    % Etc.
 \end{itemize}
-
+% 
 \subsection{Evaluation}
 \label{sec:evaluation}
+Describe how you evaluate your model and baselines. There is no need to provide long explanations for the Kaggle evaluation, but clearly explain any complementary evaluations you explore in your project (if any).
 
-The official metric is Kaggle unified accuracy on hidden labels. Locally, we evaluate on the public labeled set using the same high-level principle: extract the final answer and compare it with the gold answer. We use two local evaluation regimes. The first uses the first 100 public examples, which contain 38 MCQ and 62 free-response problems. This was useful for quick prompt iteration. The second uses stratified subsets, typically 100 MCQ and 100 free-response examples or a balanced 50/50 combined subset, which prevents the larger free-response class from hiding MCQ-specific effects.
+We evaluate our model and baselines primarily using the competition’s official Kaggle metric, unified accuracy, which measures whether the model produces the correct final answer across math problems of different difficulty levels. Since the competition includes problems ranging from high-school to graduate-level mathematics, this metric provides a direct way to compare the overall reasoning performance of different approaches under the same evaluation setting. For each method, we generate final responses using the required Qwen/Qwen3-4B-Thinking-2507 model and submit the predictions to Kaggle to obtain the official leaderboard score.
 
-Because local scoring can differ from Kaggle scoring, we treat local accuracy as a development signal rather than a final claim. The Kaggle leaderboard score is the authoritative estimate of generalization. Our current team-reported public leaderboard score is 60.7\%.
+In addition to the Kaggle evaluation, we also perform local validation to compare different baselines before submission. We split part of the available training or development data into a validation set and evaluate each method on this same set. During local evaluation, we extract the model’s final answer from its generated response and compare it with the ground-truth answer. This helps us estimate whether changes such as prompt engineering, supervised fine-tuning, or decoding strategy adjustments actually improve accuracy before using the Kaggle test set.
 
-\subsection{Implementation Details}
+We also conduct error analysis on incorrect predictions. Instead of only looking at the final accuracy, we manually inspect a sample of failed cases to understand why the model makes mistakes. Common error types include misunderstanding the problem statement, choosing the wrong mathematical method, making arithmetic errors, stopping the reasoning too early, or producing the answer in an invalid format. This complementary analysis helps us identify which parts of the pipeline need improvement and guides our later experiments.
+
+Overall, our evaluation compares the starter baseline, prompt-engineered baseline, and fine-tuned model using both local validation accuracy and Kaggle leaderboard accuracy. The local validation results help us make development decisions, while the Kaggle score serves as the final evaluation of how well our method generalizes to unseen mathematical reasoning problems.
+% 
+\subsection{Implementation details}
 \label{sec:implementation_details}
 
-All completed experiments use \modelhf{} through vLLM and Hugging Face tokenizers. The initial prompt experiments use bitsandbytes INT8 loading, \texttt{max\_model\_len=16384}, \texttt{max\_tokens=4096}, \texttt{temperature=0.6}, \texttt{top\_p=0.95}, and \texttt{top\_k=20}. The later sweep script uses longer context with \texttt{max\_model\_len=65536}, \texttt{max\_tokens=32768}, prefix caching, and GPU memory utilization 0.85. The best-combination script uses bitsandbytes loading with \texttt{max\_model\_len=16384} and supports both greedy decoding and three-sample self-consistency.
+All completed results in this report are inference-only experiments with the frozen \modelhf{} base model. We did not update model weights for the reported system, so there is no optimizer, learning rate, regularization coefficient, gradient batch size, number of training epochs, or one-epoch training time to report. This choice was mainly due to the project hardware budget and the need to run many repeatable prompt and decoding experiments before attempting parameter-efficient fine-tuning. The planned LoRA stage described in \Cref{sec:methods} was therefore not included in the reported leaderboard system.
 
-The private-submission script currently defaults to \texttt{match\_back\_few\_shot} for MCQ and \texttt{multi\_answer} for free-response, both with three-sample self-consistency. These defaults reflect the strongest type-specific sweep results, although private-set accuracy cannot be measured locally because the private labels are hidden.
+Experiments were run on a single local NVIDIA GPU with 32GB of VRAM, using GPU index 0 through \texttt{CUDA\_VISIBLE\_DEVICES}. The software stack used Hugging Face tokenizers and vLLM for batched generation, with prefix caching enabled in the main runners. vLLM performs dynamic inference batching rather than using a fixed training batch size. For the final 32GB balanced preset, the batching limits were \texttt{max\_num\_seqs=32} and \texttt{max\_num\_batched\_tokens=16384}; the larger sweep runs used up to \texttt{max\_num\_seqs=256} and \texttt{max\_num\_batched\_tokens=32768}. Full private-set generation with three samples per problem takes about 4--5 hours in our setup, so most tuning was done on smaller public subsets before running the full private set.
 
-The main decoding configurations are:
+All completed experiments use \modelhf{} through vLLM and Hugging Face tokenizers. The initial prompt experiments use bitsandbytes INT8 loading, \texttt{max\_model\_len=16384}, \texttt{max\_tokens=4096}, \texttt{temperature=0.6}, \texttt{top\_p=0.95}, and \texttt{top\_k=20}. The later sweep script uses longer context with \texttt{max\_model\_len=65536}, \texttt{max\_tokens=32768}, prefix caching, and GPU memory utilization 0.85. The 32GB balanced preset uses \texttt{max\_model\_len=32768}, \texttt{max\_tokens=16384}, \texttt{gpu\_memory\_utilization=0.85}, answer-format repair, free-response final-answer normalization, and free-response sample ranking. The 32GB maximum-quality preset increases the budget to \texttt{max\_model\_len=65536}, \texttt{max\_tokens=32768}, \texttt{gpu\_memory\_utilization=0.90}, and five-sample self-consistency, but the balanced preset was our main reproducible private-submission setting because it is faster.
+
+The main decoding configurations we tuned were:
 \begin{itemize}
   \item \textbf{Greedy}: \texttt{temperature=0.0}, \texttt{top\_p=1.0}, \texttt{top\_k=-1}, one sample.
   \item \textbf{Stochastic single sample}: \texttt{temperature=0.7}, \texttt{top\_p=0.95}, \texttt{top\_k=20}, one sample.
   \item \textbf{Self-consistency}: \texttt{temperature=0.7}, \texttt{top\_p=0.95}, \texttt{top\_k=20}, three samples with majority vote.
 \end{itemize}
-The experiments were run on a local machine with 32GB of VRAM. Full private-set generation with three samples per problem is expensive; in our current setup, generating roughly 1000 answers can take about 4--5 hours.
+We also tested a five-sample variant with the same stochastic parameters. The tuned hyperparameters were therefore prompt family, problem-type routing, \texttt{temperature}, \texttt{top\_p}, \texttt{top\_k}, number of samples \texttt{n}, maximum generation length, context length, few-shot inclusion, repair, final-answer normalization, and sample-ranking rules. The tested ranges were \texttt{temperature} in \{0.0, 0.6, 0.7\}, \texttt{top\_p} in \{0.95, 1.0\}, \texttt{top\_k} in \{-1, 20\}, \texttt{n} in \{1, 3, 5\}, \texttt{max\_tokens} in \{2048, 4096, 16384, 32768\}, and \texttt{max\_model\_len} in \{8192, 16384, 32768, 65536\}.
 
+Hyperparameters were chosen by public-set validation rather than by private labels. We first used quick 100-example public runs for prompt iteration, then stratified sweeps with separate MCQ and free-response subsets. The final settings are intentionally not identical across problem types: MCQ prompts often benefited from greedy decoding because the final output is a single option letter and stochastic sampling can drift to invalid or inconsistent letters, while free-response problems benefited more from three-sample self-consistency and answer-format ranking. This type-specific tuning produced the best local balanced-subset result: MCQ elimination with greedy decoding and free-response baseline prompting with three-sample voting reached 68/100 on the balanced public subset. The private-submission pipeline uses the same principle of routing by problem type and selecting the strongest public-validated prompt/decoding configuration.
+% 
 \subsection{Results}
 \label{sec:results}
+Present the results from starter code and preliminary implementation from your idea. This can be a mix of quantitative results (e.g., validation metrics or leaderboard score) and qualitative results (e.g., example visualizations of predictions, case studies, etc.). Use figures and tables. You are welcome to include any negative findings/results.
+\paragraph{Result 1.} Our starter code and Preliminary implementation yielded 60\% accuracy on the Kaggle submissions
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{submission.png}
+\end{figure}
+\paragraph{Result 2.} We ran into some issues with formating as there were many problems where the LLM got the correct answer but either: 1. The decimal was .66667 instead of .67 2. LLM used {} instead of () 3. Or just incorrect formatting
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{bracket-issue.png}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{image.png}
+\end{figure}
 
-\paragraph{Initial mixed prompt experiments.}
-\Cref{tab:mixed-prompts} summarizes representative 100-problem runs from \texttt{results/prompt\_experiments/summary.csv}. The strongest initial run was \texttt{split\_concise\_v1} at 44.0\%, a 3 point absolute improvement over a 41.0\% starter run on a comparable 100-problem subset. Verification and detailed reasoning did not reliably help; in several runs they reduced free-response accuracy, likely because they encouraged longer answers and more opportunities for extraction mistakes.
-
-\begin{table}[H]
-\caption{Initial mixed 100-problem prompt experiments. Each run uses 38 MCQ and 62 free-response problems from the public set.}
-\label{tab:mixed-prompts}
-\centering
-\begin{tabular}{lrrrrr}
-\toprule
-Prompt & Overall & MCQ & Free & MCQ correct & Free correct \\
-\midrule
-Starter & 41.0\% & 44.7\% & 38.7\% & 17/38 & 24/62 \\
-Concise & 42.0\% & 47.4\% & 38.7\% & 18/38 & 24/62 \\
-Split concise, $\tau=0.3$ & 44.0\% & 50.0\% & 40.3\% & 19/38 & 25/62 \\
-Split concise, free $K=4$ & 40.0\% & 34.2\% & 43.5\% & 13/38 & 27/62 \\
-Validate random & 26.0\% & 31.6\% & 22.6\% & 12/38 & 14/62 \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\paragraph{Independent prompt sweep.}
-The second experiment separately sweeps MCQ and free-response prompts on stratified 100-example subsets. \Cref{tab:stratified-sweep} shows the best variants. MCQ performance is much higher than free-response performance, suggesting that the model often can solve or guess among options when the final interface is correct. The best MCQ prompt, match-back with a few-shot example, reaches 77/100. The best single-sample free-response prompt reaches 57/100, while the multi-answer self-consistency test reaches 67/100.
-
-\begin{table}[H]
-\caption{Best stratified prompt sweep results from \texttt{results/sweep} and \texttt{results/sweep\_sc\_test}. MCQ and free-response rows are evaluated on separate 100-example subsets.}
-\label{tab:stratified-sweep}
-\centering
-\begin{tabular}{llllrrr}
-\toprule
-Type & Prompt & Decode & Accuracy & Correct & Truncated & Wrong \\
-\midrule
-MCQ & match\_back\_few\_shot & stochastic $K=1$ & 77.0\% & 77/100 & 4 & 19 \\
-MCQ & strict\_format & stochastic $K=1$ & 72.0\% & 72/100 & 11 & 17 \\
-MCQ & eliminate & stochastic $K=1$ & 72.0\% & 72/100 & 9 & 19 \\
-Free & strict\_few\_shot & stochastic $K=1$ & 57.0\% & 57/100 & 2 & 41 \\
-Free & baseline & stochastic $K=1$ & 53.0\% & 53/100 & 4 & 43 \\
-Free & multi\_answer & self-consistency $K=3$ & 67.0\% & 67/100 & 2 & 31 \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\paragraph{Best combined local configuration.}
-After the independent sweep, we tested a combined configuration on a balanced 100-problem subset using \texttt{run\_sweep\_best\_combo.py}. The best recorded combination used MCQ elimination with greedy decoding and free-response baseline with three-sample voting. It achieved 68/100 = 68.0\% local accuracy, with 36/50 = 72.0\% on MCQ and 32/50 = 64.0\% on free-response. This is our strongest directly combined local result so far.
-
-\begin{table}[H]
-\caption{Best balanced combined local result from \texttt{results/sweep\_best100/summary.csv}.}
-\label{tab:best-combo}
-\centering
-\begin{tabular}{llllr}
-\toprule
-Subset & Prompt & Decode & Accuracy & Correct \\
-\midrule
-MCQ & eliminate & greedy $K=1$ & 72.0\% & 36/50 \\
-Free & baseline & self-consistency $K=3$ & 64.0\% & 32/50 \\
-Combined & MCQ + Free & mixed & 68.0\% & 68/100 \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\paragraph{Qualitative failure analysis.}
-The wrong-answer sheets show several recurring failure modes. First, MCQ prompts can still choose the wrong letter even when the response follows the requested format. For example, one wrong MCQ response computed an answer of 3 and correctly mapped it to option G, but the gold option was E; this is a genuine reasoning or option-interpretation failure, not a formatting failure. Second, free-response models often answer only the final requested blank. In one two-part profit problem, the model produced the correct linear equation $y=470x-390$ in its reasoning but boxed only the second value $\frac{456}{47}$, so the extracted answer missed the first gold value. Third, rounding remains a problem: the model sometimes outputs 7.21 or 7091.67 when the gold answer is a longer decimal or exact expression. Finally, some responses ignore the single-box convention and use \texttt{[ANS]} text or prose after the reasoning, which can confuse extraction.
-
+% etc.
+% 
+% \subsection{Ablations}
+% \label{sec:ablations}
+% Try to explore which design choices contribute to your final performance by removing/replacing individual components. Note that ablations are most convincing when you isolate the contribution of those individual components. For example, if you are comparing architecture A and architecture B, make sure to use the same hyperparameters as much as possible (or tune them for each architecture separately and compare the best version of each). Be clear but concise.
+% 
+% % % === Discussion
 \section{Discussion}
 \label{sec:discussion}
+Provide a few sentences to summarize your project. 
 
 \paragraph{Achievements.}
-The main achievement so far is a working inference-time improvement pipeline for \model. The starter-style prompt on the early mixed subset reached 41.0\%, while our best early prompt reached 44.0\%. The stronger stratified sweep showed that task-specific prompting matters more: MCQ match-back few-shot reached 77.0\%, and free-response multi-answer self-consistency reached 67.0\% on their respective 100-example subsets. The best balanced combined local run reached 68.0\%, and our current Kaggle public leaderboard score is 60.7\%. These gains were achieved without updating model weights.
+What have you achieved? What is the significance of your contribution? Did you contribute to dataset curation, algorithm improvement or model development?  Summarize your achievement in quantitative terms. We value the effort that you have devoted to this project.
+\newline
+\newline
+Quantitatively, We have achieved 60\% accuracy with just prompt engineering alone and minor tweaks which we're very excited of. Our significance is the proof of concept that we were able to fine tune the model with different prompts in order for it to reason better for math questions. We contributed to the model development phase of prompt engineering. 
 
-\paragraph{Bottlenecks and mitigation.}
-The largest bottleneck is inference cost. Self-consistency improves robustness, but it multiplies generation time because each problem requires multiple full reasoning traces. On our 32GB VRAM setup, a full private-set three-sample run can take 4--5 hours. We mitigate this by first running small public validation sweeps, using stratified subsets, and applying three-sample voting only where it appears useful.
 
-The second bottleneck is evaluator alignment. Some local failures are not pure math failures. They come from missing blanks, wrong answer order, extra labels, decimal-versus-exact mismatch, or MCQ value-versus-letter mismatch. We addressed this by splitting prompts by question type, adding strict final-answer instructions, improving extraction fallback logic, and introducing a multi-answer prompt for free-response questions.
+% \paragraph{Lessons Learned.}
+% What did you learn from this project at this point?   Brainstorm in different aspects including selecting problems, literature survey, team formulation and technical implementation. 
+% If given more time, what aspects and how would you improve your project development?
 
-\paragraph{Plans forward.}
-The next step is to convert error analysis into training data. We will collect incorrect and borderline public-set examples, label the failure type, and write corrected solution targets with a consistent final-answer format. We will then train a LoRA adapter with supervised fine-tuning so the model learns not only more math patterns, but also the exact output style required by the evaluator. If time permits, we will test simple reinforcement learning or rejection sampling using the local judger as a reward signal, but this is lower priority than a clean SFT dataset and reproducible inference pipeline.
+\paragraph{Bottlenecks and Mitigation.}
+What are bottlenecks of the project? How did you resolve them?  Any changes that you would like to highlight from the milestone?
+\newline
+\newline
+The bottleneck of the project include the speed of which we can submit, train, and run the LLM. Since the technique we're using essentially has the LLM do 3 passes each, that means each answer is outputted 3 times. Additionally even with one of our teammates using 32 GB of V RAM, the time it takes to train the model and then have it output the answer to all 1000 questions for a proper submission takes around 30 minutes to an hour. This is a significant bottleneck since it limits the number of models we can train and submit submissions for. Our way to tackle this problem is to first focus on tweaks to the code that won't require more compute/processing power. For instance, we start with small tweaks such as prompt engineering and output formatting which wouldn't require a lot more time. Later on, we will move onto more training. 
 
-\paragraph{Team responsibilities.}
-All team members contributed to strategy discussion, prompt design, and milestone writing. Chuheng Xi focused on running \model{} locally, configuring vLLM on the 32GB VRAM machine, generating submissions, and testing high-cost inference settings. Jeffery Thi focused on organizing experimental ideas, maintaining written notes, and translating observations into report structure. Lin Nie focused on implementation, including multi-sample generation, voting, prompt sweeps, and adapting code to evaluate different prompt families.
 
-\paragraph{Timeline.}
+\paragraph{Plans Forward.}
+What do you plan to do from now until the final report? Any change of plans from the initial proposal? What decision factors contributed to this change of plans?
+\newline
+\newline
+We plan to first optimized the LLM more with better and more precise prompts as well as proper filtering to ensure the correct answers aren't viewed as wrong just because of formatting. After we have made sure we've done the best we could with just prompt engineering and minor fixes, we will start giving specific examples based on the problems we see the LLM get wrong. We will also see what type of problems the LLM gets wrong and give it specific examples of those types of questions. Lastly, we will train the model with other inputs. We haven't changed from the initial plan. 
+
+
+\paragraph{Team Responsibilities.}
+Summarize the background and expertise for each of your team member. Clearly identify each person's role and contribution in this project. We also all worked on the Milestone report together as we individually added what we did as a group. \newline
+\newline
+Shared Responsibilities: We all discussed together how we could improve the LLM and what different techniques we could use. We each did separate research on ways to improve the LLM to bring to the table during discussion.  \newline
+\newline
+Chuheng Xi - Expertise in running and training the LLM. Used his personal PC with 32 GB of V RAM to train, and run our models for submission. Added initial prompts for submission and submitted initial submission. \newline
+\newline
+Jeffery Thi - Expertise in organizing and ideation of possible implementation techniques. Added ideas to google docs and documented changes and ideas onto Milestone Report. Documented our work and changes and added it to Milestone report. \newline
+\newline
+Lin Nie - Expertise in programming and code implementation. Used programming and LLMs to implement our ideas into our actual code. Helped implement techniques such as choosing top k and other minor tweaks before in depth training. 
+
+\paragraph{Timelines.}
+Estimate the timeline with the milestones to achieve your expected outcome in this class, considering the discussion provided above.
 \begin{itemize}
-  \item Week 2: Cleaned the baseline setup, unified MCQ and free-response formatting, and established initial local accuracy.
-  \item Week 3: Tested temperature, top-$p$, and multi-sample decoding; added majority voting over extracted answers.
-  \item Week 4: Added few-shot, strict-format, concise, verify, eliminate, match-back, and multi-answer prompts.
-  \item Week 5: Built wrong-answer sheets and classified failures into formatting, arithmetic, conceptual, overthinking, MCQ mismatch, and extraction categories.
-  \item Week 6: Ran stratified sweeps for MCQ and free-response prompts and identified the best prompt families.
-  \item Week 7: Tested balanced combined configurations and prepared the private submission pipeline.
-  \item Week 8: Construct a curated failure dataset for supervised fine-tuning.
-  \item Week 9: Train and validate a LoRA adapter with consistent solution and answer formatting.
-  \item Week 10: Run final local and Kaggle evaluations, compare inference-only and fine-tuned systems, and finalize the report.
+    \item Week 2: Baseline cleanup and prompt unification (MCQ vs free-form). Run initial evaluations and establish benchmark performance metrics (accuracy, formatting errors, MCQ mapping errors).
+
+    \item Week 3: Decoding and sampling experiments. Test different temperature/top-p settings and introduce multi-sampling with majority voting. Identify best inference-time configuration per task type.
+    
+    \item Week 4: Prompt refinement with few-shot examples and tighter structure. Reduce prompt redundancy and improve compute→match behavior for MCQ and solve→verify behavior for free-form.
+    
+    \item Week 5: Error analysis. Categorize failures (arithmetic, reasoning, MCQ mapping, formatting). Break performance down by domain and difficulty to identify systematic weaknesses.
+    
+    \item Week 6: Adaptive prompt routing. Develop simple heuristics to select prompts based on task type and difficulty. Start routing easier problems to simpler prompts and harder ones to stricter prompts.
+    
+    \item Week 7: Ensemble methods. Implement multi-sample voting across prompts and decoding settings. Compare ensemble vs single-pass performance and refine aggregation strategy.
+    
+    \item Week 8: Failure dataset construction. Collect incorrect and borderline cases, label by error type, and prepare a structured dataset for future fine-tuning.
+    
+    \item Week 9: Fine-tuning preparation. Convert curated dataset into supervised fine-tuning format. Ensure consistency in reasoning style, formatting, and output structure.
+    
+    \item Week 10: Final evaluation and iteration. Run full benchmark comparison (baseline vs improved system). Identify remaining failure modes and decide next steps (advanced tuning, verifier models, or RL methods).
 \end{itemize}
 
+
 \section*{LLM Usage}
-We used LLMs as programming and writing assistants. LLM assistance helped brainstorm prompt variants, draft report language, and inspect or refactor experiment scripts. All experimental numbers in this report come from our repository outputs or team submissions, and the authors take responsibility for the final content, claims, and code.
+The use of LLMs is allowed as a general-purpose assist tool. However,  if LLMs played a significant role in research ideation and/or writing to the extent that they could be regarded as a contributor, then authors should describe the precise role of the LLM in this section on LLM usage. 
 
+Irrespective of the ways that LLMs were used in a given project, authors should understand that they take full responsibility for the contents written under their name, including content generated by LLMs that could be construed as plagiarism or scientific misconduct (e.g., fabrication of facts).  LLMs are not eligible for authorship.
+
+LLM Usage included:
+\begin{enumerate}
+    \item Using integrated LLMs like Claude to implement programming ideas into our code
+    \item Working with LLMs and asking LLMs for possible ways to improve our submissions and give us starting points to research techniques ourselves
+    \item Explain our implementation which we then wrote into this Milestone Report
+\end{enumerate}
+
+
+
+% % % === ACKNOWLEDGMENTS AND REFERENCES START
+% \section*{Acknowledgements}
+% This work was supported $\dots$.
 \bibliography{references.bib}
-\bibliographystyle{plainnat}
-
+\bibliographystyle{plainnat}  % Can also use abbrvnat, unsrt, etc.
+% 
+% % % === APPENDIX (optional)
+% \newpage
+% \appendix
+% \section*{Appendix}
+% \section{Appendix topic 1}
+% 
 \end{document}

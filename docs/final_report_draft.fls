@@ -1,0 +1,12 @@
+PWD /Users/chuhengxi/Documents/UCSD/2025-2026/Spring 2026/CSE 151B/Final_Project/t2t-qwen-math/docs
+INPUT /usr/local/texlive/2026/texmf.cnf
+INPUT /usr/local/texlive/2026/texmf-dist/web2c/texmf.cnf
+INPUT /usr/local/texlive/2026/texmf-var/web2c/pdftex/pdflatex.fmt
+INPUT /Users/chuhengxi/Documents/UCSD/2025-2026/Spring 2026/CSE 151B/Final_Project/t2t-qwen-math/docs/final_report_draft.tex
+OUTPUT final_report_draft.log
+INPUT /usr/local/texlive/2026/texmf-dist/tex/latex/base/article.cls
+INPUT /usr/local/texlive/2026/texmf-dist/tex/latex/base/article.cls
+INPUT /usr/local/texlive/2026/texmf-dist/tex/latex/base/size10.clo
+INPUT /usr/local/texlive/2026/texmf-dist/tex/latex/base/size10.clo
+INPUT /usr/local/texlive/2026/texmf-dist/tex/latex/base/size10.clo
+INPUT /usr/local/texlive/2026/texmf-dist/tex/latex/natbib/natbib.sty
