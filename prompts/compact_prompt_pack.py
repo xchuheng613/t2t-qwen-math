@@ -12,113 +12,106 @@ from collections.abc import Sequence
 
 
 BASE_SYSTEM = r"""
-You are solving a math benchmark problem. Solve efficiently, keep visible work
-brief, and verify only the final format.
-
-Final output must end with one contiguous final block:
-FINAL_ANSWERS:
-\boxed{answer1}
-\boxed{answer2}
-
-Use one boxed answer per requested blank/value, in order. For one answer, use
-one box. For a single [ANS] that asks for a point, interval, list, set, vector,
-or multiple-select choice, keep that whole answer in one box.
-
-Do not box anything before the final answer block. Do not put labels, units,
-reasoning, option text, or commentary inside boxes unless the blank specifically
-asks for an equation. If using a thinking model, all final boxes must appear
-after </think>. Nothing should appear after the final boxed answer.
-
-Prefer exact forms unless decimals are requested. If no rounding instruction is
-given and a decimal is necessary, use 12-15 significant digits. Use parseable
-notation: 5/8, sqrt(3), pi, e^x, exp(x), sin(x), cos(x), tan(x), log(x). Use *
-for multiplication when helpful, e.g. 3*x+2. Use standard interval notation
-like (a,b), [a,b], (a,\infty), and \cup for unions. Use parentheses for ordered
-pairs, vectors, and lists: (x,y), (a,b,c). For unordered multiple roots in one
-blank, use a comma-separated list inside parentheses if needed.
+You are solving a math benchmark problem. Solve efficiently and keep visible
+work short. Do not box anything before the final answer block.
 """.strip()
 
 
 MCQ_SYSTEM = r"""
-This is a multiple-choice problem with an explicit options list. Solve the
-problem and select the correct option. Output only the option letter(s), not the
-option text.
+Choose the correct option. Keep reasoning short.
 
-For single-choice, output one uppercase letter such as A. For multiple-select,
-output concatenated uppercase letters in option order, such as BCE.
+Final answer rules:
+- Output exactly one final \boxed{}.
+- The box must contain only the option letter.
+- For select-all/check-all, use combined letters with no commas, e.g. BCE.
+- Never box the option value or explanation.
+- If unsure, still choose the best option and finish.
 
-Required final format:
+Output format:
 FINAL_ANSWERS:
 \boxed{A}
 """.strip()
 
 
 FREE_SYSTEM = r"""
-This is a free-response problem. Solve efficiently. Determine how many final
-answers are required from the [ANS] blanks or the final question wording.
-Output one boxed answer per blank/value in order.
+Solve the problem. Keep reasoning short.
 
-If a blank asks for a choice letter, output only the letter. If a blank asks for
-a conclusion with choices A/B/C, output only A, B, or C. If there is no [ANS],
-infer the final requested value and output one boxed answer unless the problem
-clearly asks for multiple final values.
+Final answer rules:
+- Output exactly one final \boxed{}.
+- If there are multiple [ANS] blanks, put answers in the same box separated by commas.
+- Answer every [ANS] blank in order; do not add extra answers.
+- If one answer is a point, interval, set, list, solution list, or confidence interval, wrap it in parentheses/brackets.
+- No units, labels, [ANS], explanations, or words inside the box.
+- Only round if the problem explicitly says to round.
+- Never apply standard rounding. For money, percent, units, statistics, and trig values, keep 10-15 significant digits unless rounding is stated.
+- For formula/expression/equation blanks, use ASCII: *, **, sqrt(...), pi, ln(...). Do not use LaTeX.
+- If asked for a formula, model, equation, quotient, or composite function, output that expression, not just a simplified number.
+- Preserve the requested form; do not expand or substitute unless asked.
 
-Required final format:
+Output format:
 FINAL_ANSWERS:
-\boxed{answer1}
-\boxed{answer2}
+\boxed{answer1, answer2, answer3}
 """.strip()
 
 
 SUFFIXES = {
-    "GENERAL_ALGEBRA_SUFFIX": (
-        "Use direct computation/symbolic simplification. Return the simplified "
-        "value or expression only. Do not include variable labels unless the "
-        "blank itself asks for an equation."
+    "FORMULA_COMPOSITE_SUFFIX": (
+        "Expression task: keep the requested symbolic form. Do not replace it "
+        "with only a number."
     ),
-    "CALCULUS_SUFFIX": (
-        "Compute the requested derivative/integral/limit/ODE/optimization "
-        "result. Prefer exact symbolic form when reasonable; otherwise use a "
-        "high-precision decimal. For optimization, return the requested "
-        "variable value(s) and objective value(s) in the order asked."
+    "PERCENTILE_SUFFIX": (
+        "Percentile task: use the introductory-statistics rank method unless "
+        "another method is stated."
     ),
-    "GEOMETRY_TRIG_SUFFIX": (
-        "Track units internally but omit units in the box. For coordinates, "
-        "vectors, angles, and intervals, preserve the requested format. For "
-        "trig general solutions, include the requested period/parameter form "
-        "only if the problem asks for it."
-    ),
-    "STATS_PROB_SUFFIX": (
-        "For hypothesis tests or confidence intervals, return statistics, "
-        "critical values, p-values, and final conclusion letters exactly in "
-        "the order asked. If conclusion options are A/B/C, box only the "
-        "letter. Follow requested rounding carefully."
-    ),
-    "COMBINATORICS_NUMBER_THEORY_SUFFIX": (
-        "Solve structurally and avoid brute-force-looking rambling. Return "
-        "the final integer, fraction, expression, or requested set only. If "
-        "the problem asks for a guarantee/minimum/maximum, output that value "
-        "only."
+    "STATS_SOFTWARE_SUFFIX": (
+        "Software/statistics task: give the requested numerical outputs with "
+        "the shown precision style; do not invent extra outputs."
     ),
     "SELECTION_MATCHING_SUFFIX": (
         "This is a letter-answer or matching problem. Do not write option text. "
-        "For several blanks, output one letter per box. For select all that "
-        "apply in one blank, output concatenated letters in option order, e.g. "
-        "BCEG."
+        "For several blanks, put the letters inside the one final box separated "
+        "by commas. For select all that apply in one blank, output concatenated "
+        "letters in option order, e.g. BCEG."
+    ),
+    "MCQ_ALGORITHM_SUFFIX": (
+        "For sequence/algorithm questions, compare the proposed output lists "
+        "and choose the matching option letter."
     ),
 }
 
 
-SHORT_FALLBACK_SYSTEM = r"""
-Answer directly with no reasoning.
+MCQ_FALLBACK_SYSTEM = r"""
+/no_think
+Choose the best option.
 
-Final output only:
+Output only:
+FINAL_ANSWERS:
+\boxed{A}
+""".strip()
+
+FREE_FALLBACK_SYSTEM = r"""
+/no_think
+Rewrite only the final answers. Do not recompute.
+
+Output exactly one \boxed{}.
+If multiple answers are needed, separate them by commas inside the box.
+No labels, units, or explanation.
+
+FINAL_ANSWERS:
+\boxed{answer1, answer2}
+""".strip()
+
+
+SHORT_FALLBACK_SYSTEM = r"""
+/no_think
+Answer directly.
+
+Output exactly one final \boxed{}.
+For multiple answers, separate them by commas inside the box.
+For MCQ, box only the uppercase option letter(s).
+
 FINAL_ANSWERS:
 \boxed{answer}
-
-Use one boxed answer per requested blank/value, in order. For MCQ, box only the
-uppercase option letter(s). No labels, units, explanations, or text after the
-boxes.
 """.strip()
 
 
@@ -137,33 +130,26 @@ _SELECTION_RE = re.compile(
     r")\b|(?<![A-Za-z0-9])A[\.\)]\s+.*(?<![A-Za-z0-9])B[\.\)]\s+",
     re.IGNORECASE | re.DOTALL,
 )
-_STATS_RE = re.compile(
+_FORMULA_TASK_RE = re.compile(
     r"\b("
-    r"hypothesis|confidence|sample|population|p-?value|z\s*-?\s*score|"
-    r"t\s*-?\s*score|normal|binomial|poisson|regression|probability|"
-    r"statistic|variance|standard\s+deviation|mean|median"
+    r"formula|model|equation|quotient|composite(?:\s+function)?|"
+    r"expression|function\s+rule|write\s+an?\s+equation"
+    r")\b|N\(T\(t\)\)|P\(c\)",
+    re.IGNORECASE,
+)
+_PERCENTILE_RE = re.compile(
+    r"\bpercentile\b|\bP_?\d+\b",
+    re.IGNORECASE,
+)
+_STATS_SOFTWARE_RE = re.compile(
+    r"\b("
+    r"use\s+software|software|chi-?square|chi-?squared|regression|"
+    r"correlation|p-?value"
     r")\b",
     re.IGNORECASE,
 )
-_CALCULUS_RE = re.compile(
-    r"\b("
-    r"integral|integrate|derivative|differentiate|limit|differential\s+equation|"
-    r"optimization|optimize|maximize|minimize|series|taylor|maclaurin"
-    r")\b|\\int|\\lim|\\frac\{d",
-    re.IGNORECASE,
-)
-_GEOMETRY_RE = re.compile(
-    r"\b("
-    r"triangle|circle|angle|area|volume|vector|coordinate|polygon|radius|"
-    r"diameter|perimeter|sin|cos|tan|trigonometric|geometry"
-    r")\b|\\sin|\\cos|\\tan",
-    re.IGNORECASE,
-)
-_COMBO_NT_RE = re.compile(
-    r"\b("
-    r"integer|prime|divisible|mod|modulo|remainder|sequence|combinatorics|"
-    r"counting|game|graph|permutation|combination|factor|gcd|lcm"
-    r")\b",
+_MCQ_ALGORITHM_RE = re.compile(
+    r"\b(sequence|algorithm|output\s+list|oeis|recurrence|iteration|program)\b",
     re.IGNORECASE,
 )
 
@@ -175,31 +161,40 @@ def _format_options(options: Sequence[object]) -> str:
     )
 
 
-def _choose_suffix(question: str) -> str:
+def _choose_suffix(question: str) -> str | None:
+    if _FORMULA_TASK_RE.search(question):
+        return "FORMULA_COMPOSITE_SUFFIX"
+    if _PERCENTILE_RE.search(question):
+        return "PERCENTILE_SUFFIX"
+    if _STATS_SOFTWARE_RE.search(question):
+        return "STATS_SOFTWARE_SUFFIX"
     if _SELECTION_RE.search(question):
         return "SELECTION_MATCHING_SUFFIX"
-    if _STATS_RE.search(question):
-        return "STATS_PROB_SUFFIX"
-    if _CALCULUS_RE.search(question):
-        return "CALCULUS_SUFFIX"
-    if _GEOMETRY_RE.search(question):
-        return "GEOMETRY_TRIG_SUFFIX"
-    if _COMBO_NT_RE.search(question):
-        return "COMBINATORICS_NUMBER_THEORY_SUFFIX"
-    return "GENERAL_ALGEBRA_SUFFIX"
+    return None
+
+
+def _answer_count_line(question: str) -> str:
+    ans_count = question.count("[ANS]")
+    if ans_count == 1:
+        return "This problem has 1 [ANS] blank. Return exactly 1 answer."
+    if ans_count > 1:
+        return f"This problem has {ans_count} [ANS] blanks. Return exactly {ans_count} answers."
+    return "No [ANS] marker appears. Return exactly one final answer."
 
 
 def route_prompt(question: str, options: Sequence[object] | None = None) -> tuple[str, str]:
     """Route a problem to the compact MCQ/free prompt plus one broad suffix."""
     has_options = bool(options)
     suffix_name = _choose_suffix(question)
-    system = "\n\n".join(
-        [
-            BASE_SYSTEM,
-            MCQ_SYSTEM if has_options else FREE_SYSTEM,
-            SUFFIXES[suffix_name],
-        ]
-    )
+    if has_options:
+        parts = [BASE_SYSTEM, MCQ_SYSTEM]
+        if _MCQ_ALGORITHM_RE.search(question):
+            parts.append(SUFFIXES["MCQ_ALGORITHM_SUFFIX"])
+    else:
+        parts = [BASE_SYSTEM, _answer_count_line(question), FREE_SYSTEM]
+        if suffix_name:
+            parts.append(SUFFIXES[suffix_name])
+    system = "\n\n".join(parts)
 
     user = question.strip()
     if has_options:
@@ -233,10 +228,7 @@ def build_routed_prompt(
 ) -> tuple[str, str]:
     """Legacy-compatible routed prompt builder."""
     if fallback:
-        user = question.strip()
-        if options:
-            user = f"{user}\n\nOptions:\n{_format_options(options)}"
-        return FALLBACK_PROMPTS.get(name, SHORT_FALLBACK_SYSTEM), user + "\n\n/no_think"
+        return build_fallback_prompt(name, question, options)
 
     if options:
         _lookup(name, MCQ_PROMPTS)
@@ -245,18 +237,73 @@ def build_routed_prompt(
     return route_prompt(question, options)
 
 
-def clean_answer_text(answer: object) -> str:
+def build_fallback_prompt(
+    name: str,
+    question: str,
+    options: Sequence[object] | None = None,
+    raw_response: str = "",
+    required_answers: int | None = None,
+) -> tuple[str, str]:
+    """Build a short no-think fallback prompt for format failures."""
+    if options:
+        _lookup(name, MCQ_PROMPTS)
+        user = f"Problem:\n{question.strip()}\n\nOptions:\n{_format_options(options)}"
+        if raw_response.strip():
+            user += f"\n\nPrevious response:\n{raw_response.strip()}"
+        return MCQ_FALLBACK_SYSTEM, user
+
+    _lookup(name, FREE_PROMPTS)
+    count = required_answers if required_answers is not None else max(1, question.count("[ANS]"))
+    user = (
+        f"Problem:\n{question.strip()}\n\n"
+        f"Required number of answers: {count}"
+    )
+    if raw_response.strip():
+        user += f"\n\nPrevious response:\n{raw_response.strip()}"
+    return "\n\n".join([FREE_FALLBACK_SYSTEM, _answer_count_line(question)]), user
+
+
+def normalize_expression_style(text: str) -> str:
+    """Normalize common LaTeX-ish expression notation to ASCII."""
+    text = str(text)
+    text = text.replace("\\cdot", "*")
+    text = text.replace("\\times", "*")
+    text = text.replace("\\pi", "pi")
+    text = text.replace("\\ln", "ln")
+    text = re.sub(r"\\sqrt\{([^{}]+)\}", r"sqrt(\1)", text)
+    text = re.sub(r"\\(?:dfrac|frac)\{([^{}]+)\}\{([^{}]+)\}", r"(\1)/(\2)", text)
+    # Avoid corrupting scientific notation such as 1e-5.
+    text = re.sub(r"(?<=\d)(?=[A-DF-Za-df-z])", "*", text)
+    text = re.sub(r"(?<=\))(?=[a-zA-Z])", "*", text)
+    return text.strip()
+
+
+def maybe_convert_power_to_python(text: str, question: str = "") -> str:
+    q = question.lower()
+    expression_task = any(
+        key in q
+        for key in ("formula", "expression", "equation", "model", "quotient", "composite", "function")
+    )
+    has_variable = bool(re.search(r"[a-zA-Z]", text))
+    if expression_task and has_variable:
+        return text.replace("^", "**")
+    return text
+
+
+def clean_answer_text(answer: object, question: str = "") -> str:
     """Small cleanup hook used by submission post-processing."""
     text = str(answer).strip()
     text = re.sub(r"^(?:answer|ans)\s*[:=]\s*", "", text, flags=re.IGNORECASE)
     text = re.sub(r"\s+", " ", text)
+    text = normalize_expression_style(text)
+    text = maybe_convert_power_to_python(text, question)
     return text.strip().strip(".")
 
 
-def rebuild_final_response(answers: Sequence[object]) -> str:
+def rebuild_final_response(answers: Sequence[object], question: str = "") -> str:
     """Rebuild a judge-compatible final answer block from extracted answers."""
-    boxes = "\n".join(f"\\boxed{{{clean_answer_text(answer)}}}" for answer in answers)
-    return "FINAL_ANSWERS:\n" + boxes
+    joined = ", ".join(clean_answer_text(answer, question) for answer in answers)
+    return f"FINAL_ANSWERS:\n\\boxed{{{joined}}}"
 
 
 __all__ = [
@@ -265,6 +312,8 @@ __all__ = [
     "FREE_SYSTEM",
     "SUFFIXES",
     "route_prompt",
+    "MCQ_FALLBACK_SYSTEM",
+    "FREE_FALLBACK_SYSTEM",
     "SHORT_FALLBACK_SYSTEM",
     "MCQ_PROMPTS",
     "FREE_PROMPTS",
@@ -272,6 +321,9 @@ __all__ = [
     "build_mcq_prompt",
     "build_free_prompt",
     "build_routed_prompt",
+    "build_fallback_prompt",
+    "normalize_expression_style",
+    "maybe_convert_power_to_python",
     "clean_answer_text",
     "rebuild_final_response",
 ]

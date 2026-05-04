@@ -43,6 +43,15 @@ class SamplingConfig:
 GREEDY_N1 = SamplingConfig(name="greedy_n1", temperature=0.0, top_p=1.0, top_k=-1, n=1)
 SC_N3 = SamplingConfig(name="sc_n3", temperature=0.7, top_p=0.95, top_k=20, n=3, vote=True)
 CONFIGS = {config.name: config for config in (GREEDY_N1, SC_N3)}
+ERROR_TYPES = [
+    "correct",
+    "truncated",
+    "no_answer",
+    "out_of_range",
+    "count_mismatch",
+    "wrong",
+    "judge_error",
+]
 
 _LETTER_RE = re.compile(r"\\boxed\{\s*([A-Za-z])\s*\}")
 _LETTER_PHRASE_RE = re.compile(
@@ -87,6 +96,43 @@ def render_prompts(
             system, user = build_mcq_prompt(prompt_name, item["question"], item["options"])
         else:
             system, user = build_free_prompt(prompt_name, item["question"])
+        prompts.append(
+            tokenizer.apply_chat_template(
+                [{"role": "system", "content": system}, {"role": "user", "content": user}],
+                tokenize=False,
+                add_generation_prompt=True,
+            )
+        )
+    return prompts
+
+
+def render_fallback_prompts(
+    tokenizer: Any,
+    qtype: str,
+    prompt_name: str,
+    items: list[dict[str, Any]],
+    raw_responses: list[str],
+    prompt_module: Any,
+) -> list[str]:
+    custom_builder = getattr(prompt_module, "build_fallback_prompt", None)
+    prompts = []
+    for item, raw_response in zip(items, raw_responses):
+        options = item.get("options") if qtype == "mcq" else None
+        if custom_builder:
+            system, user = custom_builder(
+                prompt_name,
+                item["question"],
+                options,
+                raw_response=raw_response,
+                required_answers=expected_answer_count(item),
+            )
+        else:
+            system, user = prompt_module.build_routed_prompt(
+                prompt_name,
+                item["question"],
+                options,
+                fallback=True,
+            )
         prompts.append(
             tokenizer.apply_chat_template(
                 [{"role": "system", "content": system}, {"role": "user", "content": user}],
@@ -147,6 +193,53 @@ def score_response(judger: Any, item: dict[str, Any], qtype: str, response: str)
         return False
 
 
+def expected_answer_count(item: dict[str, Any]) -> int:
+    return max(1, str(item.get("question", "")).count("[ANS]"))
+
+
+def categorize_response(
+    judger: Any,
+    item: dict[str, Any],
+    qtype: str,
+    response: str,
+    correct: bool,
+    finish_reason: str | None,
+) -> tuple[str, str]:
+    if correct:
+        return "correct", ""
+
+    if finish_reason and finish_reason != "stop":
+        return "truncated", ""
+
+    if qtype == "mcq":
+        try:
+            extracted = extract_letter(response, item.get("options"), judger)
+        except Exception:
+            return "judge_error", ""
+        if not extracted:
+            return "no_answer", ""
+        n_options = len(item.get("options") or [])
+        if n_options and any((ord(letter) - 65) >= n_options for letter in extracted):
+            return "out_of_range", extracted
+        return "wrong", extracted
+
+    try:
+        extracted = judger.extract_ans(response) or ""
+    except Exception:
+        return "judge_error", ""
+    if not extracted:
+        return "no_answer", ""
+
+    try:
+        parts = judger.split_by_comma(extracted)
+    except Exception:
+        parts = [extracted]
+    expected = expected_answer_count(item)
+    if expected > 1 and len(parts) != expected:
+        return "count_mismatch", extracted
+    return "wrong", extracted
+
+
 def vote_key(response: str, item: dict[str, Any], qtype: str, judger: Any) -> str:
     if qtype == "mcq":
         return extract_letter(response, item.get("options"), judger)
@@ -169,6 +262,66 @@ def choose_majority(responses: list[str], item: dict[str, Any], qtype: str, judg
     return responses[0]
 
 
+def _rebuild_response(prompt_module: Any, answers: list[str], question: str) -> str:
+    rebuilder = getattr(prompt_module, "rebuild_final_response", None)
+    if not rebuilder:
+        return "FINAL_ANSWERS:\n" + "\n".join(f"\\boxed{{{answer}}}" for answer in answers)
+    try:
+        return rebuilder(answers, question=question)
+    except TypeError:
+        return rebuilder(answers)
+
+
+def postprocess_generated_response(
+    response: str,
+    item: dict[str, Any],
+    qtype: str,
+    judger: Any,
+    prompt_module: Any,
+) -> str:
+    """Best-effort final-answer cleanup for the expression-postprocess variant."""
+    question = str(item.get("question", ""))
+    if qtype == "mcq":
+        letter = extract_letter(response, item.get("options"), judger)
+        return _rebuild_response(prompt_module, [letter], question) if letter else ""
+
+    think_end = response.rfind("</think>")
+    tail = response[think_end + len("</think>") :] if think_end >= 0 else response
+    try:
+        answers = judger.extract_all_boxed(tail) or judger.extract_all_boxed(response)
+    except Exception:
+        answers = []
+
+    expected = expected_answer_count(item)
+    if len(answers) == 1 and expected > 1:
+        try:
+            split_answers = judger.split_by_comma(answers[0])
+        except Exception:
+            split_answers = answers
+        if len(split_answers) == expected:
+            answers = split_answers
+
+    if not answers:
+        try:
+            extracted = judger.extract_ans(response)
+        except Exception:
+            extracted = ""
+        if extracted:
+            if expected > 1:
+                try:
+                    answers = judger.split_by_comma(extracted)
+                except Exception:
+                    answers = [extracted]
+            else:
+                answers = [extracted]
+
+    if expected > 1 and len(answers) != expected:
+        return ""
+    if expected == 1 and len(answers) != 1:
+        return ""
+    return _rebuild_response(prompt_module, answers, question) if answers else ""
+
+
 def run_one(
     llm: Any,
     tokenizer: Any,
@@ -180,6 +333,9 @@ def run_one(
     items: list[dict[str, Any]],
     max_tokens: int,
     prompt_module: Any,
+    enable_fallback: bool = False,
+    fallback_max_tokens: int = 2048,
+    postprocess_final_response: bool = False,
 ) -> dict[str, Any]:
     from vllm import SamplingParams
 
@@ -195,19 +351,96 @@ def run_one(
     outputs = llm.generate(prompts, sampling_params=sampling)
 
     records = []
+    fallback_indices: list[int] = []
+    format_failure_types = {"truncated", "no_answer", "out_of_range", "count_mismatch", "judge_error"}
     for item, output in zip(items, outputs):
         responses = [choice.text.strip() for choice in output.outputs]
+        finishes = [getattr(choice, "finish_reason", None) for choice in output.outputs]
         chosen = choose_majority(responses, item, qtype, judger) if config.vote and len(responses) > 1 else responses[0]
+        chosen_idx = responses.index(chosen) if chosen in responses else 0
+        finish_reason = finishes[chosen_idx] if chosen_idx < len(finishes) else None
+        response_for_score = chosen
+        postprocess_used = False
+        if postprocess_final_response:
+            cleaned = postprocess_generated_response(chosen, item, qtype, judger, prompt_module)
+            if cleaned:
+                response_for_score = cleaned
+                postprocess_used = True
+
+        correct = score_response(judger, item, qtype, response_for_score)
+        error_type, extracted = categorize_response(
+            judger, item, qtype, response_for_score, correct, finish_reason
+        )
         records.append(
             {
                 "id": item.get("id"),
                 "is_mcq": qtype == "mcq",
                 "gold": item["answer"],
-                "response": chosen,
+                "response": response_for_score,
+                "raw_response": chosen if postprocess_used else None,
                 "all_samples": responses if config.n > 1 else None,
-                "correct": score_response(judger, item, qtype, chosen),
+                "finish_reason": finish_reason,
+                "extracted": extracted,
+                "error_type": error_type,
+                "response_chars": len(response_for_score),
+                "fallback_used": False,
+                "postprocess_used": postprocess_used,
+                "correct": correct,
             }
         )
+        if enable_fallback and error_type in format_failure_types:
+            fallback_indices.append(len(records) - 1)
+
+    if fallback_indices:
+        fallback_items = [items[idx] for idx in fallback_indices]
+        fallback_raws = [records[idx].get("raw_response") or records[idx]["response"] for idx in fallback_indices]
+        fallback_prompts = render_fallback_prompts(
+            tokenizer, qtype, prompt_name, fallback_items, fallback_raws, prompt_module
+        )
+        fallback_sampling = SamplingParams(
+            max_tokens=fallback_max_tokens,
+            temperature=0.0,
+            top_p=1.0,
+            top_k=-1,
+            n=1,
+        )
+        print(f"  fallback: retrying {len(fallback_indices)} format failures ...")
+        fallback_outputs = llm.generate(fallback_prompts, sampling_params=fallback_sampling)
+        for record_idx, item, output in zip(fallback_indices, fallback_items, fallback_outputs):
+            fallback_response = output.outputs[0].text.strip()
+            fallback_finish = getattr(output.outputs[0], "finish_reason", None)
+            fallback_for_score = fallback_response
+            fallback_postprocess_used = False
+            if postprocess_final_response:
+                cleaned = postprocess_generated_response(
+                    fallback_response, item, qtype, judger, prompt_module
+                )
+                if cleaned:
+                    fallback_for_score = cleaned
+                    fallback_postprocess_used = True
+
+            fallback_correct = score_response(judger, item, qtype, fallback_for_score)
+            fallback_error, fallback_extracted = categorize_response(
+                judger,
+                item,
+                qtype,
+                fallback_for_score,
+                fallback_correct,
+                fallback_finish,
+            )
+            if fallback_error not in format_failure_types:
+                record = records[record_idx]
+                record["raw_response_before_fallback"] = record["response"]
+                record["response"] = fallback_for_score
+                record["fallback_raw_response"] = fallback_response
+                record["fallback_finish_reason"] = fallback_finish
+                record["finish_reason"] = fallback_finish
+                record["extracted"] = fallback_extracted
+                record["error_type"] = fallback_error
+                record["response_chars"] = len(fallback_for_score)
+                record["fallback_used"] = True
+                record["postprocess_used"] = fallback_postprocess_used
+                record["correct"] = fallback_correct
 
     output_dir.mkdir(parents=True, exist_ok=True)
     out_path = output_dir / f"{qtype}__{prompt_name}__{config.name}.jsonl"
@@ -216,6 +449,14 @@ def run_one(
             file.write(json.dumps(record, ensure_ascii=False) + "\n")
 
     correct = sum(bool(record["correct"]) for record in records)
+    err_counts = Counter(record["error_type"] for record in records)
+    total_chars = sum(int(record["response_chars"]) for record in records)
+    finish_non_stop = sum(
+        1
+        for record in records
+        if record.get("finish_reason") and record.get("finish_reason") != "stop"
+    )
+    postprocess_used = sum(1 for record in records if record.get("postprocess_used"))
     summary = {
         "type": qtype,
         "prompt": prompt_name,
@@ -224,7 +465,12 @@ def run_one(
         "correct": correct,
         "acc": correct / len(records) if records else 0.0,
         "path": str(out_path),
+        "avg_response_chars": total_chars / len(records) if records else 0.0,
+        "finish_non_stop": finish_non_stop,
+        "postprocess_used": postprocess_used,
     }
+    for error_type in ERROR_TYPES:
+        summary[f"err_{error_type}"] = err_counts.get(error_type, 0)
     print(f"  -> {correct}/{len(records)} = {summary['acc']:.3f} [{out_path}]")
     return summary
 
@@ -232,6 +478,7 @@ def run_one(
 def write_summary(output_dir: Path, summaries: list[dict[str, Any]]) -> Path:
     total_n = sum(row["n"] for row in summaries)
     total_correct = sum(row["correct"] for row in summaries)
+    total_chars = sum(row.get("avg_response_chars", 0.0) * row["n"] for row in summaries)
     combined = {
         "type": "combined",
         "prompt": "__".join(f"{row['type']}_{row['prompt']}" for row in summaries),
@@ -240,11 +487,30 @@ def write_summary(output_dir: Path, summaries: list[dict[str, Any]]) -> Path:
         "correct": total_correct,
         "acc": total_correct / total_n if total_n else 0.0,
         "path": "",
+        "avg_response_chars": total_chars / total_n if total_n else 0.0,
+        "finish_non_stop": sum(row.get("finish_non_stop", 0) for row in summaries),
+        "postprocess_used": sum(row.get("postprocess_used", 0) for row in summaries),
     }
+    for error_type in ERROR_TYPES:
+        key = f"err_{error_type}"
+        combined[key] = sum(row.get(key, 0) for row in summaries)
     rows = [combined, *summaries]
     path = output_dir / "summary.csv"
     with path.open("w", newline="", encoding="utf-8") as file:
-        writer = csv.DictWriter(file, fieldnames=["type", "prompt", "config", "n", "correct", "acc", "path"])
+        fieldnames = [
+            "type",
+            "prompt",
+            "config",
+            "n",
+            "correct",
+            "acc",
+            "path",
+            "avg_response_chars",
+            "finish_non_stop",
+            "postprocess_used",
+            *(f"err_{error_type}" for error_type in ERROR_TYPES),
+        ]
+        writer = csv.DictWriter(file, fieldnames=fieldnames)
         writer.writeheader()
         writer.writerows(rows)
     return path
@@ -271,6 +537,9 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--mcq-config", default=GREEDY_N1.name, choices=sorted(CONFIGS))
     parser.add_argument("--free-config", default=SC_N3.name, choices=sorted(CONFIGS))
     parser.add_argument("--max-tokens", type=int, default=32768)
+    parser.add_argument("--fallback-on-format-failure", action="store_true")
+    parser.add_argument("--fallback-max-tokens", type=int, default=2048)
+    parser.add_argument("--postprocess-final-response", action="store_true")
     parser.add_argument("--gpu-memory-utilization", type=float, default=0.50)
     return parser.parse_args()
 
@@ -327,6 +596,9 @@ def main() -> None:
             mcq_items,
             args.max_tokens,
             prompt_module,
+            enable_fallback=args.fallback_on_format_failure,
+            fallback_max_tokens=args.fallback_max_tokens,
+            postprocess_final_response=args.postprocess_final_response,
         ),
         run_one(
             llm,
@@ -339,6 +611,9 @@ def main() -> None:
             free_items,
             args.max_tokens,
             prompt_module,
+            enable_fallback=args.fallback_on_format_failure,
+            fallback_max_tokens=args.fallback_max_tokens,
+            postprocess_final_response=args.postprocess_final_response,
         ),
     ]
     summary_path = write_summary(output_dir, summaries)

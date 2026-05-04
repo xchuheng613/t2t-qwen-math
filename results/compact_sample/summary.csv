@@ -1,0 +1,4 @@
+type,prompt,config,n,correct,acc,path
+combined,mcq_compact__free_compact,mcq_greedy_n1__free_greedy_n1,200,128,0.64,
+mcq,compact,greedy_n1,100,68,0.68,results/compact_sample/mcq__compact__greedy_n1.jsonl
+free,compact,greedy_n1,100,60,0.6,results/compact_sample/free__compact__greedy_n1.jsonl

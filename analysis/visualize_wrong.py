@@ -22,9 +22,9 @@ EXTRA_RESULT_DIRS = [
     ROOT / "results" / "public_format_router",
 ]
 
-BOXED_RE = re.compile(r"\\boxed\{([^{}]*)\}")
 ANS_RE = re.compile(r"\[ANS\]\s*([^\n]+)")
 NUMBER_RE = re.compile(r"^[-+]?\d+(?:\.\d+)?(?:[eE][-+]?\d+)?$")
+TOP_LEVEL_BRACKETS = {"(": ")", "[": "]", "{": "}", "<": ">"}
 
 
 def _is_number(s: str) -> bool:
@@ -51,8 +51,65 @@ def _normalize_str(s: str) -> str:
 def _split_multi(s: str) -> list[str]:
     if s is None:
         return []
-    parts = re.split(r"[,;]", s)
-    return [p.strip() for p in parts if p.strip()]
+    parts: list[str] = []
+    stack: list[str] = []
+    start = 0
+    i = 0
+    while i < len(s):
+        ch = s[i]
+        if ch == "\\" and i + 1 < len(s):
+            i += 2
+            continue
+        if ch in TOP_LEVEL_BRACKETS:
+            stack.append(TOP_LEVEL_BRACKETS[ch])
+        elif stack and ch == stack[-1]:
+            stack.pop()
+        elif ch in ",;" and not stack:
+            part = s[start:i].strip()
+            if part:
+                parts.append(part)
+            start = i + 1
+        i += 1
+    tail = s[start:].strip()
+    if tail:
+        parts.append(tail)
+    return parts
+
+
+def _extract_all_boxed(text: str) -> list[str]:
+    """Extract the last contiguous final group of \\boxed{...} contents."""
+    entries: list[tuple[int, int, str]] = []
+    start = 0
+    while True:
+        idx = text.find("\\boxed{", start)
+        if idx < 0:
+            break
+        brace_start = idx + len("\\boxed{")
+        depth = 1
+        i = brace_start
+        while i < len(text) and depth > 0:
+            if text[i] == "{":
+                depth += 1
+            elif text[i] == "}":
+                depth -= 1
+            i += 1
+        if depth == 0:
+            content = text[brace_start : i - 1].strip()
+            if content:
+                entries.append((idx, i, content))
+        start = max(i, idx + 1)
+
+    if not entries:
+        return []
+
+    last_group = [entries[-1]]
+    for j in range(len(entries) - 2, -1, -1):
+        gap = text[entries[j][1] : entries[j + 1][0]]
+        if re.match(r"^[\s,\$\.\;\:\-\&\\]*$", gap):
+            last_group.insert(0, entries[j])
+        else:
+            break
+    return [entry[2] for entry in last_group]
 
 
 def _numbers_close(a: str, b: str, rel: float = 5e-3) -> bool:
@@ -108,7 +165,7 @@ def diagnose(rec: dict, q: dict | None) -> tuple[str, str]:
     if is_mcq:
         gold_letter = (gold or "").strip().upper() if isinstance(gold, str) else ""
         # Try to find the model's chosen letter from the response.
-        boxed = BOXED_RE.findall(rec.get("response", ""))
+        boxed = _extract_all_boxed(rec.get("response", ""))
         chosen = (boxed[-1] if boxed else pred_stripped).strip().upper()
         chosen = re.sub(r"[^A-Z]", "", chosen)[:1]
         if gold_letter and chosen and chosen != gold_letter:
@@ -175,9 +232,9 @@ def diagnose(rec: dict, q: dict | None) -> tuple[str, str]:
                 "Different number of answers than gold expects "
                 f"(gold={len(gold_list)}, pred={len(pred_list)}). Either the model "
                 "merged / split blanks, or the extraction split on the wrong "
-                "delimiter. Prompt for one <code>\\boxed{}</code> per blank in "
-                "question order, and split judger inputs on <code>[ANS]</code> "
-                "boundaries rather than commas.",
+                "delimiter. Prompt for exactly one final <code>\\boxed{}</code> "
+                "with comma-separated answers in question order, and keep "
+                "single-object comma answers protected with parentheses/brackets.",
             )
 
     # Single-answer free-form
@@ -273,9 +330,9 @@ def extract_predicted(rec: dict) -> str:
     if extracted:
         return extracted
     resp = rec.get("response", "")
-    boxed = BOXED_RE.findall(resp)
+    boxed = _extract_all_boxed(resp)
     if boxed:
-        return boxed[-1].strip()
+        return ", ".join(item.strip() for item in boxed)
     ans = ANS_RE.findall(resp)
     if ans:
         return ans[-1].strip()

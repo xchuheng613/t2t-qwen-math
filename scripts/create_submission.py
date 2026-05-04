@@ -121,6 +121,42 @@ def render_legacy_prompts(
     return prompts
 
 
+def render_legacy_fallback_prompts(
+    tokenizer: Any,
+    prompt_name: str,
+    items: list[dict[str, Any]],
+    routes: list[Route],
+    raw_responses: list[str],
+    prompt_module: Any,
+) -> list[str]:
+    prompts = []
+    custom_builder = getattr(prompt_module, "build_fallback_prompt", None)
+    for item, route, raw_response in zip(items, routes, raw_responses):
+        if custom_builder:
+            system, user = custom_builder(
+                prompt_name,
+                item["question"],
+                item.get("options") or None,
+                raw_response=raw_response,
+                required_answers=route.expected_answers,
+            )
+        else:
+            system, user = prompt_module.build_routed_prompt(
+                prompt_name,
+                item["question"],
+                item.get("options") or None,
+                fallback=True,
+            )
+        prompts.append(
+            tokenizer.apply_chat_template(
+                [{"role": "system", "content": system}, {"role": "user", "content": user}],
+                tokenize=False,
+                add_generation_prompt=True,
+            )
+        )
+    return prompts
+
+
 def _tail_after_think(text: str) -> str:
     think_end = text.rfind("</think>")
     return text[think_end + len("</think>") :] if think_end >= 0 else text
@@ -163,18 +199,27 @@ def extract_letter(text: str, options: list[str] | None, judger: Any) -> str:
     return matches[-1] if matches else ""
 
 
-def _clean_answer_text(prompt_module: Any, answer: str) -> str:
+def _clean_answer_text(prompt_module: Any, answer: str, question: str = "") -> str:
     cleaner = getattr(prompt_module, "clean_answer_text", None)
     if cleaner:
-        return cleaner(answer)
+        try:
+            return cleaner(answer, question=question)
+        except TypeError:
+            return cleaner(answer)
     return re.sub(r"\s+", " ", str(answer)).strip()
 
 
-def _rebuild_final_response(prompt_module: Any, answers: list[str]) -> str:
+def _rebuild_final_response(prompt_module: Any, answers: list[str], question: str = "") -> str:
     rebuilder = getattr(prompt_module, "rebuild_final_response", None)
     if rebuilder:
-        return rebuilder(answers)
-    boxes = "\n".join(f"\\boxed{{{_clean_answer_text(prompt_module, answer)}}}" for answer in answers)
+        try:
+            return rebuilder(answers, question=question)
+        except TypeError:
+            return rebuilder(answers)
+    boxes = "\n".join(
+        f"\\boxed{{{_clean_answer_text(prompt_module, answer, question)}}}"
+        for answer in answers
+    )
     return "FINAL_ANSWERS:\n" + boxes
 
 
@@ -187,7 +232,7 @@ def clean_legacy_final_response(
 ) -> str:
     if route.format_type == FORMAT_MCQ:
         letter = extract_letter(response, item.get("options"), judger)
-        return _rebuild_final_response(prompt_module, [letter]) if letter else ""
+        return _rebuild_final_response(prompt_module, [letter], item.get("question", "")) if letter else ""
 
     tail = _tail_after_think(response)
     try:
@@ -202,6 +247,8 @@ def clean_legacy_final_response(
             split_answers = answers
         if len(split_answers) == route.expected_answers:
             answers = split_answers
+    if route.expected_answers > 1 and answers and len(answers) != route.expected_answers:
+        return ""
 
     if not answers:
         try:
@@ -210,8 +257,10 @@ def clean_legacy_final_response(
             extracted = ""
         if extracted:
             answers = [extracted]
+    if route.expected_answers > 1 and answers and len(answers) != route.expected_answers:
+        return ""
 
-    return _rebuild_final_response(prompt_module, answers) if answers else ""
+    return _rebuild_final_response(prompt_module, answers, item.get("question", "")) if answers else ""
 
 
 def vote_key(response: str, item: dict[str, Any], route: Route, judger: Any) -> str:
@@ -325,19 +374,21 @@ def generate_legacy_group(
             "vote_key": winning_key,
             "fallback_used": False,
         }
-        if enable_fallback and (finish_reason == "length" or not clean_response):
+        if enable_fallback and ((finish_reason and finish_reason != "stop") or not clean_response):
             fallback_indices.append(idx)
         records.append(record)
 
     if fallback_indices:
         fallback_items = [items[idx] for idx in fallback_indices]
         fallback_routes = [routes[idx] for idx in fallback_indices]
-        fallback_prompts = render_legacy_prompts(
+        fallback_raw_responses = [records[idx]["raw_response"] for idx in fallback_indices]
+        fallback_prompts = render_legacy_fallback_prompts(
             tokenizer,
             prompt_name,
             fallback_items,
+            fallback_routes,
+            fallback_raw_responses,
             prompt_module,
-            fallback=True,
         )
         print(
             f"  fallback: retrying {len(fallback_items)} truncated/no-answer prompts with short no-reasoning prompt ...",
