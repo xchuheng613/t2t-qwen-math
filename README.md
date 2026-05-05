@@ -81,6 +81,11 @@ python scripts/create_submission.py --routing-mode legacy \
 python scripts/create_submission.py --routing-mode legacy \
   --prompt-module prompts.compact_prompt_pack \
   --mcq-prompt compact --free-prompt compact
+# Optional high-budget stage for rows still failing after continuation/bounded fallback:
+python scripts/create_submission.py --routing-mode legacy \
+  --prompt-module prompts.compact_prompt_pack \
+  --mcq-prompt compact --free-prompt compact \
+  --max-model-len 65536 --high-budget-fallback
 ```
 
 ### 3. Sweep prompts on a stratified public subset

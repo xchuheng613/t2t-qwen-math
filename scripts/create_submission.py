@@ -35,7 +35,9 @@ FORMAT_FREE_RESPONSE = "free_response"
 
 _LETTER_RE = re.compile(r"\\boxed\{\s*([A-Za-z])\s*\}")
 _LETTER_PHRASE_RE = re.compile(
-    r"(?:option|choice|answer\s+is)\s*[:\s]*\(?([A-Z])\)?\b",
+    r"(?:correct\s+option\s+is|correct\s+answer\s+is|answer\s+is|"
+    r"therefore|thus|hence|i\s+choose|choose|selected|option|choice)"
+    r"\s*[:\s]*\(?([A-Z])\)?\b",
     re.IGNORECASE,
 )
 
@@ -128,25 +130,22 @@ def render_legacy_fallback_prompts(
     routes: list[Route],
     raw_responses: list[str],
     prompt_module: Any,
+    stage: str,
+    tail_tokens: int,
 ) -> list[str]:
     prompts = []
-    custom_builder = getattr(prompt_module, "build_fallback_prompt", None)
     for item, route, raw_response in zip(items, routes, raw_responses):
-        if custom_builder:
-            system, user = custom_builder(
-                prompt_name,
-                item["question"],
-                item.get("options") or None,
-                raw_response=raw_response,
-                required_answers=route.expected_answers,
-            )
-        else:
-            system, user = prompt_module.build_routed_prompt(
-                prompt_name,
-                item["question"],
-                item.get("options") or None,
-                fallback=True,
-            )
+        previous_tail = _tail_by_tokens(tokenizer, raw_response, tail_tokens)
+        system, user = build_stage_fallback_prompt(
+            prompt_module,
+            stage,
+            prompt_name,
+            item["question"],
+            item.get("options") or None,
+            raw_response=raw_response,
+            previous_tail=previous_tail,
+            required_answers=route.expected_answers,
+        )
         prompts.append(
             tokenizer.apply_chat_template(
                 [{"role": "system", "content": system}, {"role": "user", "content": user}],
@@ -155,6 +154,344 @@ def render_legacy_fallback_prompts(
             )
         )
     return prompts
+
+
+def _tail_by_tokens(tokenizer: Any, text: str, max_tokens: int) -> str:
+    if max_tokens <= 0:
+        return ""
+    try:
+        token_ids = tokenizer.encode(text, add_special_tokens=False)
+        if len(token_ids) <= max_tokens:
+            return text.strip()
+        return tokenizer.decode(token_ids[-max_tokens:], skip_special_tokens=True).strip()
+    except Exception:
+        return text[-max_tokens * 4 :].strip()
+
+
+def _options_block(options: list[str] | None) -> str:
+    if not options:
+        return ""
+    return "\n\nOptions:\n" + "\n".join(
+        f"{chr(65 + idx)}. {str(option).strip()}"
+        for idx, option in enumerate(options)
+    )
+
+
+def _generic_stage_fallback_prompt(
+    stage: str,
+    question: str,
+    options: list[str] | None,
+    *,
+    previous_tail: str,
+    required_answers: int,
+) -> tuple[str, str]:
+    if stage == "continuation":
+        system = (
+            "Continue from the previous reasoning. Do not restart the solution. "
+            "Use the previous work to finish the answer.\n\n"
+            "Output only:\n"
+            "FINAL_ANSWERS:\n"
+            "\\boxed{answer}\n\n"
+            "No explanation. For MCQ, box only uppercase option letter(s). "
+            f"For free-response, return exactly {required_answers} answer(s) in order; "
+            "if multiple answers are needed, put them in one box separated by commas."
+        )
+        user = (
+            f"Problem:\n{question.strip()}{_options_block(options)}\n\n"
+            f"Previous response tail:\n{previous_tail.strip()}"
+        )
+        return system, user
+
+    if stage == "bounded":
+        system = (
+            "Solve concisely. Do not verify repeatedly. Use at most 8 short "
+            "reasoning steps, then finish the answer.\n\n"
+            "Output only:\n"
+            "FINAL_ANSWERS:\n"
+            "\\boxed{answer}\n\n"
+            "No explanation after the final box. For MCQ, box only uppercase "
+            f"option letter(s). For free-response, return exactly {required_answers} "
+            "answer(s) in order; if multiple answers are needed, put them in one "
+            "box separated by commas."
+        )
+        user = f"Problem:\n{question.strip()}{_options_block(options)}"
+        return system, user
+
+    raise ValueError(f"Unknown fallback stage: {stage}")
+
+
+def build_stage_fallback_prompt(
+    prompt_module: Any,
+    stage: str,
+    prompt_name: str,
+    question: str,
+    options: list[str] | None,
+    *,
+    raw_response: str,
+    previous_tail: str,
+    required_answers: int,
+) -> tuple[str, str]:
+    custom_name = f"build_{stage}_fallback_prompt"
+    custom_builder = getattr(prompt_module, custom_name, None)
+    if custom_builder:
+        return custom_builder(
+            prompt_name,
+            question,
+            options,
+            raw_response=raw_response,
+            previous_tail=previous_tail,
+            required_answers=required_answers,
+        )
+
+    if stage not in {"continuation", "bounded"}:
+        custom_builder = getattr(prompt_module, "build_fallback_prompt", None)
+        if custom_builder:
+            return custom_builder(
+                prompt_name,
+                question,
+                options,
+                raw_response=raw_response,
+                required_answers=required_answers,
+            )
+        else:
+            return prompt_module.build_routed_prompt(prompt_name, question, options, fallback=True)
+
+    return _generic_stage_fallback_prompt(
+        stage,
+        question,
+        options,
+        previous_tail=previous_tail,
+        required_answers=required_answers,
+    )
+
+
+def _extract_all_boxed_anywhere(text: str, judger: Any) -> list[str]:
+    entries: list[str] = []
+    start = 0
+    while True:
+        idx = text.find("\\boxed{", start)
+        if idx < 0:
+            break
+        brace_start = idx + len("\\boxed{")
+        depth = 1
+        i = brace_start
+        while i < len(text) and depth > 0:
+            if text[i] == "{":
+                depth += 1
+            elif text[i] == "}":
+                depth -= 1
+            i += 1
+        if depth == 0:
+            content = text[brace_start : i - 1]
+            if content:
+                entries.append(judger.normalize_answer(content))
+        start = i
+    return entries
+
+
+def _answers_match_expected_count(answers: list[str], expected: int, judger: Any) -> list[str]:
+    if expected <= 1:
+        return answers[-1:]
+    if len(answers) == expected:
+        return answers
+    if len(answers) == 1:
+        try:
+            split_answers = judger.split_by_comma(answers[0])
+        except Exception:
+            split_answers = answers
+        if len(split_answers) == expected:
+            return split_answers
+    if len(answers) > expected:
+        return answers[-expected:]
+    return []
+
+
+def _prompt_token_count(tokenizer: Any, prompt_text: str) -> int:
+    try:
+        return len(tokenizer.encode(prompt_text, add_special_tokens=False))
+    except Exception:
+        return max(1, len(prompt_text) // 4)
+
+
+def _high_budget_sampling_params(max_tokens: int) -> Any:
+    from vllm import SamplingParams
+
+    return SamplingParams(
+        max_tokens=max_tokens,
+        temperature=0.0,
+        top_p=1.0,
+        top_k=-1,
+        n=1,
+    )
+
+
+def _apply_fallback_result(
+    record: dict[str, Any],
+    item: dict[str, Any],
+    route: Route,
+    judger: Any,
+    prompt_module: Any,
+    *,
+    stage: str,
+    raw_response: str,
+    finish_reason: str | None,
+    max_tokens: int,
+) -> bool:
+    clean_response = clean_legacy_final_response(raw_response, item, route, judger, prompt_module)
+    attempt = {
+        "stage": stage,
+        "finish_reason": finish_reason,
+        "max_tokens": max_tokens,
+        "cleaned": bool(clean_response),
+        "raw_response": raw_response,
+    }
+    record.setdefault("fallback_attempts", []).append(attempt)
+    if not clean_response:
+        return False
+
+    record["fallback_used"] = True
+    record["fallback_stage"] = stage
+    record["fallback_raw_response"] = raw_response
+    record["fallback_finish_reason"] = finish_reason
+    record.setdefault("raw_response_before_fallback", record["raw_response"])
+    record["raw_response"] = raw_response
+    record["response"] = clean_response
+    record["vote_key"] = vote_key(raw_response, item, route, judger)
+    return True
+
+
+def _run_fallback_stage(
+    llm: Any,
+    tokenizer: Any,
+    judger: Any,
+    prompt_name: str,
+    records: list[dict[str, Any]],
+    items: list[dict[str, Any]],
+    routes: list[Route],
+    unresolved_indices: list[int],
+    prompt_module: Any,
+    *,
+    stage: str,
+    max_tokens: int,
+    tail_tokens: int,
+) -> list[int]:
+    if not unresolved_indices:
+        return []
+
+    stage_items = [items[idx] for idx in unresolved_indices]
+    stage_routes = [routes[idx] for idx in unresolved_indices]
+    stage_raws = [records[idx]["raw_response"] for idx in unresolved_indices]
+    fallback_prompts = render_legacy_fallback_prompts(
+        tokenizer,
+        prompt_name,
+        stage_items,
+        stage_routes,
+        stage_raws,
+        prompt_module,
+        stage=stage,
+        tail_tokens=tail_tokens,
+    )
+    print(
+        f"  fallback stage={stage}: retrying {len(stage_items)} rows with max_tokens={max_tokens} ...",
+        flush=True,
+    )
+    fallback_outputs = llm.generate(
+        fallback_prompts,
+        sampling_params=_fallback_sampling_params(max_tokens),
+    )
+
+    still_unresolved: list[int] = []
+    for record_idx, item, route, output in zip(unresolved_indices, stage_items, stage_routes, fallback_outputs):
+        fallback_raw = output.outputs[0].text.strip()
+        fallback_finish = getattr(output.outputs[0], "finish_reason", None)
+        ok = _apply_fallback_result(
+            records[record_idx],
+            item,
+            route,
+            judger,
+            prompt_module,
+            stage=stage,
+            raw_response=fallback_raw,
+            finish_reason=fallback_finish,
+            max_tokens=max_tokens,
+        )
+        if not ok:
+            still_unresolved.append(record_idx)
+    return still_unresolved
+
+
+def _run_high_budget_fallback(
+    llm: Any,
+    tokenizer: Any,
+    judger: Any,
+    prompt_name: str,
+    records: list[dict[str, Any]],
+    items: list[dict[str, Any]],
+    routes: list[Route],
+    unresolved_indices: list[int],
+    prompt_module: Any,
+    *,
+    high_budget_max_tokens: int,
+    max_model_len: int,
+    context_safety_margin: int,
+) -> list[int]:
+    if not unresolved_indices:
+        return []
+
+    stage_items = [items[idx] for idx in unresolved_indices]
+    stage_routes = [routes[idx] for idx in unresolved_indices]
+    prompts = render_legacy_prompts(tokenizer, prompt_name, stage_items, prompt_module)
+    max_prompt_tokens = max(_prompt_token_count(tokenizer, prompt) for prompt in prompts)
+    effective_max_tokens = min(
+        high_budget_max_tokens,
+        max_model_len - max_prompt_tokens - context_safety_margin,
+    )
+    if effective_max_tokens <= 0:
+        print(
+            "  fallback stage=high_budget: skipped because prompts do not fit "
+            f"max_model_len={max_model_len} with safety={context_safety_margin}.",
+            flush=True,
+        )
+        for idx in unresolved_indices:
+            records[idx].setdefault("fallback_attempts", []).append(
+                {
+                    "stage": "high_budget",
+                    "skipped": True,
+                    "reason": "insufficient_context_window",
+                    "max_prompt_tokens": max_prompt_tokens,
+                    "max_model_len": max_model_len,
+                }
+            )
+        return unresolved_indices
+
+    print(
+        f"  fallback stage=high_budget: retrying {len(stage_items)} rows with "
+        f"max_tokens={effective_max_tokens} (max_prompt_tokens={max_prompt_tokens}) ...",
+        flush=True,
+    )
+    outputs = llm.generate(
+        prompts,
+        sampling_params=_high_budget_sampling_params(effective_max_tokens),
+    )
+
+    still_unresolved: list[int] = []
+    for record_idx, item, route, output in zip(unresolved_indices, stage_items, stage_routes, outputs):
+        fallback_raw = output.outputs[0].text.strip()
+        fallback_finish = getattr(output.outputs[0], "finish_reason", None)
+        ok = _apply_fallback_result(
+            records[record_idx],
+            item,
+            route,
+            judger,
+            prompt_module,
+            stage="high_budget",
+            raw_response=fallback_raw,
+            finish_reason=fallback_finish,
+            max_tokens=effective_max_tokens,
+        )
+        if not ok:
+            still_unresolved.append(record_idx)
+    return still_unresolved
 
 
 def _tail_after_think(text: str) -> str:
@@ -240,15 +577,10 @@ def clean_legacy_final_response(
     except Exception:
         answers = []
 
-    if len(answers) == 1 and route.expected_answers > 1:
-        try:
-            split_answers = judger.split_by_comma(answers[0])
-        except Exception:
-            split_answers = answers
-        if len(split_answers) == route.expected_answers:
-            answers = split_answers
-    if route.expected_answers > 1 and answers and len(answers) != route.expected_answers:
-        return ""
+    answers = _answers_match_expected_count(answers, route.expected_answers, judger)
+    if not answers:
+        all_boxed = _extract_all_boxed_anywhere(tail, judger) or _extract_all_boxed_anywhere(response, judger)
+        answers = _answers_match_expected_count(all_boxed, route.expected_answers, judger)
 
     if not answers:
         try:
@@ -257,8 +589,7 @@ def clean_legacy_final_response(
             extracted = ""
         if extracted:
             answers = [extracted]
-    if route.expected_answers > 1 and answers and len(answers) != route.expected_answers:
-        return ""
+    answers = _answers_match_expected_count(answers, route.expected_answers, judger)
 
     return _rebuild_final_response(prompt_module, answers, item.get("question", "")) if answers else ""
 
@@ -313,6 +644,11 @@ def generate_legacy_group(
     fallback_max_tokens: int,
     enable_fallback: bool,
     prompt_module: Any,
+    fallback_tail_tokens: int = 6000,
+    enable_high_budget_fallback: bool = False,
+    high_budget_max_tokens: int = 32768,
+    max_model_len: int = 32768,
+    context_safety_margin: int = 512,
 ) -> list[dict[str, Any]]:
     from tqdm import tqdm
     from vllm import SamplingParams
@@ -373,44 +709,62 @@ def generate_legacy_group(
             "chosen_idx": chosen_idx,
             "vote_key": winning_key,
             "fallback_used": False,
+            "fallback_stage": "",
+            "fallback_attempts": [],
+            "stage0_repair_used": bool(clean_response and clean_response != chosen),
         }
-        if enable_fallback and ((finish_reason and finish_reason != "stop") or not clean_response):
+        # Stage 0 is the cleanup above: if a valid final block can be rebuilt
+        # from the raw/truncated text, do not spend another inference call.
+        if enable_fallback and not clean_response:
             fallback_indices.append(idx)
         records.append(record)
 
     if fallback_indices:
-        fallback_items = [items[idx] for idx in fallback_indices]
-        fallback_routes = [routes[idx] for idx in fallback_indices]
-        fallback_raw_responses = [records[idx]["raw_response"] for idx in fallback_indices]
-        fallback_prompts = render_legacy_fallback_prompts(
+        unresolved = _run_fallback_stage(
+            llm,
             tokenizer,
+            judger,
             prompt_name,
-            fallback_items,
-            fallback_routes,
-            fallback_raw_responses,
+            records,
+            items,
+            routes,
+            fallback_indices,
             prompt_module,
+            stage="continuation",
+            max_tokens=fallback_max_tokens,
+            tail_tokens=fallback_tail_tokens,
         )
-        print(
-            f"  fallback: retrying {len(fallback_items)} truncated/no-answer prompts with short no-reasoning prompt ...",
-            flush=True,
+        unresolved = _run_fallback_stage(
+            llm,
+            tokenizer,
+            judger,
+            prompt_name,
+            records,
+            items,
+            routes,
+            unresolved,
+            prompt_module,
+            stage="bounded",
+            max_tokens=fallback_max_tokens,
+            tail_tokens=fallback_tail_tokens,
         )
-        fallback_outputs = llm.generate(
-            fallback_prompts,
-            sampling_params=_fallback_sampling_params(fallback_max_tokens),
-        )
-        for record_idx, item, route, output in zip(fallback_indices, fallback_items, fallback_routes, fallback_outputs):
-            fallback_raw = output.outputs[0].text.strip()
-            fallback_finish = getattr(output.outputs[0], "finish_reason", None)
-            fallback_clean = clean_legacy_final_response(fallback_raw, item, route, judger, prompt_module)
-            record = records[record_idx]
-            record["fallback_used"] = True
-            record["fallback_raw_response"] = fallback_raw
-            record["fallback_finish_reason"] = fallback_finish
-            record["raw_response_before_fallback"] = record["raw_response"]
-            if fallback_clean:
-                record["raw_response"] = fallback_raw
-                record["response"] = fallback_clean
-                record["vote_key"] = vote_key(fallback_raw, item, route, judger)
+        if enable_high_budget_fallback:
+            unresolved = _run_high_budget_fallback(
+                llm,
+                tokenizer,
+                judger,
+                prompt_name,
+                records,
+                items,
+                routes,
+                unresolved,
+                prompt_module,
+                high_budget_max_tokens=high_budget_max_tokens,
+                max_model_len=max_model_len,
+                context_safety_margin=context_safety_margin,
+            )
+        if unresolved:
+            print(f"  fallback: {len(unresolved)} rows still unresolved after staged fallback.", flush=True)
     print(f"[legacy {prompt_name} / {config.name}] done.", flush=True)
     return records
 
@@ -588,6 +942,11 @@ def run_hybrid_submission(args: argparse.Namespace, rows: list[dict[str, Any]]) 
             args.fallback_max_tokens,
             not args.no_fallback,
             prompt_module,
+            fallback_tail_tokens=args.fallback_tail_tokens,
+            enable_high_budget_fallback=args.high_budget_fallback,
+            high_budget_max_tokens=args.high_budget_max_tokens,
+            max_model_len=args.max_model_len,
+            context_safety_margin=args.context_safety_margin,
         )
         for record in free_records:
             record.update(
@@ -638,6 +997,11 @@ def run_legacy_submission(args: argparse.Namespace, rows: list[dict[str, Any]]) 
                 args.fallback_max_tokens,
                 not args.no_fallback,
                 prompt_module,
+                fallback_tail_tokens=args.fallback_tail_tokens,
+                enable_high_budget_fallback=args.high_budget_fallback,
+                high_budget_max_tokens=args.high_budget_max_tokens,
+                max_model_len=args.max_model_len,
+                context_safety_margin=args.context_safety_margin,
             )
         )
     return records
@@ -667,7 +1031,25 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--mcq-config", default="greedy_n1", choices=sorted(CONFIGS))
     parser.add_argument("--free-config", default="sc_n3", choices=sorted(CONFIGS))
     parser.add_argument("--max-tokens", type=int, default=16384)
-    parser.add_argument("--fallback-max-tokens", type=int, default=2048)
+    parser.add_argument(
+        "--fallback-max-tokens",
+        type=int,
+        default=8192,
+        help="Token budget for continuation and bounded-solving fallback stages.",
+    )
+    parser.add_argument(
+        "--fallback-tail-tokens",
+        type=int,
+        default=6000,
+        help="Approximate number of previous-response tokens to include in continuation fallback.",
+    )
+    parser.add_argument(
+        "--high-budget-fallback",
+        action="store_true",
+        help="After staged fallback fails, rerun unresolved rows with a larger dynamic generation budget.",
+    )
+    parser.add_argument("--high-budget-max-tokens", type=int, default=32768)
+    parser.add_argument("--context-safety-margin", type=int, default=512)
     parser.add_argument("--no-fallback", action="store_true")
     parser.add_argument("--no-repair", action="store_true")
     parser.add_argument("--math-type", default=None)

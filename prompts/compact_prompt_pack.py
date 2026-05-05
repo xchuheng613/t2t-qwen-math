@@ -102,6 +102,33 @@ FINAL_ANSWERS:
 """.strip()
 
 
+CONTINUATION_FALLBACK_SYSTEM = r"""
+Continue from the previous reasoning. Do not restart the solution. Use the
+previous work to finish the answer.
+
+Output only:
+FINAL_ANSWERS:
+\boxed{answer}
+
+No explanation. For MCQ, box only uppercase option letter(s). For free-response
+with multiple answers, put all answers in one box separated by commas.
+""".strip()
+
+
+BOUNDED_FALLBACK_SYSTEM = r"""
+Solve concisely. Do not verify repeatedly. Use at most 8 short reasoning steps,
+then finish the answer.
+
+Output only:
+FINAL_ANSWERS:
+\boxed{answer}
+
+No explanation after the final box. For MCQ, box only uppercase option letter(s).
+For free-response with multiple answers, put all answers in one box separated by
+commas.
+""".strip()
+
+
 SHORT_FALLBACK_SYSTEM = r"""
 /no_think
 Answer directly.
@@ -263,6 +290,57 @@ def build_fallback_prompt(
     return "\n\n".join([FREE_FALLBACK_SYSTEM, _answer_count_line(question)]), user
 
 
+def build_continuation_fallback_prompt(
+    name: str,
+    question: str,
+    options: Sequence[object] | None = None,
+    raw_response: str = "",
+    previous_tail: str = "",
+    required_answers: int | None = None,
+) -> tuple[str, str]:
+    """Build the first retry: continue a truncated solution and finish only."""
+    count = required_answers if required_answers is not None else max(1, question.count("[ANS]"))
+    if options:
+        _lookup(name, MCQ_PROMPTS)
+        user = (
+            f"Problem:\n{question.strip()}\n\n"
+            f"Options:\n{_format_options(options)}\n\n"
+            f"Previous response tail:\n{previous_tail.strip() or raw_response.strip()}"
+        )
+        return CONTINUATION_FALLBACK_SYSTEM, user
+
+    _lookup(name, FREE_PROMPTS)
+    user = (
+        f"Problem:\n{question.strip()}\n\n"
+        f"Required number of answers: {count}\n\n"
+        f"Previous response tail:\n{previous_tail.strip() or raw_response.strip()}"
+    )
+    return "\n\n".join([CONTINUATION_FALLBACK_SYSTEM, _answer_count_line(question)]), user
+
+
+def build_bounded_fallback_prompt(
+    name: str,
+    question: str,
+    options: Sequence[object] | None = None,
+    raw_response: str = "",
+    previous_tail: str = "",
+    required_answers: int | None = None,
+) -> tuple[str, str]:
+    """Build the second retry: concise fresh solve with a bounded reasoning budget."""
+    count = required_answers if required_answers is not None else max(1, question.count("[ANS]"))
+    if options:
+        _lookup(name, MCQ_PROMPTS)
+        user = f"Problem:\n{question.strip()}\n\nOptions:\n{_format_options(options)}"
+        return BOUNDED_FALLBACK_SYSTEM, user
+
+    _lookup(name, FREE_PROMPTS)
+    user = (
+        f"Problem:\n{question.strip()}\n\n"
+        f"Required number of answers: {count}"
+    )
+    return "\n\n".join([BOUNDED_FALLBACK_SYSTEM, _answer_count_line(question)]), user
+
+
 def normalize_expression_style(text: str) -> str:
     """Normalize common LaTeX-ish expression notation to ASCII."""
     text = str(text)
@@ -314,6 +392,8 @@ __all__ = [
     "route_prompt",
     "MCQ_FALLBACK_SYSTEM",
     "FREE_FALLBACK_SYSTEM",
+    "CONTINUATION_FALLBACK_SYSTEM",
+    "BOUNDED_FALLBACK_SYSTEM",
     "SHORT_FALLBACK_SYSTEM",
     "MCQ_PROMPTS",
     "FREE_PROMPTS",
@@ -322,6 +402,8 @@ __all__ = [
     "build_free_prompt",
     "build_routed_prompt",
     "build_fallback_prompt",
+    "build_continuation_fallback_prompt",
+    "build_bounded_fallback_prompt",
     "normalize_expression_style",
     "maybe_convert_power_to_python",
     "clean_answer_text",
