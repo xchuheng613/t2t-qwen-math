@@ -118,6 +118,40 @@ python analysis/visualize_submission.py
 
 The HTML lands in `analysis/visualizations/`.
 
+### 6. Track power usage and estimated electricity cost
+
+On an Ubuntu machine, wrap any model run with the power/cost monitor:
+
+```bash
+python scripts/power_cost_monitor.py --label 16gb_fast_public -- \
+  python scripts/run_16gb_fast.py \
+    --mode submission_response_mode \
+    --data-path data/public.jsonl \
+    --limit 50 \
+    --output-dir results/16gb_fast_check
+```
+
+The monitor samples NVIDIA GPU power through `nvidia-smi` and CPU package
+energy through Linux RAPL when available. It logs each run to
+`results/power_usage_runs.jsonl` and `results/power_usage_runs.csv`.
+
+By default, cost uses SDG&E residential TOU-DR1 bundled rates for San Diego,
+excluding fixed monthly/base service charges. Override this with your actual
+bill rate if needed:
+
+```bash
+python scripts/power_cost_monitor.py --rate-usd-per-kwh 0.52 -- \
+  python scripts/run_32gb_balanced.py --mode submission_response_mode
+```
+
+If you have a wall meter or want to account for unmeasured system overhead,
+use `--fixed-watts` or `--extra-watts`:
+
+```bash
+python scripts/power_cost_monitor.py --power-source fixed --fixed-watts 620 -- \
+  python scripts/run_32gb_max.py --mode submission_response_mode
+```
+
 ## Prompt module reference
 
 | Module                                  | Purpose |
