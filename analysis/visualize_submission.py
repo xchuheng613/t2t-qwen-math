@@ -39,14 +39,12 @@ from pathlib import Path
 from typing import Any
 
 ROOT = Path(__file__).resolve().parent.parent
-DATA_FILES = [
-    ROOT / "data" / "public.jsonl",
-    ROOT / "data" / "private.jsonl",
-]
+PUBLIC_DATA_FILE = ROOT / "data" / "public.jsonl"
+PRIVATE_DATA_FILE = ROOT / "data" / "private.jsonl"
+DATA_FILES = [PUBLIC_DATA_FILE, PRIVATE_DATA_FILE]
 RESULTS_DIR = ROOT / "results"
 OUT_DIR = ROOT / "analysis" / "visualizations"
 
-BOXED_RE = re.compile(r"\\boxed\{([^{}]*)\}")
 # Accept BOTH the new (`Final answer: \boxed{...}`) and legacy
 # (`FINAL_ANSWERS:\n\boxed{...}`) submission conventions.
 FINAL_MARKER_RE = re.compile(
@@ -63,9 +61,25 @@ TOP_LEVEL_BRACKETS = {"(": ")", "[": "]", "{": "}"}
 # Loading
 # ════════════════════════════════════════════════════════════════════════════
 
-def load_questions() -> dict[int, dict]:
+def infer_data_files(submission_dir: Path, question_set: str = "auto") -> list[Path]:
+    """Choose question-bank precedence for a submission directory.
+
+    Public and private files both use zero-based IDs, so the order matters.
+    """
+    if question_set == "public":
+        return [PUBLIC_DATA_FILE, PRIVATE_DATA_FILE]
+    if question_set == "private":
+        return [PRIVATE_DATA_FILE, PUBLIC_DATA_FILE]
+
+    name = submission_dir.name.lower()
+    if "private" in name:
+        return [PRIVATE_DATA_FILE, PUBLIC_DATA_FILE]
+    return [PUBLIC_DATA_FILE, PRIVATE_DATA_FILE]
+
+
+def load_questions(data_files: list[Path] | None = None) -> dict[int, dict]:
     qs: dict[int, dict] = {}
-    for path in DATA_FILES:
+    for path in data_files or DATA_FILES:
         if not path.exists():
             continue
         with path.open("r", encoding="utf-8") as f:
@@ -111,10 +125,30 @@ def load_submission_records(submission_dir: Path) -> list[dict[str, Any]]:
 def extract_boxed(response: str) -> str:
     if not response:
         return ""
-    matches = BOXED_RE.findall(response)
-    if matches:
-        return matches[-1].strip()
-    return ""
+    entries: list[str] = []
+    start = 0
+    needle = "\\boxed{"
+    while True:
+        idx = response.find(needle, start)
+        if idx < 0:
+            break
+        brace_start = idx + len(needle)
+        depth = 1
+        i = brace_start
+        while i < len(response) and depth > 0:
+            if response[i] == "{":
+                depth += 1
+            elif response[i] == "}":
+                depth -= 1
+            i += 1
+        if depth == 0:
+            entries.append(response[brace_start : i - 1].strip())
+        start = max(i, idx + 1)
+    return repair_sqrt_artifacts(entries[-1]) if entries else ""
+
+
+def repair_sqrt_artifacts(text: str) -> str:
+    return str(text).replace("sqrt{(}", "sqrt(")
 
 
 def split_top_level_commas(expr: str) -> list[str]:
@@ -679,6 +713,12 @@ def parse_args() -> argparse.Namespace:
         "--out-dir", default=str(OUT_DIR),
         help="Where to write HTML files. Default: analysis/visualizations/",
     )
+    parser.add_argument(
+        "--question-set",
+        choices=["auto", "public", "private"],
+        default="auto",
+        help="Question-bank precedence. Default: auto (private dirs use private.jsonl first).",
+    )
     return parser.parse_args()
 
 
@@ -695,7 +735,6 @@ def main() -> None:
     if not sub_dirs:
         sys.exit("No submission directories found. Pass them on the CLI.")
 
-    questions = load_questions()
     entries: list[tuple[str, dict[str, int], int]] = []
 
     for sub_dir in sub_dirs:
@@ -706,6 +745,7 @@ def main() -> None:
         if not records:
             print(f"  skip: {sub_dir} (no submission.csv / submission.jsonl)", file=sys.stderr)
             continue
+        questions = load_questions(infer_data_files(sub_dir, args.question_set))
         name = f"submission_{sub_dir.name}"
         out_html = out_dir / f"{name}.html"
         out_html.write_text(

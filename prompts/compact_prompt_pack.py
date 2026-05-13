@@ -44,7 +44,8 @@ Final answer rules:
 - No units, labels, [ANS], explanations, or words inside the box.
 - Only round if the problem explicitly says to round.
 - Never apply standard rounding. For money, percent, units, statistics, and trig values, keep 10-15 significant digits unless rounding is stated.
-- For formula/expression/equation blanks, use ASCII: *, **, sqrt(...), pi, ln(...). Do not use LaTeX.
+- For formula/expression/equation blanks, use explicit multiplication and clear powers.
+- Follow the notation requested by the problem.
 - If asked for a formula, model, equation, quotient, or composite function, output that expression, not just a simplified number.
 - Preserve the requested form; do not expand or substitute unless asked.
 
@@ -341,47 +342,383 @@ def build_bounded_fallback_prompt(
     return "\n\n".join([BOUNDED_FALLBACK_SYSTEM, _answer_count_line(question)]), user
 
 
-def normalize_expression_style(text: str) -> str:
-    """Normalize common LaTeX-ish expression notation to ASCII."""
+# ---------------------------------------------------------------------
+# Robust final-answer normalization for submitted answers.
+# Do NOT modify judger.py. This code only cleans our model output before
+# writing submission.csv.
+# ---------------------------------------------------------------------
+
+_FUNC_NAMES = (
+    "sin", "cos", "tan", "sec", "csc", "cot",
+    "asin", "acos", "atan",
+    "ln", "log", "exp", "sqrt",
+)
+
+_WORD_ANSWERS = {
+    "NONE", "TRUE", "FALSE", "YES", "NO",
+    "T", "F", "Y", "N",
+    "A", "B", "C", "D", "E", "F", "G", "H", "I", "J",
+}
+
+
+def _question_requests_ascii_sqrt(question: str) -> bool:
+    q = question.lower()
+    return (
+        "use sqrt()" in q
+        or "sqrt() for the square root" in q
+        or "type sqrt" in q
+    )
+
+
+def _looks_like_word_answer(text: str) -> bool:
+    t = text.strip()
+    if t.upper() in _WORD_ANSWERS:
+        return True
+    # Avoid changing natural-language labels such as "Tommy" or "origin".
+    return bool(re.fullmatch(r"[A-Za-z][A-Za-z ]{1,25}", t)) and not any(
+        op in t for op in ("+", "-", "*", "/", "^", "=", "(", ")")
+    )
+
+
+def _looks_expression_like(text: str, question: str = "") -> bool:
+    """Conservative detector for expression-style answers."""
+    t = text.strip()
+    q = question.lower()
+
+    if _looks_like_word_answer(t):
+        return False
+
+    expression_keywords = (
+        "formula", "expression", "equation", "model", "quotient",
+        "composite", "function", "simplify", "factor", "polynomial",
+        "derivative", "integral", "write", "solve for",
+    )
+
+    if any(k in q for k in expression_keywords):
+        return True
+
+    # Contains variables plus mathematical operators.
+    if re.search(r"[A-Za-z]", t) and re.search(r"[\+\-\*/\^=]", t):
+        return True
+
+    # Function calls or roots/logs/trig.
+    if re.search(r"\b(?:sin|cos|tan|sec|csc|cot|ln|log|exp|sqrt)\s*[\(\{]", t):
+        return True
+
+    # Powers.
+    if "^" in t or "**" in t:
+        return True
+
+    return False
+
+
+def _repair_known_artifacts(text: str) -> str:
+    """Repair artifacts introduced by previous normalization paths."""
     text = str(text)
+
+    # Bad artifact from judger.normalize_answer: sqrt(11) -> sqrt{(}11)
+    text = text.replace("sqrt{(}", "sqrt(")
+
+    # Sometimes output may contain mismatched sqrt artifact without closing paren.
+    text = re.sub(r"sqrt\(\s*([^,\]\}\)\s]+)\s*(?=,|$)", r"sqrt(\1)", text)
+
+    # Normalize common unicode math symbols.
+    text = text.replace("−", "-")
+    text = text.replace("×", "*")
+    text = text.replace("·", "*")
+
+    return text
+
+
+def _latex_to_ascii_core(text: str) -> str:
+    """Convert simple LaTeX syntax to ASCII/Python-ish syntax."""
+    text = str(text)
+
+    # Remove harmless LaTeX wrappers.
+    text = text.replace("\\left", "")
+    text = text.replace("\\right", "")
+
+    # Multiplication / constants / functions.
     text = text.replace("\\cdot", "*")
     text = text.replace("\\times", "*")
     text = text.replace("\\pi", "pi")
     text = text.replace("\\ln", "ln")
-    text = re.sub(r"\\sqrt\{([^{}]+)\}", r"sqrt(\1)", text)
-    text = re.sub(r"\\(?:dfrac|frac)\{([^{}]+)\}\{([^{}]+)\}", r"(\1)/(\2)", text)
-    # Avoid corrupting scientific notation such as 1e-5.
-    text = re.sub(r"(?<=\d)(?=[A-DF-Za-df-z])", "*", text)
-    text = re.sub(r"(?<=\))(?=[a-zA-Z])", "*", text)
-    return text.strip()
+    text = text.replace("\\log", "log")
+    text = text.replace("\\sin", "sin")
+    text = text.replace("\\cos", "cos")
+    text = text.replace("\\tan", "tan")
+    text = text.replace("\\sec", "sec")
+    text = text.replace("\\csc", "csc")
+    text = text.replace("\\cot", "cot")
 
-
-def maybe_convert_power_to_python(text: str, question: str = "") -> str:
-    q = question.lower()
-    expression_task = any(
-        key in q
-        for key in ("formula", "expression", "equation", "model", "quotient", "composite", "function")
+    # Fractions: \frac{a}{b} -> (a)/(b)
+    # Handles simple non-nested fractions, which covers most final answers.
+    text = re.sub(
+        r"\\(?:dfrac|tfrac|frac)\{([^{}]+)\}\{([^{}]+)\}",
+        r"(\1)/(\2)",
+        text,
     )
-    has_variable = bool(re.search(r"[a-zA-Z]", text))
-    if expression_task and has_variable:
-        return text.replace("^", "**")
+
+    # LaTeX sqrt -> ASCII sqrt(...) internally.
+    # We will convert sqrt(...) back to \sqrt{...} at final boxing time
+    # unless the problem explicitly requires sqrt().
+    text = re.sub(r"\\sqrt\{([^{}]+)\}", r"sqrt(\1)", text)
+
     return text
 
 
+def _fix_short_implicit_product(expr: str) -> str:
+    """
+    Fix very short implicit products inside exponents:
+    kt -> k*t, mn -> m*n.
+    Avoid doing this to words like theta or alpha.
+    """
+    expr = expr.strip()
+    if re.fullmatch(r"[A-Za-z]{2,3}", expr) and expr.lower() not in _FUNC_NAMES:
+        return "*".join(expr)
+    return expr
+
+
+def _normalize_power_syntax(text: str, question: str = "") -> str:
+    """
+    Normalize common power syntax:
+    x^{10} -> x**(10)
+    x^10   -> x**(10)
+    e**{kt} -> e**(k*t)
+    sin^2(x) / sin**2(x) -> sin(x)**2
+    """
+    if not _looks_expression_like(text, question):
+        return text
+
+    # Function powers: sin^2(x), sin**2(x) -> sin(x)**2
+    func_alt = "|".join(_FUNC_NAMES)
+    text = re.sub(
+        rf"\b({func_alt})\s*(?:\^|\*\*)\s*\(?(\d+)\)?\s*\(([^()]*)\)",
+        lambda m: f"{m.group(1)}({m.group(3)})**{m.group(2)}",
+        text,
+        flags=re.IGNORECASE,
+    )
+
+    # Function powers without parentheses: cos^2*x -> cos(x)**2
+    text = re.sub(
+        rf"\b({func_alt})\s*(?:\^|\*\*)\s*(\d+)\s*\*?\s*([A-Za-z])\b",
+        lambda m: f"{m.group(1)}({m.group(3)})**{m.group(2)}",
+        text,
+        flags=re.IGNORECASE,
+    )
+
+    # Existing Python power with braces: e**{kt} -> e**(k*t)
+    text = re.sub(
+        r"\*\*\{([^{}]+)\}",
+        lambda m: "**(" + _fix_short_implicit_product(m.group(1)) + ")",
+        text,
+    )
+
+    # LaTeX braced powers: x^{10} -> x**(10)
+    text = re.sub(
+        r"\^\{([^{}]+)\}",
+        lambda m: "**(" + _fix_short_implicit_product(m.group(1)) + ")",
+        text,
+    )
+
+    # Parenthesized powers: x^(n+1) -> x**(n+1)
+    text = re.sub(r"\^\(([^()]+)\)", r"**(\1)", text)
+
+    # Simple numeric / signed powers: x^-2 -> x**(-2)
+    text = re.sub(r"\^(-?\d+(?:\.\d+)?)", r"**(\1)", text)
+
+    # Simple variable powers: r^n -> r**(n)
+    text = re.sub(r"\^([A-Za-z]+)", lambda m: "**(" + _fix_short_implicit_product(m.group(1)) + ")", text)
+
+    return text
+
+
+def _insert_explicit_multiplication(text: str, question: str = "") -> str:
+    """
+    Insert explicit * in common safe cases:
+    7x -> 7*x
+    6F -> 6*F
+    2pi -> 2*pi
+    5(x+2) -> 5*(x+2)
+    (x+2)(x+3) -> (x+2)*(x+3)
+    76e**(k*t) -> 76*e**(k*t)
+    """
+    if not _looks_expression_like(text, question):
+        return text
+
+    # 5(x+2) -> 5*(x+2)
+    text = re.sub(r"(?<=\d)\s*(?=\()", "*", text)
+
+    # (x+2)(x+3) -> (x+2)*(x+3)
+    text = re.sub(r"(?<=\))\s*(?=\()", "*", text)
+
+    # (x+2)y -> (x+2)*y
+    text = re.sub(r"(?<=\))\s*(?=[A-Za-z])", "*", text)
+
+    # 2sin(x), 2sqrt(3), 2pi, 3ln(x)
+    func_alt = "|".join(_FUNC_NAMES + ("pi",))
+    text = re.sub(
+        rf"(?<=\d)\s*(?=(?:{func_alt})\b)",
+        "*",
+        text,
+        flags=re.IGNORECASE,
+    )
+
+    # 6e as Euler's constant, but avoid scientific notation like 1e-5 or 2e10.
+    text = re.sub(r"(?<=\d)\s*e\b(?![+-]?\d)", "*e", text)
+
+    # 7x, 6F, 10A. Exclude e/E here to avoid 1e-5.
+    text = re.sub(r"(?<=\d)\s*(?=[A-DF-Za-df-z])", "*", text)
+
+    # x sqrt style after conversion is usually handled by )/digit rules,
+    # but this catches x sqrt(3) if it appears.
+    text = re.sub(
+        rf"(?<=[A-Za-z0-9\)])\s+(?=(?:{func_alt})\b)",
+        "*",
+        text,
+        flags=re.IGNORECASE,
+    )
+
+    # Normalize spaces around multiplication.
+    text = re.sub(r"\s*\*\s*", "*", text)
+
+    return text
+
+
+def _normalize_function_call_spacing(text: str, question: str = "") -> str:
+    """
+    Convert common forms:
+    ln p -> ln(p)
+    log x -> log(x)
+    sqrt x -> sqrt(x)
+    but avoid changing plain words.
+    """
+    if not _looks_expression_like(text, question):
+        return text
+
+    func_alt = "|".join(_FUNC_NAMES)
+    text = re.sub(
+        rf"\b({func_alt})\s+([A-Za-z0-9_]+)\b",
+        r"\1(\2)",
+        text,
+        flags=re.IGNORECASE,
+    )
+    return text
+
+
+def _ascii_sqrt_to_latex_for_box(text: str) -> str:
+    r"""
+    Important: boxed sqrt(...) is unsafe with the official judger because
+    normalize_answer can turn sqrt(11) into sqrt{(}11.
+    Use \sqrt{...} in boxed submissions instead.
+    """
+    text = str(text)
+    out: list[str] = []
+    pos = 0
+    pattern = re.compile(r"(?<![A-Za-z\\])sqrt\(")
+    while True:
+        match = pattern.search(text, pos)
+        if not match:
+            out.append(text[pos:])
+            break
+
+        out.append(text[pos : match.start()])
+        content_start = match.end()
+        depth = 1
+        i = content_start
+        while i < len(text) and depth > 0:
+            if text[i] == "(":
+                depth += 1
+            elif text[i] == ")":
+                depth -= 1
+            i += 1
+
+        if depth != 0:
+            out.append(text[match.start() :])
+            break
+
+        content = text[content_start : i - 1]
+        out.append(r"\sqrt{" + _ascii_sqrt_to_latex_for_box(content) + "}")
+        pos = i
+
+    return "".join(out)
+
+
+def repair_sqrt_artifacts(text: str) -> str:
+    """Compatibility wrapper for callers that repair sqrt artifacts directly."""
+    return _repair_known_artifacts(text)
+
+
+def ascii_sqrt_to_latex(text: str) -> str:
+    """Compatibility wrapper for callers that box ASCII sqrt expressions."""
+    return _ascii_sqrt_to_latex_for_box(str(text))
+
+
+def normalize_expression_style(text: str, question: str = "") -> str:
+    """
+    Main cleanup hook for answer strings. This returns an internal ASCII-ish
+    representation; rebuild_final_response decides final boxed notation.
+    """
+    text = str(text).strip()
+    text = _repair_known_artifacts(text)
+    text = _latex_to_ascii_core(text)
+    text = _normalize_function_call_spacing(text, question)
+    text = _normalize_power_syntax(text, question)
+    text = _insert_explicit_multiplication(text, question)
+
+    # Remove repeated spaces.
+    text = re.sub(r"\s+", " ", text).strip()
+
+    # Clean some common accidental spaces around operators.
+    text = re.sub(r"\s*([=+\-/,])\s*", r"\1", text)
+
+    return text
+
+
+def maybe_convert_power_to_python(text: str, question: str = "") -> str:
+    """
+    Kept for compatibility with existing code. The real work now happens in
+    normalize_expression_style.
+    """
+    return _normalize_power_syntax(text, question)
+
+
 def clean_answer_text(answer: object, question: str = "") -> str:
-    """Small cleanup hook used by submission post-processing."""
+    """Cleanup hook used by submission post-processing."""
     text = str(answer).strip()
-    text = re.sub(r"^(?:answer|ans)\s*[:=]\s*", "", text, flags=re.IGNORECASE)
-    text = re.sub(r"\s+", " ", text)
-    text = normalize_expression_style(text)
-    text = maybe_convert_power_to_python(text, question)
-    return text.strip().strip(".")
+
+    # Remove accidental nested box if passed in.
+    m = re.fullmatch(r"\\boxed\{(.*)\}", text)
+    if m:
+        text = m.group(1).strip()
+
+    # Remove obvious leading labels.
+    text = re.sub(r"^(?:answer|ans|final answer)\s*[:=]\s*", "", text, flags=re.IGNORECASE)
+
+    text = normalize_expression_style(text, question)
+
+    # Remove harmless trailing period.
+    text = text.strip().strip(".")
+
+    return text
 
 
 def rebuild_final_response(answers: Sequence[object], question: str = "") -> str:
-    """Rebuild a judge-compatible final answer block from extracted answers."""
-    joined = ", ".join(clean_answer_text(answer, question) for answer in answers)
-    return f"FINAL_ANSWERS:\n\\boxed{{{joined}}}"
+    """
+    Rebuild a judge-compatible final answer block from extracted answers.
+
+    Usually we use one boxed comma-separated answer. For explicit sqrt()
+    prompts, using unboxed 'answer:' can avoid the official judger's sqrt()
+    boxed-normalization bug. Leave this branch off unless public validation
+    confirms it helps.
+    """
+    cleaned = [clean_answer_text(answer, question) for answer in answers]
+    joined = ", ".join(cleaned)
+
+    # Default safer boxed output: convert sqrt(...) to \sqrt{...} before
+    # boxing to avoid the official judge's sqrt{(} artifact.
+    boxed_joined = _ascii_sqrt_to_latex_for_box(joined)
+    return f"FINAL_ANSWERS:\n\\boxed{{{boxed_joined}}}"
 
 
 __all__ = [
@@ -404,6 +741,8 @@ __all__ = [
     "build_fallback_prompt",
     "build_continuation_fallback_prompt",
     "build_bounded_fallback_prompt",
+    "repair_sqrt_artifacts",
+    "ascii_sqrt_to_latex",
     "normalize_expression_style",
     "maybe_convert_power_to_python",
     "clean_answer_text",

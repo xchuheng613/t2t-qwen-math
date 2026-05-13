@@ -168,6 +168,10 @@ def _tail_by_tokens(tokenizer: Any, text: str, max_tokens: int) -> str:
         return text[-max_tokens * 4 :].strip()
 
 
+def _repair_sqrt_artifacts(text: str) -> str:
+    return str(text).replace("sqrt{(}", "sqrt(")
+
+
 def _options_block(options: list[str] | None) -> str:
     if not options:
         return ""
@@ -265,7 +269,44 @@ def build_stage_fallback_prompt(
     )
 
 
-def _extract_all_boxed_anywhere(text: str, judger: Any) -> list[str]:
+def extract_raw_final_boxed_group(text: str) -> list[str]:
+    """Extract final boxed contents without judge normalization."""
+    search_text = _tail_after_think(text)
+    entries: list[tuple[int, int, str]] = []
+    start = 0
+    while True:
+        idx = search_text.find("\\boxed{", start)
+        if idx < 0:
+            break
+        brace_start = idx + len("\\boxed{")
+        depth = 1
+        i = brace_start
+        while i < len(search_text) and depth > 0:
+            if search_text[i] == "{":
+                depth += 1
+            elif search_text[i] == "}":
+                depth -= 1
+            i += 1
+        if depth == 0:
+            content = search_text[brace_start : i - 1].strip()
+            if content:
+                entries.append((idx, i, content))
+        start = i
+
+    if not entries:
+        return []
+
+    last_group = [entries[-1]]
+    for j in range(len(entries) - 2, -1, -1):
+        gap = search_text[entries[j][1] : entries[j + 1][0]]
+        if re.match(r"^[\s,\$\.\;\:\-\&\\]*$", gap):
+            last_group.insert(0, entries[j])
+        else:
+            break
+    return [_repair_sqrt_artifacts(entry[2]) for entry in last_group]
+
+
+def _extract_raw_boxed_anywhere(text: str) -> list[str]:
     entries: list[str] = []
     start = 0
     while True:
@@ -282,14 +323,42 @@ def _extract_all_boxed_anywhere(text: str, judger: Any) -> list[str]:
                 depth -= 1
             i += 1
         if depth == 0:
-            content = text[brace_start : i - 1]
+            content = text[brace_start : i - 1].strip()
             if content:
-                entries.append(judger.normalize_answer(content))
+                entries.append(_repair_sqrt_artifacts(content))
         start = i
     return entries
 
 
+def _final_answer_text(response: str) -> str:
+    answers = extract_raw_final_boxed_group(response)
+    return ", ".join(answers)
+
+
+def answer_looks_like_reasoning(answer: str) -> bool:
+    bad_markers = [
+        "let's",
+        "wait",
+        "case",
+        "suppose",
+        "strategy",
+        "turn",
+        "therefore",
+        "because",
+        "we need",
+        "the problem",
+    ]
+    answer = str(answer)
+    lowered = answer.lower()
+    return (
+        len(answer) > 250
+        or "\n" in answer
+        or any(marker in lowered for marker in bad_markers)
+    )
+
+
 def _answers_match_expected_count(answers: list[str], expected: int, judger: Any) -> list[str]:
+    answers = [_repair_sqrt_artifacts(answer) for answer in answers]
     if expected <= 1:
         return answers[-1:]
     if len(answers) == expected:
@@ -338,15 +407,20 @@ def _apply_fallback_result(
     max_tokens: int,
 ) -> bool:
     clean_response = clean_legacy_final_response(raw_response, item, route, judger, prompt_module)
+    reasoning_like_answer = (
+        str(finish_reason).lower() == "length"
+        and answer_looks_like_reasoning(_final_answer_text(clean_response))
+    )
     attempt = {
         "stage": stage,
         "finish_reason": finish_reason,
         "max_tokens": max_tokens,
-        "cleaned": bool(clean_response),
+        "cleaned": bool(clean_response) and not reasoning_like_answer,
+        "rejected_reasoning_like_answer": reasoning_like_answer,
         "raw_response": raw_response,
     }
     record.setdefault("fallback_attempts", []).append(attempt)
-    if not clean_response:
+    if not clean_response or reasoning_like_answer:
         return False
 
     record["fallback_used"] = True
@@ -507,10 +581,7 @@ def extract_letter(text: str, options: list[str] | None, judger: Any) -> str:
         return match.group(1).upper()
 
     if options:
-        try:
-            boxed_contents = judger.extract_all_boxed(tail) or judger.extract_all_boxed(text)
-        except Exception:
-            boxed_contents = []
+        boxed_contents = extract_raw_final_boxed_group(tail) or extract_raw_final_boxed_group(text)
         if boxed_contents:
             candidate = boxed_contents[-1]
             try:
@@ -572,14 +643,10 @@ def clean_legacy_final_response(
         return _rebuild_final_response(prompt_module, [letter], item.get("question", "")) if letter else ""
 
     tail = _tail_after_think(response)
-    try:
-        answers = judger.extract_all_boxed(tail) or judger.extract_all_boxed(response)
-    except Exception:
-        answers = []
-
+    answers = extract_raw_final_boxed_group(tail) or extract_raw_final_boxed_group(response)
     answers = _answers_match_expected_count(answers, route.expected_answers, judger)
     if not answers:
-        all_boxed = _extract_all_boxed_anywhere(tail, judger) or _extract_all_boxed_anywhere(response, judger)
+        all_boxed = _extract_raw_boxed_anywhere(tail) or _extract_raw_boxed_anywhere(response)
         answers = _answers_match_expected_count(all_boxed, route.expected_answers, judger)
 
     if not answers:
@@ -694,8 +761,14 @@ def generate_legacy_group(
             chosen, chosen_idx = responses[0], 0
             winning_key = vote_key(responses[0], item, route, judger)
 
-        clean_response = clean_legacy_final_response(chosen, item, route, judger, prompt_module)
         finish_reason = finishes[chosen_idx] if chosen_idx < len(finishes) else None
+        clean_response = clean_legacy_final_response(chosen, item, route, judger, prompt_module)
+        rejected_reasoning_like_answer = (
+            str(finish_reason).lower() == "length"
+            and answer_looks_like_reasoning(_final_answer_text(clean_response))
+        )
+        if rejected_reasoning_like_answer:
+            clean_response = ""
         record = {
             "id": int(item["id"]),
             "format_type": route.format_type,
@@ -712,6 +785,7 @@ def generate_legacy_group(
             "fallback_stage": "",
             "fallback_attempts": [],
             "stage0_repair_used": bool(clean_response and clean_response != chosen),
+            "stage0_rejected_reasoning_like_answer": rejected_reasoning_like_answer,
         }
         # Stage 0 is the cleanup above: if a valid final block can be rebuilt
         # from the raw/truncated text, do not spend another inference call.
