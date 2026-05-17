@@ -1,9 +1,14 @@
 antlr4-python3-runtime==4.11.1
 bitsandbytes
+accelerate
+datasets
 ipykernel
 jupyter
 numpy
+peft
+safetensors
 sympy
 tqdm
 transformers
+trl
 vllm
