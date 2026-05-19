@@ -716,6 +716,7 @@ def generate_legacy_group(
     high_budget_max_tokens: int = 32768,
     max_model_len: int = 32768,
     context_safety_margin: int = 512,
+    enable_stage0_postprocess: bool = True,
 ) -> list[dict[str, Any]]:
     from tqdm import tqdm
     from vllm import SamplingParams
@@ -762,8 +763,15 @@ def generate_legacy_group(
             winning_key = vote_key(responses[0], item, route, judger)
 
         finish_reason = finishes[chosen_idx] if chosen_idx < len(finishes) else None
-        clean_response = clean_legacy_final_response(chosen, item, route, judger, prompt_module)
+        clean_response = (
+            clean_legacy_final_response(chosen, item, route, judger, prompt_module)
+            if enable_stage0_postprocess
+            else ""
+        )
         rejected_reasoning_like_answer = (
+            enable_stage0_postprocess
+            and bool(clean_response)
+            and
             str(finish_reason).lower() == "length"
             and answer_looks_like_reasoning(_final_answer_text(clean_response))
         )
@@ -784,12 +792,13 @@ def generate_legacy_group(
             "fallback_used": False,
             "fallback_stage": "",
             "fallback_attempts": [],
-            "stage0_repair_used": bool(clean_response and clean_response != chosen),
+            "stage0_postprocess_enabled": enable_stage0_postprocess,
+            "stage0_repair_used": bool(enable_stage0_postprocess and clean_response and clean_response != chosen),
             "stage0_rejected_reasoning_like_answer": rejected_reasoning_like_answer,
         }
         # Stage 0 is the cleanup above: if a valid final block can be rebuilt
         # from the raw/truncated text, do not spend another inference call.
-        if enable_fallback and not clean_response:
+        if enable_fallback and enable_stage0_postprocess and not clean_response:
             fallback_indices.append(idx)
         records.append(record)
 
@@ -1021,6 +1030,7 @@ def run_hybrid_submission(args: argparse.Namespace, rows: list[dict[str, Any]]) 
             high_budget_max_tokens=args.high_budget_max_tokens,
             max_model_len=args.max_model_len,
             context_safety_margin=args.context_safety_margin,
+            enable_stage0_postprocess=args.stage0_postprocess,
         )
         for record in free_records:
             record.update(
@@ -1076,6 +1086,7 @@ def run_legacy_submission(args: argparse.Namespace, rows: list[dict[str, Any]]) 
                 high_budget_max_tokens=args.high_budget_max_tokens,
                 max_model_len=args.max_model_len,
                 context_safety_margin=args.context_safety_margin,
+                enable_stage0_postprocess=args.stage0_postprocess,
             )
         )
     return records
@@ -1126,6 +1137,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--context-safety-margin", type=int, default=512)
     parser.add_argument("--no-fallback", action="store_true")
     parser.add_argument("--no-repair", action="store_true")
+    parser.add_argument(
+        "--stage0-postprocess",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="For legacy/hybrid free paths, rebuild clean final-answer blocks before fallback.",
+    )
     parser.add_argument("--math-type", default=None)
     parser.add_argument("--include-few-shot", action="store_true")
     parser.add_argument(

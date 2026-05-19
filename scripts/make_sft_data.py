@@ -23,6 +23,9 @@ sys.path.insert(0, str(ROOT))
 from prompts.compact_prompt_pack import build_routed_prompt, rebuild_final_response
 
 
+_OPTION_MARKER_RE = re.compile(r"(?<![A-Za-z0-9])([A-J])[\.\)]\s+")
+
+
 def load_jsonl(path: Path) -> list[dict[str, Any]]:
     rows: list[dict[str, Any]] = []
     with path.open("r", encoding="utf-8") as file:
@@ -39,7 +42,23 @@ def answer_values(row: dict[str, Any]) -> list[str]:
 
 
 def is_free_response(row: dict[str, Any]) -> bool:
-    return not bool(row.get("options"))
+    return not is_mcq_like(row)
+
+
+def has_inline_options(question: str) -> bool:
+    markers = [match.group(1) for match in _OPTION_MARKER_RE.finditer(question)]
+    return "A" in markers and "B" in markers
+
+
+def is_all_letter_gold(row: dict[str, Any]) -> bool:
+    values = answer_values(row)
+    return bool(values) and all(re.fullmatch(r"[A-J]+", value.upper()) for value in values)
+
+
+def is_mcq_like(row: dict[str, Any]) -> bool:
+    return bool(row.get("options")) or (
+        is_all_letter_gold(row) and has_inline_options(str(row.get("question", "")))
+    )
 
 
 def is_high_confidence(row: dict[str, Any]) -> bool:
@@ -118,10 +137,25 @@ def write_jsonl(path: Path, rows: list[dict[str, Any]]) -> None:
             file.write(json.dumps(row, ensure_ascii=False) + "\n")
 
 
+def apply_filters(
+    rows: list[dict[str, Any]],
+    free_only: bool,
+    high_confidence_only: bool,
+) -> list[dict[str, Any]]:
+    if free_only:
+        rows = [row for row in rows if is_free_response(row)]
+    if high_confidence_only:
+        rows = [row for row in rows if is_high_confidence(row)]
+    return rows
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--public-path", type=Path, default=Path("data/public.jsonl"))
     parser.add_argument("--out-dir", type=Path, default=Path("data/sft_free_v1"))
+    parser.add_argument("--train-path", type=Path, default=None)
+    parser.add_argument("--dev-path", type=Path, default=None)
+    parser.add_argument("--holdout-path", type=Path, default=None)
     parser.add_argument("--free-only", action="store_true")
     parser.add_argument("--high-confidence-only", action="store_true")
     parser.add_argument("--seed", type=int, default=123)
@@ -130,18 +164,28 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> None:
     args = parse_args()
-    rows = load_jsonl(args.public_path)
-    if args.free_only:
-        rows = [row for row in rows if is_free_response(row)]
-    if args.high_confidence_only:
-        rows = [row for row in rows if is_high_confidence(row)]
+    split_paths = [args.train_path, args.dev_path, args.holdout_path]
+    if any(path is not None for path in split_paths):
+        if not all(path is not None for path in split_paths):
+            raise SystemExit("--train-path, --dev-path, and --holdout-path must be provided together")
+        train = apply_filters(load_jsonl(args.train_path), args.free_only, args.high_confidence_only)
+        dev = apply_filters(load_jsonl(args.dev_path), args.free_only, args.high_confidence_only)
+        holdout = apply_filters(load_jsonl(args.holdout_path), args.free_only, args.high_confidence_only)
+    else:
+        rows = apply_filters(load_jsonl(args.public_path), args.free_only, args.high_confidence_only)
+        train, dev, holdout = split_rows(rows, seed=args.seed)
 
-    train, dev, holdout = split_rows(rows, seed=args.seed)
     write_jsonl(args.out_dir / "train.jsonl", [make_example(row) for row in train])
     write_jsonl(args.out_dir / "dev.jsonl", [make_example(row) for row in dev])
     write_jsonl(args.out_dir / "holdout.jsonl", [make_example(row) for row in holdout])
 
-    print(f"source={args.public_path} out={args.out_dir}")
+    if any(path is not None for path in split_paths):
+        print(
+            "source_splits="
+            f"{args.train_path},{args.dev_path},{args.holdout_path} out={args.out_dir}"
+        )
+    else:
+        print(f"source={args.public_path} out={args.out_dir}")
     print(f"train={len(train)} dev={len(dev)} holdout={len(holdout)}")
 
 

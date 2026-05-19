@@ -33,6 +33,7 @@ def build_sft_config(args: argparse.Namespace) -> SFTConfig:
         "gradient_accumulation_steps": args.grad_accum,
         "learning_rate": args.lr,
         "num_train_epochs": args.epochs,
+        "max_steps": args.max_steps,
         "warmup_ratio": 0.03,
         "logging_steps": 10,
         "eval_steps": args.eval_steps,
@@ -67,6 +68,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--eval-steps", type=int, default=50)
     parser.add_argument("--save-steps", type=int, default=50)
     parser.add_argument("--limit-train", type=int, default=0)
+    parser.add_argument("--limit-eval", type=int, default=0)
+    parser.add_argument("--max-steps", type=int, default=-1)
     parser.add_argument("--fp16", action="store_true")
     parser.add_argument("--bf16", action=argparse.BooleanOptionalAction, default=True)
     parser.add_argument("--assistant-only-loss", action=argparse.BooleanOptionalAction, default=True)
@@ -111,6 +114,8 @@ def main() -> None:
     eval_dataset = load_dataset("json", data_files=args.eval_file, split="train")
     if args.limit_train > 0:
         train_dataset = train_dataset.select(range(min(args.limit_train, len(train_dataset))))
+    if args.limit_eval > 0:
+        eval_dataset = eval_dataset.select(range(min(args.limit_eval, len(eval_dataset))))
     if args.flatten_messages:
         train_dataset = flatten_messages_dataset(train_dataset, tokenizer)
         eval_dataset = flatten_messages_dataset(eval_dataset, tokenizer)
