@@ -451,6 +451,14 @@ def _latex_to_ascii_core(text: str) -> str:
     text = text.replace("\\csc", "csc")
     text = text.replace("\\cot", "cot")
 
+    # Fractions with a sqrt numerator need to be handled before the generic
+    # simple-fraction rule because the numerator contains nested braces.
+    text = re.sub(
+        r"\\(?:dfrac|tfrac|frac)\{\\sqrt\{([^{}]+)\}\}\{([^{}]+)\}",
+        r"\\sqrt{\1}/\2",
+        text,
+    )
+
     # Fractions: \frac{a}{b} -> (a)/(b)
     # Handles simple non-nested fractions, which covers most final answers.
     text = re.sub(
@@ -465,6 +473,63 @@ def _latex_to_ascii_core(text: str) -> str:
     text = re.sub(r"\\sqrt\{([^{}]+)\}", r"sqrt(\1)", text)
 
     return text
+
+
+def _normalize_requested_variable(text: str, question: str = "") -> str:
+    """Honor prompts that request a specific variable spelling."""
+    q = question.lower()
+    if "enter t for the variable" not in q or ("theta" not in q and "\\theta" not in q):
+        return text
+
+    func_alt = "|".join(_FUNC_NAMES)
+
+    # Handle function-variable adjacency first: cos\theta -> cos(t).
+    text = re.sub(
+        rf"\b({func_alt})\\theta\b",
+        r"\1(t)",
+        text,
+        flags=re.IGNORECASE,
+    )
+    text = re.sub(
+        rf"\b({func_alt})\s*theta\b",
+        r"\1(t)",
+        text,
+        flags=re.IGNORECASE,
+    )
+
+    text = text.replace("\\theta", "t")
+    text = re.sub(r"\btheta\b", "t", text, flags=re.IGNORECASE)
+    text = re.sub(
+        rf"\b({func_alt})\s+t\b",
+        r"\1(t)",
+        text,
+        flags=re.IGNORECASE,
+    )
+    return text
+
+
+def _normalize_yes_no_answers(text: str, question: str = "") -> str:
+    q = question.lower()
+    if "yes or no" not in q and "input yes or no" not in q:
+        return text
+
+    parts = [part.strip() for part in text.split(",")]
+    if not parts:
+        return text
+
+    fixed: list[str] = []
+    changed = False
+    for part in parts:
+        low = part.lower()
+        if low == "yes":
+            fixed.append("Yes")
+            changed = changed or part != "Yes"
+        elif low == "no":
+            fixed.append("No")
+            changed = changed or part != "No"
+        else:
+            fixed.append(part)
+    return ", ".join(fixed) if changed else text
 
 
 def _fix_short_implicit_product(expr: str) -> str:
@@ -662,6 +727,8 @@ def normalize_expression_style(text: str, question: str = "") -> str:
     text = str(text).strip()
     text = _repair_known_artifacts(text)
     text = _latex_to_ascii_core(text)
+    text = _normalize_requested_variable(text, question)
+    text = _normalize_yes_no_answers(text, question)
     text = _normalize_function_call_spacing(text, question)
     text = _normalize_power_syntax(text, question)
     text = _insert_explicit_multiplication(text, question)
