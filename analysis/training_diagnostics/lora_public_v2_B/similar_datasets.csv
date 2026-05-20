@@ -1,0 +1,8 @@
+name,size,url,why
+GSM8K,8.5K grade-school math word problems,https://huggingface.co/datasets/openai/gsm8k,Good for concise multi-step arithmetic reasoning and final-answer extraction.
+MATH,12.5K competition problems with step-by-step solutions,https://arxiv.org/abs/2103.03874,"Useful for harder algebra, counting, number theory, and geometry reasoning."
+DeepMind Mathematics Dataset,Generator plus pre-generated modules,https://github.com/google-deepmind/mathematics_dataset,"Can synthesize targeted algebra, arithmetic, calculus, comparison, and probability drills."
+AQuA-RAT,About 100K algebraic word problems,https://huggingface.co/datasets/deepmind/aqua_rat,Multiple-choice algebra with rationales; useful for MCQ formatting and option selection.
+MathQA,"29,837 train / 4,475 validation / 2,985 test",https://huggingface.co/datasets/allenai/math_qa,"AQuA-derived word problems with options, rationales, and operation programs."
+NuminaMath-CoT,About 860K chain-of-thought math problems,https://huggingface.co/datasets/AI-MO/NuminaMath-CoT,Large CoT pool; filter heavily to match the competition answer style.
+OpenMathInstruct-2,14M generated problem-solution pairs,https://huggingface.co/datasets/nvidia/OpenMathInstruct-2,Very large synthetic instruction data; best used after strict deduping and format filtering.

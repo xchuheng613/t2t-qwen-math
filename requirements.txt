@@ -4,6 +4,7 @@ accelerate
 datasets
 ipykernel
 jupyter
+matplotlib
 numpy
 peft
 safetensors
