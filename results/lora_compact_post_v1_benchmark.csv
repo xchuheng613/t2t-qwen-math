@@ -1,0 +1,2 @@
+run_name,prediction_path,data_path,total,correct,accuracy,mcq_correct,mcq_total,mcq_accuracy,free_correct,free_total,free_accuracy,truncation_count,no_extraction_count,count_mismatch_count,mcq_format_error_count,format_error_count,fallback_used,stage0_repair_used,postprocess_used,avg_response_chars,avg_raw_response_chars
+lora_compact_post_v1_best_holdout_free,results/lora_compact_post_v1_best_holdout_free/submission.jsonl,data/lora_public_v2/holdout_free.jsonl,100,25,0.250000,0,0,,25,100,0.250000,0,0,2,0,2,2,97,0,39.21,50.36

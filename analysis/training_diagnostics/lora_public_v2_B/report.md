@@ -20,7 +20,7 @@
 ## Loss function
 
 The training script uses `SFTTrainer` for causal language modeling, so the objective is next-token cross-entropy over the flattened `text` field.
-In the saved `training_args.bin`, `assistant_only_loss` is `False`, `packing` is `False`, and `max_length` is `4096`.
+In this run, `assistant_only_loss` is `False (inferred from this train script's defaults)`, `packing` is `False (inferred from this train script's defaults)`, and `max_length` is `4096 (inferred from this train script's defaults)`.
 That means the logged loss is token loss, not exact-answer accuracy.
 
 ## Curves
@@ -57,6 +57,8 @@ That means the logged loss is token loss, not exact-answer accuracy.
 ## Why this LoRA probably did not help
 
 - The SFT train split has only `371` examples and the run reached only `24` optimizer steps.
+- Eval was logged at `eval_steps=50` while training logged at `logging_steps=10` and stopped at `max_steps=24`. This gives only one validation-loss point, so it is hard to apply the TA's loss-intersection rule.
+- The train loss was still decreasing at the end, so the run was undertrained; at the same time, validation/holdout task accuracy got worse, which suggests the LR/capacity/data mix was not stable enough to improve reasoning.
 - Train token accuracy reached `67.44%`, while eval token accuracy was `51.83%`; that is a clear generalization gap.
 - The LoRA improved free-response dev accuracy from `66.67%` to `68.69%`, but hurt MCQ dev accuracy from `81.48%` to `75.31%`.
 - Holdout free-response accuracy moved from `66.00%` to `65.00%`, so the small dev free-response gain did not generalize.
@@ -94,3 +96,5 @@ Use these as candidates for augmentation, then filter/deduplicate into the exact
 - `dataset_summary.csv`
 - `lora_parameter_summary.csv`
 - `lora_weight_stats.csv`
+
+For the next one-epoch LR/optimizer/module sweep, run `python3 scripts/plan_lora_experiments.py` and then execute selected commands from `analysis/lora_experiment_plan/README.md`.

@@ -223,6 +223,11 @@ def load_training_args(path: Path) -> dict[str, Any]:
     keys = [
         "output_dir",
         "learning_rate",
+        "optim",
+        "lr_scheduler_type",
+        "warmup_ratio",
+        "weight_decay",
+        "max_grad_norm",
         "num_train_epochs",
         "max_steps",
         "per_device_train_batch_size",
@@ -234,6 +239,7 @@ def load_training_args(path: Path) -> dict[str, Any]:
         "packing",
         "bf16",
         "fp16",
+        "logging_steps",
         "save_steps",
         "eval_steps",
     ]
@@ -381,7 +387,9 @@ def summarize_benchmark(path: Path) -> tuple[list[dict[str, Any]], list[dict[str
     inference_debug_rows: list[dict[str, Any]] = []
     for row in raw_rows:
         name = row.get("run_name", "")
-        if "dev" in name:
+        if "train" in name:
+            split = "train"
+        elif "dev" in name or "validation" in name:
             split = "validation"
         elif "holdout" in name:
             split = "holdout"
@@ -541,6 +549,17 @@ def find_row(rows: list[dict[str, Any]], run_name: str) -> dict[str, Any] | None
     return None
 
 
+def find_accuracy_row(rows: list[dict[str, Any]], split: str, model: str) -> dict[str, Any] | None:
+    candidates = [
+        row
+        for row in rows
+        if row.get("split") == split and row.get("model") == model and row.get("accuracy") is not None
+    ]
+    if not candidates:
+        return None
+    return candidates[-1]
+
+
 def pct(value: float | None) -> str:
     return "not measured" if value is None else f"{value * 100:.2f}%"
 
@@ -549,6 +568,13 @@ def maybe_delta(new: float | None, old: float | None) -> str:
     if new is None or old is None:
         return ""
     return f"{(new - old) * 100:+.2f} pts"
+
+
+def arg_or_inferred(training_args: dict[str, Any], key: str, inferred: Any) -> Any:
+    value = training_args.get(key)
+    if value is not None:
+        return value
+    return f"{inferred} (inferred from this train script's defaults)"
 
 
 def write_report(
@@ -569,12 +595,17 @@ def write_report(
     last_eval = eval_logs[-1] if eval_logs else {}
     base_dev = find_row(accuracy_rows, "base_dev_post")
     lora_dev = find_row(accuracy_rows, "lora_B_dev_post")
+    train_base = find_accuracy_row(accuracy_rows, "train", "base")
+    train_lora = find_accuracy_row(accuracy_rows, "train", "lora")
     base_holdout = find_row(accuracy_rows, "base_holdout_free_post_v2fix") or find_row(accuracy_rows, "base_holdout_free_post")
     lora_holdout = find_row(accuracy_rows, "lora_B_holdout_free_post")
     target_modules = adapter_config.get("target_modules", [])
     attention_params = sum(row["trainable_lora_params"] for row in module_rows if row["family"] == "attention")
     mlp_params = sum(row["trainable_lora_params"] for row in module_rows if row["family"] == "mlp")
     total_params = attention_params + mlp_params
+    assistant_only_loss = arg_or_inferred(training_args, "assistant_only_loss", False)
+    packing = arg_or_inferred(training_args, "packing", False)
+    max_length = arg_or_inferred(training_args, "max_length", 4096)
 
     lines = [
         "# LoRA training diagnostics",
@@ -599,7 +630,7 @@ def write_report(
         "## Loss function",
         "",
         "The training script uses `SFTTrainer` for causal language modeling, so the objective is next-token cross-entropy over the flattened `text` field.",
-        f"In the saved `training_args.bin`, `assistant_only_loss` is `{training_args.get('assistant_only_loss')}`, `packing` is `{training_args.get('packing')}`, and `max_length` is `{training_args.get('max_length')}`.",
+        f"In this run, `assistant_only_loss` is `{assistant_only_loss}`, `packing` is `{packing}`, and `max_length` is `{max_length}`.",
         "That means the logged loss is token loss, not exact-answer accuracy.",
         "",
         "## Curves",
@@ -619,7 +650,7 @@ def write_report(
         "",
         "| Split | Base | LoRA | Delta | Notes |",
         "|---|---:|---:|---:|---|",
-        f"| Training task accuracy | not measured | not measured |  | No generated train-set predictions were found; only token accuracy is logged. |",
+        f"| Training task accuracy | {pct(train_base.get('accuracy') if train_base else None)} | {pct(train_lora.get('accuracy') if train_lora else None)} | {maybe_delta(train_lora.get('accuracy') if train_lora else None, train_base.get('accuracy') if train_base else None)} | {'Generated train-set predictions found in benchmark summary.' if train_base or train_lora else 'No generated train-set predictions were found; only token accuracy is logged.'} |",
         f"| Validation/dev task accuracy | {pct(base_dev.get('accuracy') if base_dev else None)} | {pct(lora_dev.get('accuracy') if lora_dev else None)} | {maybe_delta(lora_dev.get('accuracy') if lora_dev else None, base_dev.get('accuracy') if base_dev else None)} | Public dev split. |",
         f"| Holdout free-response task accuracy | {pct(base_holdout.get('accuracy') if base_holdout else None)} | {pct(lora_holdout.get('accuracy') if lora_holdout else None)} | {maybe_delta(lora_holdout.get('accuracy') if lora_holdout else None, base_holdout.get('accuracy') if base_holdout else None)} | Free-response holdout split. |",
         "",
@@ -636,6 +667,8 @@ def write_report(
         "## Why this LoRA probably did not help",
         "",
         f"- The SFT train split has only `{next((row['rows'] for row in dataset_rows if row['split'] == 'train'), 0)}` examples and the run reached only `{csv_value(curve_rows[-1].get('step') if curve_rows else None)}` optimizer steps.",
+        f"- Eval was logged at `eval_steps={training_args.get('eval_steps')}` while training logged at `logging_steps={training_args.get('logging_steps')}` and stopped at `max_steps={training_args.get('max_steps')}`. This gives only one validation-loss point, so it is hard to apply the TA's loss-intersection rule.",
+        "- The train loss was still decreasing at the end, so the run was undertrained; at the same time, validation/holdout task accuracy got worse, which suggests the LR/capacity/data mix was not stable enough to improve reasoning.",
         f"- Train token accuracy reached `{pct(last_train.get('mean_token_accuracy'))}`, while eval token accuracy was `{pct(last_eval.get('eval_mean_token_accuracy'))}`; that is a clear generalization gap.",
         f"- The LoRA improved free-response dev accuracy from `{pct(base_dev.get('free_accuracy') if base_dev else None)}` to `{pct(lora_dev.get('free_accuracy') if lora_dev else None)}`, but hurt MCQ dev accuracy from `{pct(base_dev.get('mcq_accuracy') if base_dev else None)}` to `{pct(lora_dev.get('mcq_accuracy') if lora_dev else None)}`.",
         f"- Holdout free-response accuracy moved from `{pct(base_holdout.get('accuracy') if base_holdout else None)}` to `{pct(lora_holdout.get('accuracy') if lora_holdout else None)}`, so the small dev free-response gain did not generalize.",
@@ -671,6 +704,8 @@ def write_report(
             "- `dataset_summary.csv`",
             "- `lora_parameter_summary.csv`",
             "- `lora_weight_stats.csv`",
+            "",
+            "For the next one-epoch LR/optimizer/module sweep, run `python3 scripts/plan_lora_experiments.py` and then execute selected commands from `analysis/lora_experiment_plan/README.md`.",
         ]
     )
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
@@ -685,6 +720,9 @@ def main() -> None:
     model_config = read_json(model_config_path) if model_config_path.exists() else {}
     trainer_state = read_json(args.checkpoint_dir / "checkpoint-24" / "trainer_state.json")
     training_args = load_training_args(args.checkpoint_dir / "training_args.bin")
+    for key in ["eval_steps", "logging_steps", "max_steps", "num_train_epochs", "train_batch_size"]:
+        if training_args.get(key) is None and trainer_state.get(key) is not None:
+            training_args[key] = trainer_state.get(key)
     target_modules = list(adapter_config.get("target_modules", []))
 
     curve_rows = trainer_curve_rows(trainer_state)

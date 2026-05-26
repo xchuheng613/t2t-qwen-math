@@ -32,10 +32,14 @@ def build_sft_config(args: argparse.Namespace) -> SFTConfig:
         "per_device_eval_batch_size": 1,
         "gradient_accumulation_steps": args.grad_accum,
         "learning_rate": args.lr,
+        "optim": args.optim,
+        "lr_scheduler_type": args.lr_scheduler_type,
+        "warmup_ratio": args.warmup_ratio,
+        "weight_decay": args.weight_decay,
+        "max_grad_norm": args.max_grad_norm,
         "num_train_epochs": args.epochs,
         "max_steps": args.max_steps,
-        "warmup_ratio": 0.03,
-        "logging_steps": 10,
+        "logging_steps": args.logging_steps,
         "eval_steps": args.eval_steps,
         "save_steps": args.save_steps,
         "eval_strategy": "steps",
@@ -60,11 +64,23 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--max-seq-length", type=int, default=4096)
     parser.add_argument("--epochs", type=float, default=1.0)
     parser.add_argument("--lr", type=float, default=5e-5)
+    parser.add_argument("--optim", default="adamw_torch")
+    parser.add_argument("--lr-scheduler-type", default="linear")
+    parser.add_argument("--warmup-ratio", type=float, default=0.03)
+    parser.add_argument("--weight-decay", type=float, default=0.0)
+    parser.add_argument("--max-grad-norm", type=float, default=1.0)
     parser.add_argument("--rank", type=int, default=16)
     parser.add_argument("--alpha", type=int, default=32)
     parser.add_argument("--dropout", type=float, default=0.05)
+    parser.add_argument(
+        "--target-modules",
+        nargs="+",
+        default=["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"],
+        help="Projection modules to adapt. Use attention only: q_proj k_proj v_proj o_proj; MLP only: gate_proj up_proj down_proj.",
+    )
     parser.add_argument("--grad-accum", type=int, default=16)
     parser.add_argument("--batch-size", type=int, default=1)
+    parser.add_argument("--logging-steps", type=int, default=10)
     parser.add_argument("--eval-steps", type=int, default=50)
     parser.add_argument("--save-steps", type=int, default=50)
     parser.add_argument("--limit-train", type=int, default=0)
@@ -134,15 +150,7 @@ def main() -> None:
         lora_dropout=args.dropout,
         bias="none",
         task_type="CAUSAL_LM",
-        target_modules=[
-            "q_proj",
-            "k_proj",
-            "v_proj",
-            "o_proj",
-            "gate_proj",
-            "up_proj",
-            "down_proj",
-        ],
+        target_modules=args.target_modules,
     )
 
     trainer_kwargs = {

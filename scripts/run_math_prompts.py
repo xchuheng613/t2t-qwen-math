@@ -741,10 +741,18 @@ def dry_run(rows: list[dict[str, Any]], mode: Mode, include_few_shot: bool, math
 # CLI
 # ════════════════════════════════════════════════════════════════════════════
 
+MODE_ALIASES = {
+    "internal": Mode.INTERNAL.value,
+    "submission": Mode.SUBMISSION.value,
+    Mode.INTERNAL.value: Mode.INTERNAL.value,
+    Mode.SUBMISSION.value: Mode.SUBMISSION.value,
+}
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("--mode", choices=[m.value for m in Mode], required=True,
-                        help="Which output mode to run.")
+    parser.add_argument("--mode", choices=sorted(MODE_ALIASES), required=True,
+                        help="Which output mode to run. Short aliases: internal, submission.")
     parser.add_argument("--data-path", default="data/public.jsonl",
                         help="Path to the input JSONL.")
     parser.add_argument("--output-dir", default="results/new_prompts",
@@ -781,7 +789,7 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> None:
     args = parse_args()
-    mode = Mode(args.mode)
+    mode = Mode(MODE_ALIASES[args.mode])
     rows = load_rows(Path(args.data_path), limit=args.limit)
     if not rows:
         sys.exit(f"No rows loaded from {args.data_path}")

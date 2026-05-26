@@ -152,6 +152,30 @@ python scripts/power_cost_monitor.py --power-source fixed --fixed-watts 620 -- \
   python scripts/run_32gb_max.py --mode submission_response_mode
 ```
 
+### 7. Diagnose and iterate on LoRA runs
+
+Generate the LoRA training curves, token metrics, adapter weight plots, task
+accuracy summary, and dataset suggestions:
+
+```bash
+python3 scripts/analyze_training_diagnostics.py
+```
+
+The report is written to
+`analysis/training_diagnostics/lora_public_v2_B/report.md`.
+
+To create one-epoch LR/optimizer/module experiments with validation logging at
+the same cadence as training logging:
+
+```bash
+python3 scripts/plan_lora_experiments.py --python python3
+```
+
+This writes runnable train, merge, eval, and score commands to
+`analysis/lora_experiment_plan/README.md`. The score commands also write
+`analysis/*.jsonl`, which `python3 analysis/visualize_wrong.py` turns into
+HTML error-pattern reports.
+
 ## Prompt module reference
 
 | Module                                  | Purpose |
