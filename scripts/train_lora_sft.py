@@ -22,6 +22,8 @@ def supported_kwargs(cls: type[Any], kwargs: dict[str, Any]) -> dict[str, Any]:
 
 def build_sft_config(args: argparse.Namespace) -> SFTConfig:
     """Build SFTConfig across TRL versions with small API differences."""
+    # Qwen's shipped chat template does not expose assistant token masks, so
+    # flattened-message runs apply assistant masking manually before SFTTrainer.
     assistant_only_loss = args.assistant_only_loss and not args.flatten_messages
     kwargs: dict[str, Any] = {
         "output_dir": args.output_dir,
@@ -98,6 +100,72 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
+def _tokenize_text(tokenizer: Any, text: str) -> list[int]:
+    return tokenizer(text, add_special_tokens=False)["input_ids"]
+
+
+def _tokenize_with_offsets(tokenizer: Any, text: str) -> tuple[list[int], list[tuple[int, int]]]:
+    encoded = tokenizer(text, add_special_tokens=False, return_offsets_mapping=True)
+    return encoded["input_ids"], encoded["offset_mapping"]
+
+
+def tokenize_assistant_only_dataset(dataset: Any, tokenizer: Any, max_length: int) -> Any:
+    """Flatten chat rows but mask loss to assistant-response tokens only."""
+
+    def format_row(example: dict[str, Any]) -> dict[str, list[int]]:
+        messages = example.get("messages")
+        if not messages:
+            text = str(example.get("text", ""))
+            if tokenizer.eos_token and not text.endswith(tokenizer.eos_token):
+                text += tokenizer.eos_token
+            input_ids = _tokenize_text(tokenizer, text)
+            return {
+                "input_ids": input_ids[:max_length],
+                "attention_mask": [1] * min(len(input_ids), max_length),
+                "labels": input_ids[:max_length],
+            }
+
+        prompt_messages = messages[:-1] if messages[-1].get("role") == "assistant" else messages
+        prompt_text = tokenizer.apply_chat_template(
+            prompt_messages,
+            tokenize=False,
+            add_generation_prompt=True,
+        )
+        full_text = tokenizer.apply_chat_template(
+            messages,
+            tokenize=False,
+            add_generation_prompt=False,
+        )
+        if tokenizer.eos_token and not full_text.endswith(tokenizer.eos_token):
+            full_text += tokenizer.eos_token
+
+        if full_text.startswith(prompt_text):
+            answer_start = len(prompt_text)
+        else:
+            marker = "<|im_start|>assistant\n"
+            marker_idx = full_text.rfind(marker)
+            if marker_idx < 0:
+                raise ValueError("Rendered chat text does not contain an assistant message marker.")
+            answer_start = marker_idx + len(marker)
+            think_prefix = "<think>\n"
+            if full_text.startswith(think_prefix, answer_start):
+                answer_start += len(think_prefix)
+
+        input_ids, offsets = _tokenize_with_offsets(tokenizer, full_text)
+        input_ids = input_ids[:max_length]
+        offsets = offsets[:max_length]
+        labels = input_ids.copy()
+        labels = [
+            label if start >= answer_start else -100
+            for label, (start, _end) in zip(labels, offsets)
+        ]
+        if all(label == -100 for label in labels):
+            raise ValueError("Assistant-only label mask removed every token; increase --max-seq-length.")
+        return {"input_ids": input_ids, "attention_mask": [1] * len(input_ids), "labels": labels}
+
+    return dataset.map(format_row, remove_columns=dataset.column_names)
+
+
 def flatten_messages_dataset(dataset: Any, tokenizer: Any) -> Any:
     """Turn conversational rows into a plain text SFT dataset."""
 
@@ -132,7 +200,11 @@ def main() -> None:
         train_dataset = train_dataset.select(range(min(args.limit_train, len(train_dataset))))
     if args.limit_eval > 0:
         eval_dataset = eval_dataset.select(range(min(args.limit_eval, len(eval_dataset))))
-    if args.flatten_messages:
+    if args.flatten_messages and args.assistant_only_loss:
+        train_dataset = tokenize_assistant_only_dataset(train_dataset, tokenizer, args.max_seq_length)
+        eval_dataset = tokenize_assistant_only_dataset(eval_dataset, tokenizer, args.max_seq_length)
+        print("Using manual assistant-only labels with flattened chat messages.", flush=True)
+    elif args.flatten_messages:
         train_dataset = flatten_messages_dataset(train_dataset, tokenizer)
         eval_dataset = flatten_messages_dataset(eval_dataset, tokenizer)
 
