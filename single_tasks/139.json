@@ -1,0 +1,1 @@
+{"id": "139", "instruction": "Solve for $a$: (x+4 a)^2+(y-5 b)^2=9 There are two solutions, $a_1$ and $a_2$, where $a_1 \\leq a_2$. $a_1=$ [ANS] $a_2=$ [ANS]", "output": "(-x - sqrt(9 - (y-5*b)**2))/(--4), (-x + sqrt(9 - (y-5*b)**2))/(--4)"}

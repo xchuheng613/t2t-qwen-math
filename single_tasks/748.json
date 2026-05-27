@@ -1,0 +1,1 @@
+{"id": "748", "instruction": "Write a linear equation which fits data in the table.\n$\\begin{array}{cc}\\hline x-values & y-values \\\\ \\hline-1 & {0} \\\\ \\hline 0 & {3} \\\\ \\hline 1 & {6} \\\\ \\hline 2 & {9} \\\\ \\hline 3 & {12} \\\\ \\hline \\end{array}$\nThe linear equation is $y=$ [ANS].", "output": "3*x+3"}

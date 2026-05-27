@@ -1,0 +1,1 @@
+{"id": "385", "instruction": "Define a sequence $a_0=2006$ and $a_{n+1}=(n+1)^{a_n}$ for all positive integers $n$ . Find the remainder when $a_{2007}$ is divided by $1000$ .\n\nOptions:\nA. 601\nB. 602\nC. 608\nD. 604\nE. 606\nF. 605\nG. 611\nH. 603\nI. 609\nJ. 607", "output": "A"}

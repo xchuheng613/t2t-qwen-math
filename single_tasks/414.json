@@ -1,0 +1,1 @@
+{"id": "414", "instruction": "For the curve\n$y=23 \\cos(6 \\pi x-4)$ determine each of the following:\nAmplitude=[ANS]\nPeriod=[ANS]\nPhase shift=[ANS] Note: Use a negative for a shift to the left. Note: Use a negative for a shift to the left.", "output": "23, 0.333333333333333, 0.212207"}

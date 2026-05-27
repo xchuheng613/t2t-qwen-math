@@ -1,0 +1,1 @@
+{"id": "798", "instruction": "A formula for converting miles into kilometers is\n${K=1.61M}$ where $M$ is a number of miles, and $K$ is the corresponding number of kilometers. Use the formula to find the number of kilometers that corresponds to thirteen miles. [ANS] kilometers corresponds to thirteen miles.", "output": "20.93"}

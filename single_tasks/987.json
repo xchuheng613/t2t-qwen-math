@@ -1,0 +1,1 @@
+{"id": "987", "instruction": "A random sample of 16 size AA batteries for toys yield a mean of 3.37 hours with standard deviation, 1.26 hours.\n(a) Find the critical value, t*, for a 99\\% CI. t*=[ANS]\n(b) Find the margin of error for a 99\\% CI. [ANS]", "output": "2.947, 2.947*1.26/[sqrt(16)]"}

@@ -1,0 +1,1 @@
+{"id": "842", "instruction": "Find the minimum value of \\[\\frac{(x+1/x)^6-(x^6+1/x^6)-2}{(x+1/x)^3+(x^3+1/x^3)}\\] for $x>0$.\n\nOptions:\nA. 8\nB. 5.9\nC. 7\nD. 4\nE. 6\nF. 5\nG. 5.5\nH. 5.2\nI. 5.8\nJ. 5.7", "output": "E"}

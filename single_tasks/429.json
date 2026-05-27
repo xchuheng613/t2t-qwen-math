@@ -1,0 +1,1 @@
+{"id": "429", "instruction": "If you write the function $P=8 e^{2 t}$ in the form $P=P_{0}a^{t}$, then $P_0=$ [ANS], and $a=$ [ANS]. This function represents exponential [ANS].", "output": "8, e^2, growth"}

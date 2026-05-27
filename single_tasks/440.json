@@ -1,0 +1,1 @@
+{"id": "440", "instruction": "Solve for $0\\leq \\theta<2\\pi$: \\cos 4 \\theta+\\cos 6 \\theta=0. Separate your answers with commas. $\\theta=$ [ANS]", "output": "(0.314159, 0.942478, 1.5708, 2.19911, 2.82743, 3.45575, 4.08407, 4.71239, 5.34071, 5.96903)"}

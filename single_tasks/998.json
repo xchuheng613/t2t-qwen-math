@@ -1,0 +1,1 @@
+{"id": "998", "instruction": "Compute $\\lim_{x \\to 0}\\left(\\frac{ 3 \\cdot \\cos(x)+6 }{ 4 \\cdot x^3 \\cdot \\sin(x) }-\\frac{ 9 }{ 4 \\cdot x^4 }\\right)$. Use the expansion of the function in the Taylor series.\n\nOptions:\nA. 1/80\nB. 1/70\nC. 1/90\nD. 1/140\nE. 1/160\nF. 1/60\nG. 1/40\nH. 1/100\nI. 1/120\nJ. 1/150", "output": "A"}

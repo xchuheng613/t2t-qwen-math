@@ -1,0 +1,1 @@
+{"id": "544", "instruction": "Express the function F(x)=\\tan(7 \\pi x) in the form $f \\circ g$. $f(x)$=[ANS]\n$g(x)$=[ANS]", "output": "tan(x), 7*pi*x"}

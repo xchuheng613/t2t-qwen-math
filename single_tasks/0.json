@@ -1,0 +1,1 @@
+{"id": "0", "instruction": "Find the sum of the first $325$ positive even whole numbers. Sum: [ANS]", "output": "325*(1+325)"}

@@ -1,0 +1,1 @@
+{"id": "49", "instruction": "Solve the equation for $v$:\n k=\\frac{u}{3} \\left(v-9 J\\right)\n$\\begin{array}{cccc}\\hline &  v=& & [ANS] [ANS] \\\\ \\hline \\end{array}$\nNote: Write your answer as a single fraction, and type the numerator and denominator separately in the answer blanks provided.", "output": "3*k+9*J*u, u"}

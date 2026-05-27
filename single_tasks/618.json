@@ -1,0 +1,1 @@
+{"id": "618", "instruction": "Simplify the expression. Use sqrt for the square root symbol (Example: $\\sqrt{2}=$ sqrt(2).)\n${{\\sqrt{150}}+{\\sqrt{54}}+{\\sqrt{27}}+{\\sqrt{48}}=}$ [ANS]", "output": "8*sqrt(6)+7*sqrt(3)"}

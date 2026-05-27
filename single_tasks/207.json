@@ -1,0 +1,1 @@
+{"id": "207", "instruction": "Suppose $A$ is directly proportional to the square of $B$, and $A=96$ when $B=4$.\nFind the constant of proportionality. [ANS]\nWrite the formula for $A$ in terms of $B$. [ANS]\nUse your formula to find $A$ when $B=7$. $A=$ [ANS]", "output": "6, A = 6*B^2, 294"}

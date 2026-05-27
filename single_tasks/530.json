@@ -1,0 +1,1 @@
+{"id": "530", "instruction": "Find the solutions y of the differential equation y'=(t^2+3y^2)/2ty with y(1) = 1. What is y(2)?\n\nOptions:\nA. 7.890\nB. 6.789\nC. 2.345\nD. 5.678\nE. 1.234\nF. 4.567\nG. 4.321\nH. 8.910\nI. 2.718\nJ. 3.464", "output": "J"}

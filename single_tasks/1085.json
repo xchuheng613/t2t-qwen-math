@@ -1,0 +1,1 @@
+{"id": "1085", "instruction": "Solve the equation:\n$$\n\\tan\\left(\\frac{ \\pi }{ 4 }+x\\right)+\\tan\\left(\\frac{ \\pi }{ 4 }-x\\right)=2\n$$\n\nOptions:\nA. x=π⋅n - π/4\nB. x=π⋅n + π/8\nC. x=π⋅n\nD. x=π⋅n + π/6\nE. x=π⋅n + π/12\nF. x=π⋅n + π/16\nG. x=π⋅n + π/2\nH. x=π⋅n + π/4\nI. x=π⋅n + π/3", "output": "C"}

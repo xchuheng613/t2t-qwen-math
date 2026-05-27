@@ -1,0 +1,1 @@
+{"id": "787", "instruction": "Solve for $k$ from $0=151 (k-117x)^2-\\frac{x}{125}$, and give your answer as a comma-separated list.\n$k=$ [ANS].", "output": "(117*x-sqrt(x/18875), 117*x+sqrt(x/18875))"}

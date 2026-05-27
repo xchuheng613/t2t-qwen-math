@@ -1,0 +1,1 @@
+{"id": "57", "instruction": "A sample of eight math SAT scores is given below:\n600 \\quad 640 \\quad 640 \\quad 560 \\quad 680 \\quad 610 \\quad 540 \\quad 720 Find the first and third quartiles and the interquartile range for this sample. First Quartile=[ANS]\nThird Quartile=[ANS]\nInterquartile Range=[ANS]", "output": "580, 660, 80"}

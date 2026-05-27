@@ -1,0 +1,1 @@
+{"id": "765", "instruction": "Let $n$ be the smallest positive integer for which there exist positive real numbers $a$ and $b$ such that $(a+bi)^n=(a-bi)^n$ , where $i=\\sqrt{-1}.$ . Compute $\\frac{b^2}{a^2}$ .\n\nOptions:\nA. 2.25\nB. 1\nC. 4\nD. 5\nE. 2.75\nF. 2\nG. 3.5\nH. 6\nI. 2.5\nJ. 3", "output": "J"}

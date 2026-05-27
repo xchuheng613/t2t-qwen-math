@@ -1,0 +1,1 @@
+{"id": "512", "instruction": "Evaluate the function $H$ at the given values.\n$H(r)={-r^{2}+3}$\n$H(4)=$ [ANS]\n$H(-4)=$ [ANS]\n$H(0)=$ [ANS]", "output": "-13, -13, 3"}

@@ -1,0 +1,1 @@
+{"id": "997", "instruction": "Suppose that a rectangle has an area of 75 square meters. Express the perimeter $P$ as a function of the length $x$ of one of the sides. $P(x)$=[ANS]", "output": "2*(x + 75/x)"}

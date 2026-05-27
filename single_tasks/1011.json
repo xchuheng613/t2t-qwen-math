@@ -1,0 +1,1 @@
+{"id": "1011", "instruction": "Find the value of each expression if defined; otherwise, input undefined.\n(a) $\\tan(\\tan^{-1} 8)=$ [ANS]. (b) $\\sin^{-1}[\\sin (-\\frac{\\pi}{6})]=$ [ANS] radians.", "output": "8, -0.523598775598299"}

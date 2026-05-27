@@ -1,0 +1,1 @@
+{"id": "48", "instruction": "Integral $int_{0}^{4}{frac{sqrt{x}}{1+xsqrt{x}}}dx=$\n\nOptions:\nA. $frac{4}{3}ln 2$\nB. $frac{3}{4}ln 3$\nC. $frac{4}{3}ln 9$\nD. $frac{4}{3}ln 4$\nE. $frac{2}{3}ln 9$\nF. $frac{5}{3}ln 3$\nG. $0$\nH. $frac{2}{3}ln 3$\nI. $frac{4}{3}ln 3$\nJ. $frac{3}{2}ln 3$", "output": "I"}

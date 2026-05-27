@@ -1,0 +1,1 @@
+{"id": "1120", "instruction": "List all values of $c$ that makes each trinomial a perfect square trinomial. Separate multiple answers by commas.\n(a) $x^2+8x+c$: [ANS]\n(b) $x^2+c x+25$: [ANS]", "output": "16, (-10, 10)"}

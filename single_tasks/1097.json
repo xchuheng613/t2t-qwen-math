@@ -1,0 +1,1 @@
+{"id": "1097", "instruction": "For each of the following, use at least 5 decimal places. $43^{\\circ} 33' 21''$=[ANS] $^{\\circ}$ $\\sin(43^{\\circ} 33' 21'')$=[ANS]\n$77.2608333333333^{\\circ}$=[ANS] $^{\\circ}$ [ANS] $'$ [ANS] $''$", "output": "43.5558333333333, sin(43.5558*pi/180), 77, 15, 39"}

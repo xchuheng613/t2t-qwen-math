@@ -1,0 +1,1 @@
+{"id": "137", "instruction": "The expression\n\\frac{10}{7}+\\frac{9}{10} can be written as a fraction \\frac{a}{b} where the integers $a$ and $b$ have no factor in common, and $b$ is positive. Enter a=[ANS] and b=[ANS]\nHint: Find a common denominator and cancel any common factors in numerator and denominator.", "output": "163, 70"}

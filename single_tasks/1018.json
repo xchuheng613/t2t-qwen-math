@@ -1,0 +1,1 @@
+{"id": "1018", "instruction": "Construct the $97$ \\% confidence interval estimate of the population proportion $p$ if the sample size is $n=600$ and the number of successes in the sample is $x=317.$ [ANS] $< p <$ [ANS]", "output": "0.484107727117115, 0.572558939549551"}

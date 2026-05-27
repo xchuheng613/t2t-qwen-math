@@ -1,0 +1,1 @@
+{"id": "408", "instruction": "Given P=7 b^3+2 b-6, Q=b^2+4 b+3, R=b^3-3 Then $P+Q=$ [ANS] $b^3+$ [ANS] $b^2+$ [ANS] $b+$ [ANS]\nand $R(P+Q)=$ [ANS] $b^6+$ [ANS] $b^5+$ [ANS] $b^4+$ [ANS] $b^3+$ [ANS] $b^2+$ [ANS] $b+$ [ANS]", "output": "7, 1, 6, -3, 7, 1, 6, -24, -3, -18, 9"}

@@ -1,0 +1,1 @@
+{"id": "1", "instruction": "$int_{-infty}^{+infty} frac{a^{3/2}}{s^2+a^2} ds = $\n\nOptions:\nA. $0$\nB. $frac{1}{a}$\nC. $frac{3}{a}$\nD. $frac{1}{2a^2}$\nE. $frac{1}{2a}$\nF. $frac{2}{a}$\nG. $2a$\nH. $frac{3}{2a}$\nI. $frac{3}{2a^2}$\nJ. $frac{1}{a^2}$", "output": "F"}

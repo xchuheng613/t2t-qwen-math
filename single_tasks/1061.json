@@ -1,0 +1,1 @@
+{"id": "1061", "instruction": "Write $-8 \\sin(5 t)+7 \\cos(5 t)$ in the form $A \\sin(B t+\\phi)$ using sum or difference formulas. $-8 \\sin(5 t)+7 \\cos(5 t)$=[ANS]", "output": "sqrt(8^2+7^2)*sin(5*t+atan(-7/8)+pi)"}

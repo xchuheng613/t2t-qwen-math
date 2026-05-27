@@ -1,0 +1,1 @@
+{"id": "444", "instruction": "Find the multiple regression equation for the data given below. \\begin{array}{r|rrrrr} x_1 &-2 &-1 & 0 & 2 & 2 \\cr \\hline x_2 &-4 & 2 & 0 &-2 & 2 \\cr \\hline y & 6 &-13 & 0 & 18 & 1 \\end{array} The equation is $\\hat{y}=$ [ANS] $+$ [ANS] $x_1+$ [ANS] $x_2.$", "output": "-0.203125, 4.890625, -4.0625"}

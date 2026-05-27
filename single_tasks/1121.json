@@ -1,0 +1,1 @@
+{"id": "1121", "instruction": "Give the constant term and the coefficient of $x$ in the linear expression $10x+r x$.\nThe constant term is [ANS]\nThe coefficient of $x$ is [ANS]", "output": "0, 10+r"}

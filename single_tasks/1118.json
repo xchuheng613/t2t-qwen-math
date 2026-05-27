@@ -1,0 +1,1 @@
+{"id": "1118", "instruction": "$S={1,2,...,1000}$ and $T'=\\left\\{ 1001-t|t \\in T\\right\\}$.\nA set $P$ satisfies the following three conditions:\n$1.$ All elements of $P$ are a subset of $S$.\n$2. A,B \\in P \\Rightarrow A \\cap B \\neq \\O$\n$3. A \\in P \\Rightarrow A' \\in P$\nFind the maximum of $|P|$.", "output": "2^{999}-2^{499}"}

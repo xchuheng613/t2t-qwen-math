@@ -1,0 +1,1 @@
+{"id": "985", "instruction": "Find all solutions in the complex numbers to the equation x^2-x-20=0 and enter them as a comma-separated list. If there is a repeated root, list it as many times as its multiplicity.\nSolutions: [ANS]", "output": "(5, -4)"}

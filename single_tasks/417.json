@@ -1,0 +1,1 @@
+{"id": "417", "instruction": "Let the sum of all odd $n$ such that $\\frac{1}{n}$ expressed in base $8$ is a repeating decimal with period $4$ be $S$ . Find the remainder when $S$ is divided by $1000$ .\n\nOptions:\nA. 639\nB. 631\nC. 636\nD. 630\nE. 632\nF. 634\nG. 638\nH. 637\nI. 635\nJ. 633", "output": "E"}

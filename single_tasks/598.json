@@ -1,0 +1,1 @@
+{"id": "598", "instruction": "Is the following expression a monomial, binomial, or trinomial?\n${3t^{15}+5t^{10}}$ [ANS] What is the degree of the expression? [ANS]", "output": "binomial, 15"}

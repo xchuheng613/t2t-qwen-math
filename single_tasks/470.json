@@ -1,0 +1,1 @@
+{"id": "470", "instruction": "The cost of a parking ticket at NAU is \\$40 for the first offense, but the cost triples for each additional offense. Write a formula for the cost $C$ as a function of the number of tickets $n$. Remember to use the variable \" $n$ \" in your answer. $\\ C$=[ANS]", "output": "40*3**(n-1)"}

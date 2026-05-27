@@ -1,0 +1,1 @@
+{"id": "176", "instruction": "Sender chooses $\\mathrm{p}=1 0 7, \\mathrm{e_1}=2, \\mathrm{d}=6 7$, and the random integer is r=45. Find the plaintext to be transmitted if the ciphertext is (28,9).\n\nOptions:\nA. 29\nB. 77\nC. 66\nD. 76\nE. 13\nF. 51\nG. 47\nH. 45\nI. 80\nJ. 32", "output": "C"}

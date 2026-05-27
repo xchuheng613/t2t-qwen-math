@@ -1,0 +1,1 @@
+{"id": "162", "instruction": "Evaluate this expression:\n${(19-4)^{2}+4(19-4^{2})}$ [ANS]", "output": "237"}

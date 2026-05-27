@@ -1,0 +1,1 @@
+{"id": "159", "instruction": "Determine the probability of making a Type II error for the following hypothesis test, given that $\\mu=211$.\n$ \\qquad \\begin{array}{rrcl} H_0: & \\mu &=& 210 \\\\ H_1: & \\mu & \\not=& 210 \\end{array}$ For this test, take $\\sigma=11$, $n=60$, and $\\alpha=0.05$. P(Type II Error)=[ANS]", "output": "0.891543061484441"}

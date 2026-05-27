@@ -1,0 +1,1 @@
+{"id": "297", "instruction": "The altitude of a right triangle is 16 cm. Let $h$ be the length of the hypotenuse and let $p$ be the perimeter of the triangle. Express $h$ as a function of $p$. $h(p)=$ [ANS]", "output": "(p**2 - 2 * 16 * p + 2 * 16**2)/(2 * (p - 16))"}

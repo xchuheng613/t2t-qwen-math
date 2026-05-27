@@ -1,0 +1,1 @@
+{"id": "983", "instruction": "Consider the function $f(x)=\\frac{18}{5+x^2}$. Complete the table of values for $f(x)$ below when $x=0, 1, 2, 3$. Give exact values. $\\begin{array}{ccccc}\\hline x & 0 & 1 & 2 & 3 \\\\ \\hline f(x) & [ANS] & [ANS] & [ANS] & [ANS] \\\\ \\hline \\end{array}$", "output": "18/5, 18/6, 18/9, 18/14"}

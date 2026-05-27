@@ -1,0 +1,1 @@
+{"id": "279", "instruction": "Consider all positive integers written in base 35, are alternating 1's and 0's, beginning and ending with 1. How many of these numbers are prime?\n\nOptions:\nA. \\boxed{6}\nB. \\boxed{4}\nC. \\boxed{8}\nD. \\boxed{7}\nE. \\boxed{9}\nF. \\boxed{0}\nG. \\boxed{1}\nH. \\boxed{5}\nI. \\boxed{3}\nJ. \\boxed{2}", "output": "G"}

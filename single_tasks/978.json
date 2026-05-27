@@ -1,0 +1,1 @@
+{"id": "978", "instruction": "Determine the probability of making a Type II error for the following hypothesis test, given that $\\mu=1089$.\n$ \\qquad \\begin{array}{rrcl} H_0: \\mu=1050 \\\\ H_1: \\mu > 1050 \\end{array}$ For this test, take $\\sigma=51$, $n=26$, and $\\alpha=0.04$. P(Type II Error)=[ANS]", "output": "0.0158346381172345"}

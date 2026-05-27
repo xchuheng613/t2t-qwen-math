@@ -1,0 +1,1 @@
+{"id": "558", "instruction": "Evaluate these expressions:\n${|8-7|^{2}-|8-7^{2}|=}$ [ANS]\n${(8-7)^{2}-(8-7^{2})=}$ [ANS]", "output": "-40, 42"}

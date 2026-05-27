@@ -1,0 +1,1 @@
+{"id": "33", "instruction": "An ordinary deck of cards containing 26 red cards and 26 black cards is shuffled and dealt out one card at a time without replacement. Let $X_i$ be the color of the $i$th card. Compute $H(X_1,X_2,\\ldots,X_{52})$ in bits.\n\nOptions:\nA. 52\nB. 48.8\nC. 49.9\nD. 50.0\nE. 51.5\nF. 46.5\nG. 50.2\nH. 47.3\nI. 45.6\nJ. 53.2", "output": "B"}

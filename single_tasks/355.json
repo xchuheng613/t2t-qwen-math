@@ -1,0 +1,1 @@
+{"id": "355", "instruction": "Find the number of polynomials $P(x)$ with positive integer coefficients and with at most $2$ terms such that $P(2)=384$ .\n\nOptions:\nA. 726\nB. 732\nC. 734\nD. 727\nE. 730\nF. 725\nG. 728\nH. 731\nI. 729\nJ. 733", "output": "I"}

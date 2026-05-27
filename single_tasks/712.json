@@ -1,0 +1,1 @@
+{"id": "712", "instruction": "Simplify the expression 2-\\frac{4}{x-3} and give your answer in the form of \\frac{f(x)}{g(x)}. Your answer for the function $f(x)$ is: [ANS]\nYour answer for the function $g(x)$ is: [ANS]", "output": "2 x-4-2*3, x-3"}

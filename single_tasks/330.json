@@ -1,0 +1,1 @@
+{"id": "330", "instruction": "Calculate the area of the surface formed by rotating the astroid $x^{\\frac{ 2 }{ 3 }} + y^{\\frac{ 2 }{ 3 }} = 2^{\\frac{ 2 }{ 3 }}$ about the x-axis.\n\nOptions:\nA. 48π/8\nB. 48π/5\nC. 48π/11\nD. 48π/6\nE. 48π/10\nF. 48π/12\nG. 48π/3\nH. 48π/4\nI. 48π/9\nJ. 48π/7", "output": "B"}

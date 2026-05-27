@@ -1,0 +1,1 @@
+{"id": "128", "instruction": "Indicate whether the following statements are True (T) or False (F). You must get all answers correct in order to receive credit. [ANS] 1. $5 > 5$ [ANS] 2. $5=5$ [ANS] 3. $5 \\geq 5$ [ANS] 4. $5 \\neq 5$ [ANS] 5. $5 < 5$ [ANS] 6. $5 \\leq 5$", "output": "F, T, T, F, F, T"}

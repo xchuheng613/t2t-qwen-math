@@ -1,0 +1,1 @@
+{"id": "18", "instruction": "Let $Y_1 < Y_2 < \\cdots < Y_8$ be the order statistics of eight independent observations from a continuous-type distribution with 70 th percentile $\\pi_{0.7}=27.3$.\n(a) Determine $P\\left(Y_7<27.3\\right)$.\n\nOptions:\nA. 0.9012\nB. 0.2929\nC. 0.4334\nD. 0.7890\nE. 0.3456\nF. 0.1234\nG. 0.1975\nH. 0.6543\nI. $0.2553$\nJ. 0.5678", "output": "I"}

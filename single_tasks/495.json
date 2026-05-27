@@ -1,0 +1,1 @@
+{"id": "495", "instruction": "Find the area of an equilateral triangle, each of whose sides is $9$ inches long. Area (in square inches): [ANS]", "output": "sqrt(3)*9^2/4"}

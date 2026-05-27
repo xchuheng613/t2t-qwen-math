@@ -1,0 +1,1 @@
+{"id": "474", "instruction": "Derive the solution y = f(t) to the following IVP. $ty' - 2y = t^5sin(2t) - t^3 + 4t^4$, where $y(\\pi) = 3\\pi^4/2$. What is y(t) when $t=pi/2$.\n\nOptions:\nA. 23.456\nB. 24.512\nC. 16.389\nD. 20.123\nE. 19.095\nF. 18.042\nG. 21.789\nH. 17.234\nI. 15.678\nJ. 22.876", "output": "E"}

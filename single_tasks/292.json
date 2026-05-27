@@ -1,0 +1,1 @@
+{"id": "292", "instruction": "Find the point of equilibrium for the following supply and demand equations where $x$ is number of units and $p$ is the price per unit. Demand: $p=231-0.000060x$ Supply: $p=145+0.000370x$ Number of units for equilibrium=[ANS]\nPrice per unit at equilibrium=[ANS]", "output": "200000, 219"}

@@ -1,0 +1,1 @@
+{"id": "148", "instruction": "A square with side length 49 is completely tiled with the following non-overlapping shapes: 600 $1\\times 4$ rectangles and a unit square. Find the number of possible locations of the unit square.\n\nOptions:\nA. 171\nB. 168\nC. 169\nD. 164\nE. 167\nF. 165\nG. 166\nH. 170\nI. 173\nJ. 172", "output": "C"}

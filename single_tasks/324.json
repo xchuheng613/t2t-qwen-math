@@ -1,0 +1,1 @@
+{"id": "324", "instruction": "Find the area of the region that lies outside the circle x^2+y^2=4 but inside the circle x^2+y^2-4y-32=0. The area is [ANS] square units", "output": "32*pi"}

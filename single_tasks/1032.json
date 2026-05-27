@@ -1,0 +1,1 @@
+{"id": "1032", "instruction": "Let $z$ be a complex number such that $z^7=1$ . Find the remainder when the sum of all possible distinct values of $(z^4+z^2+z+2)^{27}$ is divided by 1000.\n\nOptions:\nA. 559\nB. 556\nC. 557\nD. 553\nE. 552\nF. 550\nG. 555\nH. 551\nI. 558\nJ. 554", "output": "B"}

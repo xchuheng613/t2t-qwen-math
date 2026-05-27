@@ -1,0 +1,1 @@
+{"id": "1087", "instruction": "Find the number of positive integers $x$ less than $2500$ such that both $\\lfloor \\log_4 x\\rfloor$ and $\\lfloor \\log_3 x\\rfloor$ are prime.\n\nOptions:\nA. 395\nB. 393\nC. 397\nD. 390\nE. 398\nF. 399\nG. 392\nH. 394\nI. 391\nJ. 396", "output": "I"}

@@ -1,0 +1,1 @@
+{"id": "291", "instruction": "Find the sum of all positive integers $n, k_1, \\dots, k_n$ such that $k_1 + \\cdots + k_n = 5n-4$ and \\[ \\frac{1}{k_1} + \\cdots + \\frac{1}{k_n} = 1. \\]\n\nOptions:\nA. 32\nB. 38\nC. 39\nD. 36\nE. 34\nF. 35\nG. 31\nH. 33\nI. 37", "output": "D"}

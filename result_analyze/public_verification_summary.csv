@@ -1,0 +1,2 @@
+timestamp,run_name,prediction_path,data_path,total,correct,accuracy,mcq_correct,mcq_total,mcq_accuracy,free_correct,free_total,free_accuracy,analysis_path,html_path
+2026-05-26T20:36:51,public_compact_v3_postfix_full,results/public_compact_v3_postfix_full/submission.jsonl,data/public.jsonl,1126,757,0.672291,371,471,0.787686,386,655,0.589313,result_analyze/public_compact_v3_postfix_full.jsonl,

@@ -1,0 +1,1 @@
+{"id": "226", "instruction": "A point $P$ lies inside square $ABCD$ such that $PA = 11, PB = 22,$ and $PC = 33.$ The area of $ABCD$ can be expressed in the form $a + b\\sqrt{c}$ , where $a, b,$ and $c$ are positive integers and $c$ is not divisible by the square of any prime. Find $a + b + c$ .\n\nOptions:\nA. 850\nB. 853\nC. 854\nD. 855\nE. 851\nF. 849\nG. 852", "output": "F"}

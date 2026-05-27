@@ -1,0 +1,1 @@
+{"id": "980", "instruction": "In a city, the property tax rate for per thousand dollars of property value is ${\\$4.66}$. Fill in blanks: Question 1: The owner of a house worth $420$ thousand dollars should pay [ANS] dollars in tax.\nQuestion 2: The owner of a house worth [ANS] thousand dollars should pay ${\\$3{,}075.60}$ in tax.", "output": "1957.2, 660"}

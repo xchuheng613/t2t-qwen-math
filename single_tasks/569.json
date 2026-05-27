@@ -1,0 +1,1 @@
+{"id": "569", "instruction": "Of the following, which gives the best upper bound for the value of f(N) where f is a solution to the recurrence f(2N + 1) = f(2N) = f(N) + log N for N >= 1, with f(1) = 0?\n\nOptions:\nA. O(N^2 log N)\nB. O(log N) + 0(1)\nC. O(N log(log N))\nD. O(log N)\nE. O(N)\nF. O(N^2)\nG. O(N log N)\nH. O((log N)^2)\nI. O(1)\nJ. O(2^N)", "output": "H"}

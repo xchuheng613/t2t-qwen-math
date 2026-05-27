@@ -1,0 +1,1 @@
+{"id": "616", "instruction": "The following deposits were made into a bank account last month: \\$155 \\$120 \\$130 \\$150 \\$65 The total of all deposits=[ANS]\nThe average amount of the deposits=[ANS]", "output": "155+120+130+150+65, (155+120+130+150+65)/5"}

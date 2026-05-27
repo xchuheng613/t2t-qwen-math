@@ -1,0 +1,1 @@
+{"id": "307", "instruction": "Write the first four terms of the binomial expansion of $(a-4 b)^{14}.$ Answer: [ANS]", "output": "a^14-56*a^13*b+1456*a^12*b^2-23296*a^11*b^3"}

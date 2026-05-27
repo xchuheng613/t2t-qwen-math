@@ -1,0 +1,1 @@
+{"id": "135", "instruction": "Simplify the radical ${\\sqrt{275}}$. If it cannot be simplified, simply type its value as the answer. Use sqrt() for the square root symbol. For example: $\\sqrt{2}=$ sqrt(2).\n${{\\sqrt{275}}=}$ [ANS]", "output": "5*sqrt(11)"}

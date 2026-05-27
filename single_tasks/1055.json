@@ -1,0 +1,1 @@
+{"id": "1055", "instruction": "Given the data set below, calculate the range, sample variance, and sample standard deviation.\n21, \\ 26, \\ 36, \\ 16, \\ 30, \\ 16, \\ 44, \\ 9, \\ 52 range $=$ [ANS] variance $=$ [ANS] standard deviation $=$ [ANS]", "output": "43, 200.194444444444, 14.1490086028826"}

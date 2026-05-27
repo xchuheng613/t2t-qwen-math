@@ -1,0 +1,1 @@
+{"id": "584", "instruction": "Perform the indicated operation and simplify if possible. Assume all cancelled factors are not zero.\n$\\begin{array}{cccc}\\hline &  \\frac{16}{p^2} \\cdot \\frac{4 p^2 q^2}{p^4}\\div \\frac{8 p^4}{p^6}=& & [ANS] [ANS] \\\\ \\hline \\end{array}$", "output": "8*q^2, p^2"}

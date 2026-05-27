@@ -1,0 +1,1 @@
+{"id": "652", "instruction": "Find $|\\sum_{k=0}^{2n} \\dbinom{2n}{k}^{3}|$ $\\mod {1000}$ where $n=5$ .\n\nOptions:\nA. 260\nB. 280\nC. 240\nD. 270\nE. 290\nF. 265\nG. 261\nH. 255\nI. 250\nJ. 262", "output": "A"}

@@ -1,0 +1,1 @@
+{"id": "760", "instruction": "Evaluate $L=\\lim_{(x,y) \\to (3,3)}\\left(\\frac{ x^6-y^6 }{ x^2+x^2 \\cdot y-x \\cdot y^2-y^2 }\\right)$\n\nOptions:\nA. 486/19\nB. 486/17\nC. 486/13\nD. 486/11\nE. 486/9\nF. 486/5\nG. 486/4\nH. 486/6\nI. 486/10\nJ. 486/7", "output": "F"}

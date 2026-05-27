@@ -1,0 +1,1 @@
+{"id": "977", "instruction": "Simplify the expression \\tan\\left(2\\cos^{-1}(x/6)\\right) answer=<answer \\%\\%IDPREFIX\\%\\%first_answer text>", "output": "2*x*sqrt(6^2-x^2)/(2*x^2-6^2)"}

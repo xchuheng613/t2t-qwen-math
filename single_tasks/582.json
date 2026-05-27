@@ -1,0 +1,1 @@
+{"id": "582", "instruction": "Translate the following phrases into algebraic expressions:\n$7.6\\%$ of $x$ $\\longrightarrow$ [ANS]\n$76.3\\%$ of $y$ $\\longrightarrow$ [ANS]\n$455.4\\%$ of $z$ $\\longrightarrow$ [ANS]", "output": "7.6/100*x, 76.3/100*y, 455.4/100*z"}

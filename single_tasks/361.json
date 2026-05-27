@@ -1,0 +1,1 @@
+{"id": "361", "instruction": "Find the number of $5$ digit numbers using only the digits $1,2,3,4,5,6,7,8$ such that every pair of adjacent digits is no more than $1$ apart. For instance, $12345$ and $33234$ are acceptable numbers, while $13333$ and $56789$ are not.\n\nOptions:\nA. 496\nB. 501\nC. 504\nD. 505\nE. 500\nF. 497\nG. 502\nH. 499\nI. 498\nJ. 503", "output": "G"}

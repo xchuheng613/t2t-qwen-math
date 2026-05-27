@@ -1,0 +1,1 @@
+{"id": "711", "instruction": "Find the minimum sample size needed to be $99$ \\% confident that the sample variance is within $30$ \\% of the population variance. [ANS]", "output": "171"}

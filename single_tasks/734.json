@@ -1,0 +1,1 @@
+{"id": "734", "instruction": "Determine the number of integers $n$ such that $1\\le n \\le 1000$ and $n^{12}-1$ is divisible by $73$ .\n\nOptions:\nA. 164\nB. 167\nC. 168\nD. 165\nE. 162\nF. 163\nG. 160\nH. 161\nI. 166\nJ. 169", "output": "A"}

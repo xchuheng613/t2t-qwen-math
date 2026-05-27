@@ -1,0 +1,1 @@
+{"id": "715", "instruction": "Simplify the function L(P)=(P+5)(5-P) by expanding and combining like terms. Simplify your answer as much as possible. $L(P)=$ [ANS]\nIs $L(P)$ a constant, linear, quadratic, or cubic function, or none of these? [ANS]", "output": "-P^2+25, QUADRATIC"}

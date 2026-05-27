@@ -1,0 +1,1 @@
+{"id": "601", "instruction": "A positive integer $n$ is called spammy if the base ten repeating decimal for $\\frac{1}{n}$ has period $1$ . Find the number of spammy positive integers less than or equal to $1000$ .\n\nOptions:\nA. 35\nB. 31\nC. 39\nD. 33\nE. 38\nF. 37\nG. 32\nH. 34\nI. 36\nJ. 30", "output": "F"}

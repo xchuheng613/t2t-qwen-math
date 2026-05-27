@@ -1,0 +1,1 @@
+{"id": "340", "instruction": "Find the arc length of y = x^{-1} over the interval [1,2] using the Simpson's Rule S_8.\n\nOptions:\nA. 0.932\nB. 1.232\nC. 2.032\nD. 1.732\nE. 1.032\nF. 1.332\nG. 1.132\nH. 0.832\nI. 1.532\nJ. 2.132", "output": "G"}

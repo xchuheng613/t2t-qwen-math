@@ -1,0 +1,1 @@
+{"id": "245", "instruction": "Part 1 of 2:\nExpand and simplify $ B(v)=40 \\left(\\frac{v-16 v^2}{v} \\right)$.\n$B(v)$=[ANS]", "output": "40-640*v"}

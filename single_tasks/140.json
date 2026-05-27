@@ -1,0 +1,1 @@
+{"id": "140", "instruction": "Simplify completely. If\n \\sqrt[3]{24 p^{12} v^{23}}=A \\sqrt[3]{B} then $A=$ [ANS], $B=$ [ANS]. Hint: It is possible that $A$ and/or $B$ could equal $1$.", "output": "2*p^4*v^7, 3*v^2"}

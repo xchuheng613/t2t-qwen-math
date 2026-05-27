@@ -1,0 +1,1 @@
+{"id": "921", "instruction": "Calculate the mean and median of the following grades on a math test: 96, \\ 88, \\ 87, \\ 86, \\ 84, \\ 82, \\ 80, \\ 76, \\ 69, \\ 68, \\ 61\nMean=[ANS]\nMedian=[ANS]\nIs this data set skewed to the right, symmetric, or skewed to the left? [ANS]\n(Enter \"SKEWED RIGHT\", \"SYMMETRIC\", or \"SKEWED LEFT\");", "output": "79.7273, 82, SKEWED LEFT"}

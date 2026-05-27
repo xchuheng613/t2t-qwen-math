@@ -1,0 +1,1 @@
+{"id": "345", "instruction": "Evaluate $\\lim_{x \\to 0^{+}} \\left( \\left( \\frac{ \\tan(x) }{ x } \\right)^{\\frac{ 1 }{ x^2 }} \\right)$ using l'Hospital's Rule.\n\nOptions:\nA. e^(1/6)\nB. e^(1/5)\nC. e^(1/2)\nD. e^(1/10)\nE. e^(1/8)\nF. e^(1/9)\nG. e^(1/3)\nH. e^(1/12)\nI. e^(1/4)\nJ. e^(1/7)", "output": "G"}

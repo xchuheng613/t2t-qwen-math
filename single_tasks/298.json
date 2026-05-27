@@ -1,0 +1,1 @@
+{"id": "298", "instruction": "A caterer for a party buys 75 cans of soda and 20 bags of chips. Write an expression for the total cost if soda costs $s$ dollars per can and chips cost $c$ dollars per bag.\n\\$ [ANS]", "output": "75*s+20*c"}

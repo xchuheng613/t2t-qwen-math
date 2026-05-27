@@ -1,0 +1,1 @@
+{"id": "62", "instruction": "Given that $x=1$ is a zero of the polynomial $P(x)=8x^3-8x^2-32x+32$, find all other zeros of the polynomial $P(x)$. The other zeros of $P(x)$ are $x=$ [ANS].   If there are multiple zeros, separate the different zeros by commas.", "output": "(2, -2)"}

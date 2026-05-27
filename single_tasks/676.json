@@ -1,0 +1,1 @@
+{"id": "676", "instruction": "Let the probability density function f(x) of the random variable X satisfy f(1+x)=f(1-x), and $$\\int_{0}^{2} f \\left( x \\right) \\mathrm{d} x=0. 6$$ then P{X<0}=().\n\nOptions:\nA. 0.45\nB. 0.4\nC. 0.35\nD. 0.15\nE. 0.3\nF. 0.25\nG. 0.2\nH. 0.5\nI. 0.0\nJ. 0.1", "output": "G"}

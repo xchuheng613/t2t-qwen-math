@@ -1,0 +1,1 @@
+{"id": "625", "instruction": "For each positive integer $n$, let $a(n)$ be the number of zeroes in the base 3 representation of $n$. Find the upper bound of the set of real numbers $x$ for which the series \\[ \\sum_{n=1}^\\infty \\frac{x^{a(n)}}{n^3} \\] converge?\n\nOptions:\nA. 28\nB. 29\nC. 26\nD. 25\nE. 24\nF. 27\nG. 26.5\nH. 23\nI. 22\nJ. 21", "output": "D"}

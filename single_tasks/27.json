@@ -1,0 +1,1 @@
+{"id": "27", "instruction": "Find the half-life of an element which decays by 3.416\\% each day. The half-life is [ANS] days.", "output": "[ln(0.5)]/[ln(0.96584)]"}

@@ -1,0 +1,1 @@
+{"id": "873", "instruction": "Write variable expressions for\nThe value in cents of $a$ nickels=[ANS]\nThe value in cents of $a$ dimes=[ANS]\nThe value in cents of $a$ quarters=[ANS]\nThe value in cents of $a$ dimes and one quarter=[ANS]\nThe value in cents of $17$ dimes=[ANS]", "output": "a*5, a*10, a*25, a*10+25, 17*10"}

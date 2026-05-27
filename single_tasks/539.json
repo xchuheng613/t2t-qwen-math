@@ -1,0 +1,1 @@
+{"id": "539", "instruction": "The volume of a cone of height $4$ and radius $r$ is $ V=\\frac{4}{3} \\pi r^2$. What is the radius of such a cone whose volume is $5 \\pi$?\n$r$=[ANS]", "output": "sqrt(3*5/4)"}

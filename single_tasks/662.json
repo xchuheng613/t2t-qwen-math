@@ -1,0 +1,1 @@
+{"id": "662", "instruction": "Let W(t) be the standard Brownian motion. Find P(W(1) + W(2) > 2).\n\nOptions:\nA. 0.158\nB. 0.276\nC. 0.217\nD. 0.625\nE. 0.500\nF. 0.458\nG. 0.368\nH. 0.186\nI. 0.333\nJ. 0.042", "output": "H"}

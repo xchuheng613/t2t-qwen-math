@@ -1,0 +1,1 @@
+{"id": "907", "instruction": "A square rug lies in the middle of a rectangular room. There are 6 feet of uncovered floor on 2 sides of the rug and 5 feet of uncovered floor on the other 2 sides. Find a polynomial expression for the area of the room in terms of x, the side length of the rug.\nThe area of the room is [ANS].", "output": "(2*6 +x)*(2*5+x)"}

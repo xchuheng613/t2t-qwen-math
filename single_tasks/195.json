@@ -1,0 +1,1 @@
+{"id": "195", "instruction": "Find the quotient and remainder using synthetic division for \\frac{x^5-x^4+7x^3-7x^2+5x-10}{x-1}. The quotient is [ANS]\nThe remainder is [ANS]", "output": "x**4+7*x**2+5, -5"}

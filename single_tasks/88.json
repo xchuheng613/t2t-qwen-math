@@ -1,0 +1,1 @@
+{"id": "88", "instruction": "Let $a, b$ be positive integers such that\n$$$\\gcd(2019!, 2020!, a, b) \\cdot \\text{lcm}(2019!, 2020!, a, b) =\\sqrt{ab \\cdot 2019! \\cdot 2020!}.$$$\nFind the minimum possible value of $a+b.$\n\nOptions:\nA. 129\nB. 122\nC. 128\nD. 121\nE. 123\nF. 127\nG. 126\nH. 125\nI. 120\nJ. 124", "output": "D"}

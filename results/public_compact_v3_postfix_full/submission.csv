@@ -1,0 +1,2374 @@
+id,response
+0,"FINAL_ANSWERS:
+\boxed{105950}"
+1,"FINAL_ANSWERS:
+\boxed{B}"
+2,"FINAL_ANSWERS:
+\boxed{143.2181744, 2.326247}"
+3,"FINAL_ANSWERS:
+\boxed{5/8}"
+4,"FINAL_ANSWERS:
+\boxed{C}"
+5,"FINAL_ANSWERS:
+\boxed{62.77777777777778, 335.9277777777778, 604.67}"
+6,"FINAL_ANSWERS:
+\boxed{G, B}"
+7,"FINAL_ANSWERS:
+\boxed{13/9}"
+8,"FINAL_ANSWERS:
+\boxed{0.4472135955}"
+9,"FINAL_ANSWERS:
+\boxed{A}"
+10,"FINAL_ANSWERS:
+\boxed{E}"
+11,"FINAL_ANSWERS:
+\boxed{G}"
+12,"FINAL_ANSWERS:
+\boxed{380, 315, 14, 310}"
+13,"FINAL_ANSWERS:
+\boxed{J}"
+14,"FINAL_ANSWERS:
+\boxed{F}"
+15,"FINAL_ANSWERS:
+\boxed{B, C, A}"
+16,"FINAL_ANSWERS:
+\boxed{1.364, 3.142}"
+17,"FINAL_ANSWERS:
+\boxed{16*x, 16*x}"
+18,"FINAL_ANSWERS:
+\boxed{I}"
+19,"FINAL_ANSWERS:
+\boxed{E}"
+20,"FINAL_ANSWERS:
+\boxed{-10.000, 100.000, -9.000, 81.000, 1.000, 1.000, 3.000, 9.000, 7.000, 49.000, 8.000, 64.000, 304.000, 60.800, 7.797}"
+21,"FINAL_ANSWERS:
+\boxed{(1-t)**(3), 4*t(1-t)**(3), 10*t**(2)*(1-t)**(3), 21*t**(5)*(1-t)**(2), 56*t**(3)*(1-t)**(5)}"
+22,"FINAL_ANSWERS:
+\boxed{1.60, 1.76, 0.16*ceil(p/16), up, 1, 0.16}"
+23,"FINAL_ANSWERS:
+\boxed{B, A, B, A}"
+24,"FINAL_ANSWERS:
+\boxed{E}"
+25,"FINAL_ANSWERS:
+\boxed{18.810526316, 11.340067, Yes, Reject H0}"
+26,"FINAL_ANSWERS:
+\boxed{625*L}"
+27,"FINAL_ANSWERS:
+\boxed{19.94}"
+28,"FINAL_ANSWERS:
+\boxed{144}"
+29,"FINAL_ANSWERS:
+\boxed{442.8571428571428, 332.1428571428571}"
+30,"FINAL_ANSWERS:
+\boxed{3.03, 0.09, B, 5.05, 0.031, A, 0.58, 0.452, B}"
+31,"FINAL_ANSWERS:
+\boxed{K, I, J, F, B, H}"
+32,"FINAL_ANSWERS:
+\boxed{7091.66666666667}"
+33,"FINAL_ANSWERS:
+\boxed{B}"
+34,"FINAL_ANSWERS:
+\boxed{504/(11*pi)}"
+35,"FINAL_ANSWERS:
+\boxed{2010}"
+36,"FINAL_ANSWERS:
+\boxed{π/3, 0.7}"
+37,"FINAL_ANSWERS:
+\boxed{110101, 11010101, 1010100001}"
+38,"FINAL_ANSWERS:
+\boxed{1250, 875}"
+39,"FINAL_ANSWERS:
+\boxed{2.3}"
+40,"FINAL_ANSWERS:
+\boxed{Nominal, Ordinal, Ordinal, Nominal}"
+41,"FINAL_ANSWERS:
+\boxed{S*T+S*W+T*W, T+W, 65.2390566038}"
+42,"FINAL_ANSWERS:
+\boxed{J}"
+43,"FINAL_ANSWERS:
+\boxed{Yes, \frac{-7-\sqrt{41}}{2}, \frac{-7+\sqrt{41}}{2}}"
+44,"FINAL_ANSWERS:
+\boxed{(-1,-3), -\dfrac{3*\sqrt{10}}{10}}"
+45,"FINAL_ANSWERS:
+\boxed{C}"
+46,"FINAL_ANSWERS:
+\boxed{429.804, 1012.555}"
+47,"FINAL_ANSWERS:
+\boxed{9}"
+48,"FINAL_ANSWERS:
+\boxed{I}"
+49,"FINAL_ANSWERS:
+\boxed{3*k+9*J u, u}"
+50,"FINAL_ANSWERS:
+\boxed{B}"
+51,"FINAL_ANSWERS:
+\boxed{A}"
+52,"FINAL_ANSWERS:
+\boxed{46080}"
+53,"FINAL_ANSWERS:
+\boxed{C}"
+54,"FINAL_ANSWERS:
+\boxed{H}"
+55,"FINAL_ANSWERS:
+\boxed{6*e**(16*x), 6}"
+56,"FINAL_ANSWERS:
+\boxed{A, C}"
+57,"FINAL_ANSWERS:
+\boxed{580, 660, 80}"
+58,"FINAL_ANSWERS:
+\boxed{A, C}"
+59,"FINAL_ANSWERS:
+\boxed{B}"
+60,"FINAL_ANSWERS:
+\boxed{38}"
+61,"FINAL_ANSWERS:
+\boxed{BCEG}"
+62,"FINAL_ANSWERS:
+\boxed{2,-2}"
+63,"FINAL_ANSWERS:
+\boxed{I}"
+64,"FINAL_ANSWERS:
+\boxed{12.08}"
+65,"FINAL_ANSWERS:
+\boxed{-15/13, 13/15, -15/13, -13/15, 13/15, -13/15}"
+66,"FINAL_ANSWERS:
+\boxed{77.2*e**(0.016*t), 92.056, 2020}"
+67,"FINAL_ANSWERS:
+\boxed{122}"
+68,"FINAL_ANSWERS:
+\boxed{C}"
+69,"FINAL_ANSWERS:
+\boxed{D}"
+70,"FINAL_ANSWERS:
+\boxed{(133*pi)/(90)}"
+71,"FINAL_ANSWERS:
+\boxed{(-8,\infty)}"
+72,"FINAL_ANSWERS:
+\boxed{190, 250}"
+73,"FINAL_ANSWERS:
+\boxed{H}"
+74,"FINAL_ANSWERS:
+\boxed{E}"
+75,"FINAL_ANSWERS:
+\boxed{169+(x-4)**(2)=x**(2), 23.125}"
+76,"FINAL_ANSWERS:
+\boxed{105.4}"
+77,"FINAL_ANSWERS:
+\boxed{75.7, N, 65.4, E}"
+78,"FINAL_ANSWERS:
+\boxed{B}"
+79,"FINAL_ANSWERS:
+\boxed{2.777777777777777}"
+80,"FINAL_ANSWERS:
+\boxed{3360}"
+81,"FINAL_ANSWERS:
+\boxed{C}"
+82,"FINAL_ANSWERS:
+\boxed{G}"
+83,"FINAL_ANSWERS:
+\boxed{yes, yes, no}"
+84,"FINAL_ANSWERS:
+\boxed{-1+√6*i,-1-√6*i}"
+85,"FINAL_ANSWERS:
+\boxed{J}"
+86,"FINAL_ANSWERS:
+\boxed{G}"
+87,"FINAL_ANSWERS:
+\boxed{I}"
+88,"FINAL_ANSWERS:
+\boxed{S}"
+89,"FINAL_ANSWERS:
+\boxed{E}"
+90,"FINAL_ANSWERS:
+\boxed{E}"
+91,"FINAL_ANSWERS:
+\boxed{F}"
+92,"FINAL_ANSWERS:
+\boxed{E}"
+93,"FINAL_ANSWERS:
+\boxed{20/(5+3*cos(t)), 135/(8-2*sin(t))}"
+94,"FINAL_ANSWERS:
+\boxed{C}"
+95,"FINAL_ANSWERS:
+\boxed{F}"
+96,"FINAL_ANSWERS:
+\boxed{B}"
+97,"FINAL_ANSWERS:
+\boxed{301}"
+98,"FINAL_ANSWERS:
+\boxed{80}"
+99,"FINAL_ANSWERS:
+\boxed{S}"
+100,"FINAL_ANSWERS:
+\boxed{7.212121212, 48.787878788, 9.787878788, 66.212121212, 0.0124560000, 6.634893235, No, No}"
+101,"FINAL_ANSWERS:
+\boxed{G}"
+102,"FINAL_ANSWERS:
+\boxed{6*10**(6)}"
+103,"FINAL_ANSWERS:
+\boxed{(-1)**(n+1)/n**(4), (n+2)/(n+4)}"
+104,"FINAL_ANSWERS:
+\boxed{2, 1/2}"
+105,"FINAL_ANSWERS:
+\boxed{25.00, 0, 500, 25.00+0.65*(m-500), 500}"
+106,"FINAL_ANSWERS:
+\boxed{F}"
+107,"FINAL_ANSWERS:
+\boxed{-\dfrac{2*\sqrt{14}}{9}}"
+108,"FINAL_ANSWERS:
+\boxed{84}"
+109,"FINAL_ANSWERS:
+\boxed{8, 448}"
+110,"FINAL_ANSWERS:
+\boxed{E}"
+111,"FINAL_ANSWERS:
+\boxed{stretched, 8, compressed, 8, (-16,-3)}"
+112,"FINAL_ANSWERS:
+\boxed{F}"
+113,"FINAL_ANSWERS:
+\boxed{14.112}"
+114,"FINAL_ANSWERS:
+\boxed{A}"
+115,"FINAL_ANSWERS:
+\boxed{D, D, A}"
+116,"FINAL_ANSWERS:
+\boxed{420*0.18**(n)}"
+117,"FINAL_ANSWERS:
+\boxed{(17)/(60)}"
+118,"FINAL_ANSWERS:
+\boxed{47069}"
+119,"FINAL_ANSWERS:
+\boxed{C, A, A, A}"
+120,"FINAL_ANSWERS:
+\boxed{B}"
+121,"FINAL_ANSWERS:
+\boxed{H}"
+122,"FINAL_ANSWERS:
+\boxed{B}"
+123,"FINAL_ANSWERS:
+\boxed{D}"
+124,"FINAL_ANSWERS:
+\boxed{50/7, 5/7, 170/7}"
+125,"FINAL_ANSWERS:
+\boxed{13}"
+126,"FINAL_ANSWERS:
+\boxed{24}"
+127,"FINAL_ANSWERS:
+\boxed{171.023, 173.024, 5.271, 5.812, 0.452, 87.884, 0.498, 178.520, 1.342, 1.984, 175.860, 181.180, 175.840, 182.160, observations}"
+128,"FINAL_ANSWERS:
+\boxed{F, T, T, F, F, T}"
+129,"FINAL_ANSWERS:
+\boxed{D}"
+130,"FINAL_ANSWERS:
+\boxed{E}"
+131,"FINAL_ANSWERS:
+\boxed{J}"
+132,"FINAL_ANSWERS:
+\boxed{C, A}"
+133,"FINAL_ANSWERS:
+\boxed{14/3}"
+134,"FINAL_ANSWERS:
+\boxed{C}"
+135,"FINAL_ANSWERS:
+\boxed{5*\sqrt{11}}"
+136,"FINAL_ANSWERS:
+\boxed{T, T, F, T}"
+137,"FINAL_ANSWERS:
+\boxed{163, 70}"
+138,"FINAL_ANSWERS:
+\boxed{E}"
+139,"FINAL_ANSWERS:
+\boxed{\frac{-x-\sqrt{9-(y-5*b)**(2)} }{4}, \frac{-x+\sqrt{9-(y-5*b)**(2)} }{4}}"
+140,"FINAL_ANSWERS:
+\boxed{2*p**(4)*v**(7), 3*v**(2)}"
+141,"FINAL_ANSWERS:
+\boxed{9}"
+142,"FINAL_ANSWERS:
+\boxed{C}"
+143,"FINAL_ANSWERS:
+\boxed{25}"
+144,"FINAL_ANSWERS:
+\boxed{500}"
+145,"FINAL_ANSWERS:
+\boxed{D}"
+146,"FINAL_ANSWERS:
+\boxed{F}"
+147,"FINAL_ANSWERS:
+\boxed{((x-5)**(2))/(16)+(9)/(4)}"
+148,"FINAL_ANSWERS:
+\boxed{C}"
+149,"FINAL_ANSWERS:
+\boxed{F, F, T, T}"
+150,"FINAL_ANSWERS:
+\boxed{2.10}"
+151,"FINAL_ANSWERS:
+\boxed{0.564642473395035, 0.825335614909678, 0.684136809592128}"
+152,"FINAL_ANSWERS:
+\boxed{1/2, 1/5, 55.25, 13.26}"
+153,"FINAL_ANSWERS:
+\boxed{H}"
+154,"FINAL_ANSWERS:
+\boxed{A}"
+155,"FINAL_ANSWERS:
+\boxed{37/160}"
+156,"FINAL_ANSWERS:
+\boxed{40.25, 45}"
+157,"FINAL_ANSWERS:
+\boxed{(m-27)*(m-P)}"
+158,"FINAL_ANSWERS:
+\boxed{A, C}"
+159,"FINAL_ANSWERS:
+\boxed{0.8914}"
+160,"FINAL_ANSWERS:
+\boxed{C}"
+161,"FINAL_ANSWERS:
+\boxed{decreasing, 4339145}"
+162,"FINAL_ANSWERS:
+\boxed{237}"
+163,"FINAL_ANSWERS:
+\boxed{1.4}"
+164,"FINAL_ANSWERS:
+\boxed{A, C, C, A, C, A}"
+165,"FINAL_ANSWERS:
+\boxed{D}"
+166,"FINAL_ANSWERS:
+\boxed{1/80}"
+167,"FINAL_ANSWERS:
+\boxed{65*pi/36}"
+168,"FINAL_ANSWERS:
+\boxed{-(3)/(2)}"
+169,"FINAL_ANSWERS:
+\boxed{5730}"
+170,"FINAL_ANSWERS:
+\boxed{8*k**(9)}"
+171,"FINAL_ANSWERS:
+\boxed{81.97853764, -0.905420675}"
+172,"FINAL_ANSWERS:
+\boxed{B}"
+173,"FINAL_ANSWERS:
+\boxed{25}"
+174,"FINAL_ANSWERS:
+\boxed{F}"
+175,"FINAL_ANSWERS:
+\boxed{G}"
+176,"FINAL_ANSWERS:
+\boxed{C}"
+177,"FINAL_ANSWERS:
+\boxed{-3.507, (-infty,-2.650), 0.00149, B}"
+178,"FINAL_ANSWERS:
+\boxed{165000, 17000, 74000, 91000}"
+179,"FINAL_ANSWERS:
+\boxed{23.0789659628}"
+180,"FINAL_ANSWERS:
+\boxed{F}"
+181,"FINAL_ANSWERS:
+\boxed{256/81}"
+182,"FINAL_ANSWERS:
+\boxed{F}"
+183,"FINAL_ANSWERS:
+\boxed{12}"
+184,"FINAL_ANSWERS:
+\boxed{0,-(11)/(8)}"
+185,"FINAL_ANSWERS:
+\boxed{G}"
+186,"FINAL_ANSWERS:
+\boxed{8*x**(5)*y**(9)}"
+187,"FINAL_ANSWERS:
+\boxed{F, T, T, T}"
+188,"FINAL_ANSWERS:
+\boxed{0.000777}"
+189,"FINAL_ANSWERS:
+\boxed{-0.082848,-0.351475+0.648525*i,-1+0.917152*i,-1.648525+0.648525*i,-1.917152,-1.648525-0.648525*i,-1-0.917152*i,-0.351475-0.648525*i}"
+190,"FINAL_ANSWERS:
+\boxed{5.011872336}"
+191,"FINAL_ANSWERS:
+\boxed{37.95}"
+192,"FINAL_ANSWERS:
+\boxed{13, 49, 1000000, 1}"
+193,"FINAL_ANSWERS:
+\boxed{2.3035714286}"
+194,"FINAL_ANSWERS:
+\boxed{A}"
+195,"FINAL_ANSWERS:
+\boxed{x**(4)+7*x**(2)+5, -5}"
+196,"FINAL_ANSWERS:
+\boxed{68, 340}"
+197,"FINAL_ANSWERS:
+\boxed{A, C}"
+198,"FINAL_ANSWERS:
+\boxed{m=kr, 1/220, 183.3333333333333, 1/24, 37.5}"
+199,"FINAL_ANSWERS:
+\boxed{250, 6}"
+200,"FINAL_ANSWERS:
+\boxed{F}"
+201,"FINAL_ANSWERS:
+\boxed{0.943, 0.1728, 0.3456}"
+202,"FINAL_ANSWERS:
+\boxed{5*((7)/(4))**(x)}"
+203,"FINAL_ANSWERS:
+\boxed{448*t**(2)-236.8*t-65.28, 7.209474725}"
+204,"FINAL_ANSWERS:
+\boxed{32.00}"
+205,"FINAL_ANSWERS:
+\boxed{371}"
+206,"FINAL_ANSWERS:
+\boxed{-(9)/(8)}"
+207,"FINAL_ANSWERS:
+\boxed{6, 6*B**(2), 294}"
+208,"FINAL_ANSWERS:
+\boxed{(pi)/(6),(5*pi)/(6)}"
+209,"FINAL_ANSWERS:
+\boxed{(24.7154,27.2846)}"
+210,"FINAL_ANSWERS:
+\boxed{E}"
+211,"FINAL_ANSWERS:
+\boxed{462446, 2000}"
+212,"FINAL_ANSWERS:
+\boxed{116.25}"
+213,"FINAL_ANSWERS:
+\boxed{1330}"
+214,"FINAL_ANSWERS:
+\boxed{668.838833+12.159256*x}"
+215,"FINAL_ANSWERS:
+\boxed{B}"
+216,"FINAL_ANSWERS:
+\boxed{C, A, A}"
+217,"FINAL_ANSWERS:
+\boxed{2.55, 4.4167295593}"
+218,"FINAL_ANSWERS:
+\boxed{572}"
+219,"FINAL_ANSWERS:
+\boxed{3.070616622, 0.0581256667, 26.41000000, 6.35902, A}"
+220,"FINAL_ANSWERS:
+\boxed{81}"
+221,"FINAL_ANSWERS:
+\boxed{B, B, B}"
+222,"FINAL_ANSWERS:
+\boxed{-\sqrt{13}/4, 0, \sqrt{13}/4, 0, 0, -13, -13, +INF}"
+223,"FINAL_ANSWERS:
+\boxed{G}"
+224,"FINAL_ANSWERS:
+\boxed{8*x**(4)+6*x, csc(x)}"
+225,"FINAL_ANSWERS:
+\boxed{7.77}"
+226,"FINAL_ANSWERS:
+\boxed{F}"
+227,"FINAL_ANSWERS:
+\boxed{5850000, 5860000}"
+228,"FINAL_ANSWERS:
+\boxed{I}"
+229,"FINAL_ANSWERS:
+\boxed{11, 61}"
+230,"FINAL_ANSWERS:
+\boxed{C, E, C, 0.3085, B}"
+231,"FINAL_ANSWERS:
+\boxed{255, 80.3921568627451, 66, 174, 195, 110, 808080}"
+232,"FINAL_ANSWERS:
+\boxed{J}"
+233,"FINAL_ANSWERS:
+\boxed{I}"
+234,"FINAL_ANSWERS:
+\boxed{S}"
+235,"FINAL_ANSWERS:
+\boxed{A}"
+236,"FINAL_ANSWERS:
+\boxed{8.48528137423857, 2.353051922, A}"
+237,"FINAL_ANSWERS:
+\boxed{7, 0, 7}"
+238,"FINAL_ANSWERS:
+\boxed{70, 2, 4.2, 379, 703, 68.1, 0.7, 710}"
+239,"FINAL_ANSWERS:
+\boxed{D}"
+240,"FINAL_ANSWERS:
+\boxed{T, F, F, T}"
+241,"FINAL_ANSWERS:
+\boxed{0.829373, 2.053748913, -5.00378, B, -2.929378, 0.929378}"
+242,"FINAL_ANSWERS:
+\boxed{17, 18, 16, 17}"
+243,"FINAL_ANSWERS:
+\boxed{16/9}"
+244,"FINAL_ANSWERS:
+\boxed{H}"
+245,"FINAL_ANSWERS:
+\boxed{40-640*v}"
+246,"FINAL_ANSWERS:
+\boxed{A}"
+247,"FINAL_ANSWERS:
+\boxed{J}"
+248,"FINAL_ANSWERS:
+\boxed{324, LARGER}"
+249,"FINAL_ANSWERS:
+\boxed{12.17}"
+250,"FINAL_ANSWERS:
+\boxed{-16.81, -4.02, 6.39, B}"
+251,"FINAL_ANSWERS:
+\boxed{J}"
+252,"FINAL_ANSWERS:
+\boxed{7000*x}"
+253,"FINAL_ANSWERS:
+\boxed{F}"
+254,"FINAL_ANSWERS:
+\boxed{C}"
+255,"FINAL_ANSWERS:
+\boxed{20}"
+256,"FINAL_ANSWERS:
+\boxed{D, D, A}"
+257,"FINAL_ANSWERS:
+\boxed{J}"
+258,"FINAL_ANSWERS:
+\boxed{D}"
+259,"FINAL_ANSWERS:
+\boxed{5, \sqrt{29}, -2, \sqrt{29}, -2, 5, -\sqrt{29}, 2, \sqrt{29}, 5}"
+260,"FINAL_ANSWERS:
+\boxed{B,E,F}"
+261,"FINAL_ANSWERS:
+\boxed{14, -1, 189, 12}"
+262,"FINAL_ANSWERS:
+\boxed{A, C}"
+263,"FINAL_ANSWERS:
+\boxed{-1.082531755, (-infty,-1.750686062), 0.139550923, C}"
+264,"FINAL_ANSWERS:
+\boxed{40100}"
+265,"FINAL_ANSWERS:
+\boxed{7, 4, 197}"
+266,"FINAL_ANSWERS:
+\boxed{S}"
+267,"FINAL_ANSWERS:
+\boxed{B}"
+268,"FINAL_ANSWERS:
+\boxed{16, 8}"
+269,"FINAL_ANSWERS:
+\boxed{5.9329587897}"
+270,"FINAL_ANSWERS:
+\boxed{E}"
+271,"FINAL_ANSWERS:
+\boxed{C}"
+272,"FINAL_ANSWERS:
+\boxed{-0.45,0.72}"
+273,"FINAL_ANSWERS:
+\boxed{-119, no, -17, no, -7, no, -17/7, no, -1, no, -1/7, no, 1/7, no, 1, no, 17/7, no, 7, no, 17, no, 119, no}"
+274,"FINAL_ANSWERS:
+\boxed{7500, 6850, 20, 5000}"
+275,"FINAL_ANSWERS:
+\boxed{-64, 36, -1}"
+276,"FINAL_ANSWERS:
+\boxed{F}"
+277,"FINAL_ANSWERS:
+\boxed{2.56, (1.79,infty), 0.0052, D}"
+278,"FINAL_ANSWERS:
+\boxed{19.775681847, 26.224318153}"
+279,"FINAL_ANSWERS:
+\boxed{F}"
+280,"FINAL_ANSWERS:
+\boxed{G}"
+281,"FINAL_ANSWERS:
+\boxed{E}"
+282,"FINAL_ANSWERS:
+\boxed{B}"
+283,"FINAL_ANSWERS:
+\boxed{78}"
+284,"FINAL_ANSWERS:
+\boxed{B}"
+285,"FINAL_ANSWERS:
+\boxed{9, 16, 27, 26}"
+286,"FINAL_ANSWERS:
+\boxed{68.48833838}"
+287,"FINAL_ANSWERS:
+\boxed{J}"
+288,"FINAL_ANSWERS:
+\boxed{C}"
+289,"FINAL_ANSWERS:
+\boxed{2789}"
+290,"FINAL_ANSWERS:
+\boxed{C}"
+291,"FINAL_ANSWERS:
+\boxed{S}"
+292,"FINAL_ANSWERS:
+\boxed{200000, 219}"
+293,"FINAL_ANSWERS:
+\boxed{1, -10/7, 1}"
+294,"FINAL_ANSWERS:
+\boxed{C}"
+295,"FINAL_ANSWERS:
+\boxed{E}"
+296,"FINAL_ANSWERS:
+\boxed{A}"
+297,"FINAL_ANSWERS:
+\boxed{(p**(2))/(2*p+32)}"
+298,"FINAL_ANSWERS:
+\boxed{75*s+20*c}"
+299,"FINAL_ANSWERS:
+\boxed{1820}"
+300,"FINAL_ANSWERS:
+\boxed{2.43, 0.105, B, 5.76, 0.008, B}"
+301,"FINAL_ANSWERS:
+\boxed{20*a**(2)*b-30*ab**(2)}"
+302,"FINAL_ANSWERS:
+\boxed{7.5}"
+303,"FINAL_ANSWERS:
+\boxed{C}"
+304,"FINAL_ANSWERS:
+\boxed{54, 46, 48, 1.2474335749, 2, 9.210, B}"
+305,"FINAL_ANSWERS:
+\boxed{0.875, -0.75}"
+306,"FINAL_ANSWERS:
+\boxed{J}"
+307,"FINAL_ANSWERS:
+\boxed{a**(14),-56*a**(13)*b,1456*a**(12)*b**(2),-23296*a**(11)*b**(3)}"
+308,"FINAL_ANSWERS:
+\boxed{F, T, T, T, T, F}"
+309,"FINAL_ANSWERS:
+\boxed{144}"
+310,"FINAL_ANSWERS:
+\boxed{C}"
+311,"FINAL_ANSWERS:
+\boxed{4, 2, 8, 3, 8, -5, -4, 2, 5, 1}"
+312,"FINAL_ANSWERS:
+\boxed{0.6375, 0.7298}"
+313,"FINAL_ANSWERS:
+\boxed{B}"
+314,"FINAL_ANSWERS:
+\boxed{No, Yes, No}"
+315,"FINAL_ANSWERS:
+\boxed{A, C}"
+316,"FINAL_ANSWERS:
+\boxed{H}"
+317,"FINAL_ANSWERS:
+\boxed{(-49/8)*x+4}"
+318,"FINAL_ANSWERS:
+\boxed{G}"
+319,"FINAL_ANSWERS:
+\boxed{41}"
+320,"FINAL_ANSWERS:
+\boxed{646.8}"
+321,"FINAL_ANSWERS:
+\boxed{cos(8*x**(3)+6*x**(2)-6), 8*cos**(3)*(x)+6*cos**(2)*(x)-6}"
+322,"FINAL_ANSWERS:
+\boxed{log(6)+log (x-y)+log (x+y)}"
+323,"FINAL_ANSWERS:
+\boxed{0, -6}"
+324,"FINAL_ANSWERS:
+\boxed{32pi}"
+325,"FINAL_ANSWERS:
+\boxed{C, A, B}"
+326,"FINAL_ANSWERS:
+\boxed{millimeters, feet, miles, feet, kilometers, inches}"
+327,"FINAL_ANSWERS:
+\boxed{1060}"
+328,"FINAL_ANSWERS:
+\boxed{38.66}"
+329,"FINAL_ANSWERS:
+\boxed{H}"
+330,"FINAL_ANSWERS:
+\boxed{B}"
+331,"FINAL_ANSWERS:
+\boxed{1457, 1587, 1142, 1376}"
+332,"FINAL_ANSWERS:
+\boxed{C}"
+333,"FINAL_ANSWERS:
+\boxed{185.526315789}"
+334,"FINAL_ANSWERS:
+\boxed{F}"
+335,"FINAL_ANSWERS:
+\boxed{8*(s-3), r-3}"
+336,"FINAL_ANSWERS:
+\boxed{I}"
+337,"FINAL_ANSWERS:
+\boxed{F, F, C}"
+338,"FINAL_ANSWERS:
+\boxed{100*( (1)/(2) )**(t/21), 100*(0.7)**(t/10), A}"
+339,"FINAL_ANSWERS:
+\boxed{-\sqrt{3}, \sqrt{3}/3, 1, -2, \frac{2\sqrt{3}}{3}}"
+340,"FINAL_ANSWERS:
+\boxed{G}"
+341,"FINAL_ANSWERS:
+\boxed{J}"
+342,"FINAL_ANSWERS:
+\boxed{A}"
+343,"FINAL_ANSWERS:
+\boxed{-10, \sqrt{10}, No, No, No}"
+344,"FINAL_ANSWERS:
+\boxed{32}"
+345,"FINAL_ANSWERS:
+\boxed{G}"
+346,"FINAL_ANSWERS:
+\boxed{A, A, B}"
+347,"FINAL_ANSWERS:
+\boxed{-512}"
+348,"FINAL_ANSWERS:
+\boxed{G}"
+349,"FINAL_ANSWERS:
+\boxed{E}"
+350,"FINAL_ANSWERS:
+\boxed{77.606}"
+351,"FINAL_ANSWERS:
+\boxed{0.3592, 0.7223, INCREASES}"
+352,"FINAL_ANSWERS:
+\boxed{0.6*x=72, 120}"
+353,"FINAL_ANSWERS:
+\boxed{A}"
+354,"FINAL_ANSWERS:
+\boxed{7.634985869, -6.422988861, -4.128248992, 0}"
+355,"FINAL_ANSWERS:
+\boxed{I}"
+356,"FINAL_ANSWERS:
+\boxed{C}"
+357,"FINAL_ANSWERS:
+\boxed{H}"
+358,"FINAL_ANSWERS:
+\boxed{A, D, B}"
+359,"FINAL_ANSWERS:
+\boxed{43, 82}"
+360,"FINAL_ANSWERS:
+\boxed{5*(x+(1)/(5))**(2)-(1)/(5), -(1)/(5)}"
+361,"FINAL_ANSWERS:
+\boxed{G}"
+362,"FINAL_ANSWERS:
+\boxed{A, E, A, A, A}"
+363,"FINAL_ANSWERS:
+\boxed{15.313}"
+364,"FINAL_ANSWERS:
+\boxed{G}"
+365,"FINAL_ANSWERS:
+\boxed{2.093, n-k-1}"
+366,"FINAL_ANSWERS:
+\boxed{8**(14)}"
+367,"FINAL_ANSWERS:
+\boxed{15, 3}"
+368,"FINAL_ANSWERS:
+\boxed{69.2222222222}"
+369,"FINAL_ANSWERS:
+\boxed{61}"
+370,"FINAL_ANSWERS:
+\boxed{J}"
+371,"FINAL_ANSWERS:
+\boxed{C}"
+372,"FINAL_ANSWERS:
+\boxed{F}"
+373,"FINAL_ANSWERS:
+\boxed{14, 53, 30.9090909091, 27, 29.5, 32.75, 26.5, 29}"
+374,"FINAL_ANSWERS:
+\boxed{0.893, Yes}"
+375,"FINAL_ANSWERS:
+\boxed{J}"
+376,"FINAL_ANSWERS:
+\boxed{21*p}"
+377,"FINAL_ANSWERS:
+\boxed{J}"
+378,"FINAL_ANSWERS:
+\boxed{429.4}"
+379,"FINAL_ANSWERS:
+\boxed{7.9511}"
+380,"FINAL_ANSWERS:
+\boxed{0.020906, 0.041808}"
+381,"FINAL_ANSWERS:
+\boxed{13.2, 24.6}"
+382,"FINAL_ANSWERS:
+\boxed{70, C, 3, 9, B, C}"
+383,"FINAL_ANSWERS:
+\boxed{16, 414}"
+384,"FINAL_ANSWERS:
+\boxed{B}"
+385,"FINAL_ANSWERS:
+\boxed{A}"
+386,"FINAL_ANSWERS:
+\boxed{negative, 0.680625}"
+387,"FINAL_ANSWERS:
+\boxed{I}"
+388,"FINAL_ANSWERS:
+\boxed{340, 289, 28.9, 43}"
+389,"FINAL_ANSWERS:
+\boxed{F}"
+390,"FINAL_ANSWERS:
+\boxed{-12}"
+391,"FINAL_ANSWERS:
+\boxed{0.25, 110, A, A}"
+392,"FINAL_ANSWERS:
+\boxed{693, 593}"
+393,"FINAL_ANSWERS:
+\boxed{A}"
+394,"FINAL_ANSWERS:
+\boxed{C, C}"
+395,"FINAL_ANSWERS:
+\boxed{B}"
+396,"FINAL_ANSWERS:
+\boxed{17, 14}"
+397,"FINAL_ANSWERS:
+\boxed{I}"
+398,"FINAL_ANSWERS:
+\boxed{90000.00, 1718.21, 52}"
+399,"FINAL_ANSWERS:
+\boxed{C}"
+400,"FINAL_ANSWERS:
+\boxed{5, 3, 2, 0, 1, 4, 5, 1, 4, 0, 3, 2}"
+401,"FINAL_ANSWERS:
+\boxed{C,D}"
+402,"FINAL_ANSWERS:
+\boxed{D}"
+403,"FINAL_ANSWERS:
+\boxed{I}"
+404,"FINAL_ANSWERS:
+\boxed{6020.00}"
+405,"FINAL_ANSWERS:
+\boxed{(C-630)/50}"
+406,"FINAL_ANSWERS:
+\boxed{h=84+0.8*t}"
+407,"FINAL_ANSWERS:
+\boxed{80}"
+408,"FINAL_ANSWERS:
+\boxed{7, 1, 6, -3, 7, 1, 6, -24, -3, -18, 9}"
+409,"FINAL_ANSWERS:
+\boxed{3*pi/4,7*pi/4}"
+410,"FINAL_ANSWERS:
+\boxed{-1/2, (-1/2,1/4)}"
+411,"FINAL_ANSWERS:
+\boxed{C}"
+412,"FINAL_ANSWERS:
+\boxed{E}"
+413,"FINAL_ANSWERS:
+\boxed{8}"
+414,"FINAL_ANSWERS:
+\boxed{23, (1)/(3), (2)/(3*pi)}"
+415,"FINAL_ANSWERS:
+\boxed{E, D, A}"
+416,"FINAL_ANSWERS:
+\boxed{1481.6, 1462.381, 19.219, 0.9870, 98.70}"
+417,"FINAL_ANSWERS:
+\boxed{D}"
+418,"FINAL_ANSWERS:
+\boxed{1.02*x+10}"
+419,"FINAL_ANSWERS:
+\boxed{18.98}"
+420,"FINAL_ANSWERS:
+\boxed{D}"
+421,"FINAL_ANSWERS:
+\boxed{-13,3}"
+422,"FINAL_ANSWERS:
+\boxed{x+y, 5.07*x+2.95*y, 28}"
+423,"FINAL_ANSWERS:
+\boxed{C}"
+424,"FINAL_ANSWERS:
+\boxed{6(2)/(7)}"
+425,"FINAL_ANSWERS:
+\boxed{C}"
+426,"FINAL_ANSWERS:
+\boxed{6, 6}"
+427,"FINAL_ANSWERS:
+\boxed{2315.60, 4.39}"
+428,"FINAL_ANSWERS:
+\boxed{D}"
+429,"FINAL_ANSWERS:
+\boxed{8, e**(2), growth}"
+430,"FINAL_ANSWERS:
+\boxed{I}"
+431,"FINAL_ANSWERS:
+\boxed{B}"
+432,"FINAL_ANSWERS:
+\boxed{log10*(W/w), 50.11872336}"
+433,"FINAL_ANSWERS:
+\boxed{G}"
+434,"FINAL_ANSWERS:
+\boxed{A, C}"
+435,"FINAL_ANSWERS:
+\boxed{518.28752118}"
+436,"FINAL_ANSWERS:
+\boxed{(y**(2))/(32)}"
+437,"FINAL_ANSWERS:
+\boxed{H}"
+438,"FINAL_ANSWERS:
+\boxed{16, 5, 14, 3, 26, 3}"
+439,"FINAL_ANSWERS:
+\boxed{I}"
+440,"FINAL_ANSWERS:
+\boxed{(pi)/(10),(3*pi)/(10),(pi)/(2),(7*pi)/(10),(9*pi)/(10),(11*pi)/(10),(13*pi)/(10),(3*pi)/(2),(17*pi)/(10),(19*pi)/(10)}"
+441,"FINAL_ANSWERS:
+\boxed{A}"
+442,"FINAL_ANSWERS:
+\boxed{I}"
+443,"FINAL_ANSWERS:
+\boxed{59+m}"
+444,"FINAL_ANSWERS:
+\boxed{-0.203125, 4.890625, -4.0625}"
+445,"FINAL_ANSWERS:
+\boxed{8.90117918517108, 22.69800692218626}"
+446,"FINAL_ANSWERS:
+\boxed{80,-160,320}"
+447,"FINAL_ANSWERS:
+\boxed{g(x+1), g(x)+4}"
+448,"FINAL_ANSWERS:
+\boxed{6+\sqrt{31},6-\sqrt{31}}"
+449,"FINAL_ANSWERS:
+\boxed{G}"
+450,"FINAL_ANSWERS:
+\boxed{h, f, (1)/(2)*3**(x), g, -2*x**(3)}"
+451,"FINAL_ANSWERS:
+\boxed{55.33333, 52.66667, 50.00000, 47.33333, 44.66667}"
+452,"FINAL_ANSWERS:
+\boxed{13}"
+453,"FINAL_ANSWERS:
+\boxed{250}"
+454,"FINAL_ANSWERS:
+\boxed{I}"
+455,"FINAL_ANSWERS:
+\boxed{598401, 926, 2027}"
+456,"FINAL_ANSWERS:
+\boxed{45}"
+457,"FINAL_ANSWERS:
+\boxed{85.9436692696234}"
+458,"FINAL_ANSWERS:
+\boxed{G}"
+459,"FINAL_ANSWERS:
+\boxed{-30.8052511111111, -0.19474888888889, -0.12468592766550, 49.1246859276655, ROOT, ROOT, EXTRANEOUS, ROOT}"
+460,"FINAL_ANSWERS:
+\boxed{J}"
+461,"FINAL_ANSWERS:
+\boxed{F}"
+462,"FINAL_ANSWERS:
+\boxed{45, 182}"
+463,"FINAL_ANSWERS:
+\boxed{0.0404, B}"
+464,"FINAL_ANSWERS:
+\boxed{5*x**(4)-3*x**(3)+14*x**(2)+20}"
+465,"FINAL_ANSWERS:
+\boxed{E}"
+466,"FINAL_ANSWERS:
+\boxed{2012}"
+467,"FINAL_ANSWERS:
+\boxed{0, 0, -252}"
+468,"FINAL_ANSWERS:
+\boxed{111.1111111111}"
+469,"Okay, let's tackle this problem step by step. First, the problem is about figuring out how many miles you can afford in a taxi ride with a certain amount of money. 
+
+So, the taxi has a flat fee of $35 and then $3.10 per mile. You have $221 total. Let x be the number of miles. We need to write an inequality that represents how many miles you can afford.
+
+Hmm, the key here is that the total cost can't exceed the amount you have, right? Because if you go more miles, the cost would be more than $221, which you can't pay. So the total cost is 35 + 3.10x, and this has to be less than or equal to 221. So the inequality should be 35 + 3.10x ≤ 221. 
+
+Wait, the problem says ""Your inequality has three parts, a left side, a right side, and a comparison operator in the middle"". So the three parts would be the left side (35 + 3.10x), the operator (≤), and the right side (221). But the problem says ""Enter these as <, >, <=, >=,=, and!=."" So the three blanks are the left side, the operator, and the right side? Wait, let me check the problem statement again.
+
+The problem says: ""Write an inequality to represent this situation in terms of how many miles you can afford: Your inequality has three parts, a left side, a right side, and a comparison operator in the middle: <, >, <=, >=, =, or !=. Enter these as <, >, <=, >=,=, and!=. [ANS] [ANS] [ANS]""
+
+Ah, so the three blanks are the left side, the operator, and the right side. So the inequality is (left side) [operator] (right side). So the left side is 35 + 3.10x, the operator is <=, and the right side is 221. So the three answers would be ""35 + 3.10x"", ""<="", ""221"".
+
+Wait, but the problem says ""Enter these as <, >, <=, >=,=, and!=."" So the operator is written as <=, which is two characters, but the problem says ""Enter these as..."", so the three blanks are the left expression, the operator string, and the right expression.
+
+Wait, the problem says ""Your inequality has three parts, a left side, a right side, and a comparison operator in the middle"". So the three parts are left side, operator, right side. So the first [ANS] is the left side (35 + 3.10x), the second [ANS] is the operator (<=), and the third [ANS] is the right side (221).
+
+Then, the next part: ""Solve this inequality. At most how many miles can you afford?"" So we need to solve 35 + 3.10x ≤ 221 for x.
+
+Let's do that. Subtract 35 from both sides: 3.10x ≤ 221 - 35. 221 - 35 is 186. So 3.10x ≤ 186. Then divide both sides by 3.10: x ≤ 186 / 3.10. Let's compute that. 186 divided by 3.1. Let's see: 3.1 * 60 = 186, because 3.1*60 = 186. So x ≤ 60. So the maximum miles you can afford is 60 miles.
+
+Then, ""You can afford at most [ANS] miles."" So the answer here is 60.
+
+Next, ""Use interval notation to express the number of miles you can afford."" Since x is the number of miles, and it's a non-negative number (you can't drive negative miles), the interval would be [0, 60], but wait, does the problem specify that x has to be a non-negative real number? The problem says ""the number of miles the taxi will drive you"", so x ≥ 0. But the inequality is 35 + 3.10x ≤ 221, so x ≤ 60. So the solution set is all x such that 0 ≤ x ≤ 60. But in interval notation, that's [0, 60]. However, sometimes in these problems, they might consider x as a positive real number, but since you can't have negative miles, the lower bound is 0.
+
+Wait, but the problem says ""at most how many miles can you afford"". So the maximum is 60, and the interval is from 0 up to 60 inclusive.
+
+Wait, let's check the problem statement again. It says ""You can afford at most [ANS] miles."" So that's 60. Then the interval notation is [0, 60].
+
+But let's confirm the inequality. The problem says ""how many miles you can afford"". So the inequality is 35 + 3.10x ≤ 221, which solves to x ≤ 60. So the number of miles you can afford is all x where x ≤ 60 and x ≥ 0 (since you can't have negative miles). So the interval is [0, 60].
+
+Wait, but does the problem specify that x has to be a non-negative number? The problem says ""the number of miles the taxi will drive you"", so x is a non-negative real number. So the interval is [0, 60].
+
+Let me check the calculation again. 221 - 35 = 186. 186 divided by 3.10. Let's compute 186 / 3.1. 3.1 * 60 = 186, exactly. So x = 60 is the maximum. So the answer for the miles is 60.
+
+So the five [ANS] blanks are:
+
+First part: the inequality's left side: ""35 + 3.10x""
+
+Second part: the operator: ""<=""
+
+Third part: the right side: ""221""
+
+Fourth part: ""60"" (at most how many miles)
+
+Fifth part: the interval notation: ""[0, 60]""
+
+Wait, the problem says ""This problem has 5 [ANS] blanks."" Let's count:
+
+The problem says: ""Write an inequality... [ANS] [ANS] [ANS]"". So three blanks here.
+
+Then: ""Solve this inequality. At most how many miles can you afford? You can afford at most [ANS] miles."" So fourth blank.
+
+Then: ""Use interval notation to express the number of miles you can afford. [ANS]"". So fifth blank.
+
+Yes, five blanks total.
+
+So the answers are:
+
+1. 35 + 3.10x
+
+2. <=
+
+3. 221
+
+4. 60
+
+5. [0, 60]
+
+Wait, but the problem says ""If one answer is a point, interval, set, list, solution list, or confidence interval, wrap it in parentheses/brackets.""
+
+So the interval should be in brackets: [0, 60]
+
+Let me check if the problem wants the interval as [0,60] or (0,60] or something else. Since you can afford 0 miles (if you don't drive), but the problem says ""the number of miles the taxi will drive you"", so x=0 is possible (you don't get driven anywhere). But in reality, you might not have x=0, but mathematically, the inequality allows x=0. So the interval is [0,60].
+
+Wait, but when you solve 35 + 3.10x ≤ 221, x can be 0, which would cost $35, which is within $221. So yes, x=0 is allowed. So the interval is [0,60].
+
+Let me confirm the calculation again. 35 + 3.10*60 = 35 + 186 = 221. Exactly. So 60 miles is the maximum.
+
+So the answers are:
+
+First [ANS]: 35 + 3.10x
+
+Second [ANS]: <=
+
+Third [ANS]: 221
+
+Fourth [ANS]: 60
+
+Fifth [ANS]: [0, 60]
+
+Wait, the problem says ""Do not box anything before the final answer block."" and ""Output exactly one final \boxed{}."" with the answers separated by commas.
+
+So the final answer should be:
+
+\boxed{35 + 3.10x, <=, 221, 60, [0, 60]}
+
+But let's check the problem's instruction: ""If one answer is a point, interval, set, list, solution list, or confidence interval, wrap it in parentheses/brackets.""
+
+So the interval is [0,60], which is written with brackets.
+
+Also, the problem says ""No units, labels, [ANS], explanations, or words inside the box.""
+
+So the answers are as above.
+
+Wait, the problem says ""Keep reasoning short."" So I need to make sure I didn't miss anything.
+
+Another check: the inequality is 35 + 3.10x ≤ 221. So left side is 35 + 3.10x, operator is <=, right side is 221. Correct.
+
+Solving: 3.10x ≤ 186 → x ≤ 60. So at most 60 miles.
+
+Interval notation: [0,60] because x can't be negative.
+
+Yes, that's correct.
+
+So the five answers are:
+
+35 + 3.10x, <=, 221, 60, [0, 60]
+
+I think that's it.
+</think>
+
+FINAL_ANSWERS:
+\boxed{35 + 3.10x, <=, 221, 60, [0, 60]}"
+470,"FINAL_ANSWERS:
+\boxed{40*3**(n-1)}"
+471,"FINAL_ANSWERS:
+\boxed{C}"
+472,"FINAL_ANSWERS:
+\boxed{8}"
+473,"FINAL_ANSWERS:
+\boxed{1.07}"
+474,"FINAL_ANSWERS:
+\boxed{F}"
+475,"FINAL_ANSWERS:
+\boxed{-1.234, 0.456, 0.789, 0.321, 0.852, 1.234, 12}"
+476,"FINAL_ANSWERS:
+\boxed{31.1632+2.7126*x}"
+477,"FINAL_ANSWERS:
+\boxed{-\sqrt{21}, 21}"
+478,"FINAL_ANSWERS:
+\boxed{-0.4646, -0.5247}"
+479,"FINAL_ANSWERS:
+\boxed{-0.3, decreased, 0.3}"
+480,"FINAL_ANSWERS:
+\boxed{E}"
+481,"FINAL_ANSWERS:
+\boxed{1340, 2.20, 2.45, 2.85}"
+482,"FINAL_ANSWERS:
+\boxed{578.5714285714286, 57928.57142857143}"
+483,"FINAL_ANSWERS:
+\boxed{8.21}"
+484,"FINAL_ANSWERS:
+\boxed{E}"
+485,"FINAL_ANSWERS:
+\boxed{6233, 6367}"
+486,"FINAL_ANSWERS:
+\boxed{J}"
+487,"FINAL_ANSWERS:
+\boxed{166.668, 3709.332, 3876*(0.957)**(t/10), 0.44}"
+488,"FINAL_ANSWERS:
+\boxed{A}"
+489,"FINAL_ANSWERS:
+\boxed{12.5, 51.25}"
+490,"FINAL_ANSWERS:
+\boxed{-(1)/(7)}"
+491,"FINAL_ANSWERS:
+\boxed{8.5, 8.2, 8.1, 8.1, 8.3, 8.5, 8.75, 9.0, C}"
+492,"FINAL_ANSWERS:
+\boxed{(17)/(32)}"
+493,"FINAL_ANSWERS:
+\boxed{H}"
+494,"FINAL_ANSWERS:
+\boxed{Interval, Interval, Ordinal, Ordinal}"
+495,"FINAL_ANSWERS:
+\boxed{35.0740288532698}"
+496,"FINAL_ANSWERS:
+\boxed{C}"
+497,"FINAL_ANSWERS:
+\boxed{8, 24}"
+498,"FINAL_ANSWERS:
+\boxed{49, 44.5, 44.05, 44.005, 44}"
+499,"FINAL_ANSWERS:
+\boxed{E}"
+500,"FINAL_ANSWERS:
+\boxed{G}"
+501,"FINAL_ANSWERS:
+\boxed{-6, 6.5, A}"
+502,"FINAL_ANSWERS:
+\boxed{90, 44}"
+503,"FINAL_ANSWERS:
+\boxed{10*1000**(t/47), 15.83}"
+504,"FINAL_ANSWERS:
+\boxed{8, 4}"
+505,"FINAL_ANSWERS:
+\boxed{2}"
+506,"FINAL_ANSWERS:
+\boxed{J}"
+507,"FINAL_ANSWERS:
+\boxed{A}"
+508,"FINAL_ANSWERS:
+\boxed{A, C, 0.0050, (D,G), A, D, D}"
+509,"FINAL_ANSWERS:
+\boxed{\sqrt{7}/5}"
+510,"FINAL_ANSWERS:
+\boxed{6}"
+511,"FINAL_ANSWERS:
+\boxed{I}"
+512,"FINAL_ANSWERS:
+\boxed{-13, -13, 3}"
+513,"FINAL_ANSWERS:
+\boxed{8}"
+514,"FINAL_ANSWERS:
+\boxed{C}"
+515,"FINAL_ANSWERS:
+\boxed{E}"
+516,"FINAL_ANSWERS:
+\boxed{30, 81.03, 84.41, C}"
+517,"FINAL_ANSWERS:
+\boxed{3*pi/4, 2.356}"
+518,"FINAL_ANSWERS:
+\boxed{0.07}"
+519,"FINAL_ANSWERS:
+\boxed{A}"
+520,"FINAL_ANSWERS:
+\boxed{C}"
+521,"FINAL_ANSWERS:
+\boxed{60, 15}"
+522,"FINAL_ANSWERS:
+\boxed{B}"
+523,"FINAL_ANSWERS:
+\boxed{-(3*pi)/(8)}"
+524,"FINAL_ANSWERS:
+\boxed{A, A}"
+525,"FINAL_ANSWERS:
+\boxed{60}"
+526,"FINAL_ANSWERS:
+\boxed{-38}"
+527,"FINAL_ANSWERS:
+\boxed{157.5}"
+528,"FINAL_ANSWERS:
+\boxed{B, D}"
+529,"FINAL_ANSWERS:
+\boxed{72}"
+530,"FINAL_ANSWERS:
+\boxed{J}"
+531,"FINAL_ANSWERS:
+\boxed{-(51)/(40)*x**(5)-(51)/(40)*x**(4)-(153)/(40)*x**(3)+(51)/(40)*x**(2)-(459)/(10)*x+51}"
+532,"FINAL_ANSWERS:
+\boxed{B}"
+533,"FINAL_ANSWERS:
+\boxed{32.2}"
+534,"FINAL_ANSWERS:
+\boxed{5*n+10}"
+535,"FINAL_ANSWERS:
+\boxed{C}"
+536,"FINAL_ANSWERS:
+\boxed{x**(2)-7*x+5, -5, -5}"
+537,"FINAL_ANSWERS:
+\boxed{D}"
+538,"FINAL_ANSWERS:
+\boxed{(17)/(64)}"
+539,"FINAL_ANSWERS:
+\boxed{\sqrt{15}/2}"
+540,"FINAL_ANSWERS:
+\boxed{1/39}"
+541,"FINAL_ANSWERS:
+\boxed{F}"
+542,"FINAL_ANSWERS:
+\boxed{G}"
+543,"FINAL_ANSWERS:
+\boxed{right 3 units, up 0 units, right 0 units, up 1 unit, right 1 unit, up 2 units, right 2 units, up 1 unit}"
+544,"FINAL_ANSWERS:
+\boxed{tan(x), 7*pi x}"
+545,"FINAL_ANSWERS:
+\boxed{14.025, 19.371, AB}"
+546,"FINAL_ANSWERS:
+\boxed{1}"
+547,"FINAL_ANSWERS:
+\boxed{1.60395, 4, 13.2767, A}"
+548,"FINAL_ANSWERS:
+\boxed{14, 3, 3}"
+549,"FINAL_ANSWERS:
+\boxed{G}"
+550,"FINAL_ANSWERS:
+\boxed{F, F, T, T, T, T, F, F}"
+551,"FINAL_ANSWERS:
+\boxed{1-2*sec(x), sec(x)+1, 4*tan(x)+3, 4*tan(x)+3}"
+552,"FINAL_ANSWERS:
+\boxed{J}"
+553,"FINAL_ANSWERS:
+\boxed{C}"
+554,"FINAL_ANSWERS:
+\boxed{G}"
+555,"FINAL_ANSWERS:
+\boxed{J}"
+556,"FINAL_ANSWERS:
+\boxed{35.1920677232}"
+557,"FINAL_ANSWERS:
+\boxed{41, 35, 16}"
+558,"FINAL_ANSWERS:
+\boxed{-40, 42}"
+559,"FINAL_ANSWERS:
+\boxed{B}"
+560,"FINAL_ANSWERS:
+\boxed{S}"
+561,"FINAL_ANSWERS:
+\boxed{241}"
+562,"FINAL_ANSWERS:
+\boxed{H}"
+563,"FINAL_ANSWERS:
+\boxed{D}"
+564,"FINAL_ANSWERS:
+\boxed{A, E, A, A, A}"
+565,"FINAL_ANSWERS:
+\boxed{x(17-2*x)*(4-2*x), 0, 2}"
+566,"FINAL_ANSWERS:
+\boxed{5, 333.333333333333}"
+567,"FINAL_ANSWERS:
+\boxed{9048}"
+568,"FINAL_ANSWERS:
+\boxed{(46/11)*t+84, 84*(65/42)**(t/11), 201.09, 255.29}"
+569,"FINAL_ANSWERS:
+\boxed{H}"
+570,"FINAL_ANSWERS:
+\boxed{0.07}"
+571,"FINAL_ANSWERS:
+\boxed{B}"
+572,"FINAL_ANSWERS:
+\boxed{918}"
+573,"FINAL_ANSWERS:
+\boxed{D}"
+574,"FINAL_ANSWERS:
+\boxed{F}"
+575,"FINAL_ANSWERS:
+\boxed{10.154}"
+576,"FINAL_ANSWERS:
+\boxed{F}"
+577,"FINAL_ANSWERS:
+\boxed{D, D, A}"
+578,"FINAL_ANSWERS:
+\boxed{770}"
+579,"FINAL_ANSWERS:
+\boxed{13, 47.8, 73.8}"
+580,"FINAL_ANSWERS:
+\boxed{D}"
+581,"FINAL_ANSWERS:
+\boxed{(2)/(9)}"
+582,"FINAL_ANSWERS:
+\boxed{0.076*x, 0.763*y, 4.554*z}"
+583,"FINAL_ANSWERS:
+\boxed{5/7}"
+584,"FINAL_ANSWERS:
+\boxed{8*q**(2), p**(2)}"
+585,"FINAL_ANSWERS:
+\boxed{3}"
+586,"FINAL_ANSWERS:
+\boxed{I}"
+587,"FINAL_ANSWERS:
+\boxed{C, \sigma**(2), -0.5\sigma**(2), 0.75\sigma**(2), 0.5\gamma(1)+2.25\sigma**(2), 0.5\gamma(0)-1.5\sigma**(2), 2\sigma**(2), -0.25, 1, -1}"
+588,"FINAL_ANSWERS:
+\boxed{F}"
+589,"FINAL_ANSWERS:
+\boxed{107}"
+590,"FINAL_ANSWERS:
+\boxed{3**(5), 3**(4)}"
+591,"FINAL_ANSWERS:
+\boxed{43}"
+592,"FINAL_ANSWERS:
+\boxed{G}"
+593,"FINAL_ANSWERS:
+\boxed{G}"
+594,"FINAL_ANSWERS:
+\boxed{A, C}"
+595,"FINAL_ANSWERS:
+\boxed{-1.643, 1.96, -1.96, A}"
+596,"FINAL_ANSWERS:
+\boxed{D}"
+597,"FINAL_ANSWERS:
+\boxed{I}"
+598,"FINAL_ANSWERS:
+\boxed{binomial, 15}"
+599,"FINAL_ANSWERS:
+\boxed{25/343, 11*(4)/(7)}"
+600,"FINAL_ANSWERS:
+\boxed{G}"
+601,"FINAL_ANSWERS:
+\boxed{F}"
+602,"FINAL_ANSWERS:
+\boxed{D}"
+603,"FINAL_ANSWERS:
+\boxed{1.08*x=216.00, 200.00}"
+604,"FINAL_ANSWERS:
+\boxed{3, 4}"
+605,"FINAL_ANSWERS:
+\boxed{700, 620}"
+606,"FINAL_ANSWERS:
+\boxed{117/8}"
+607,"FINAL_ANSWERS:
+\boxed{(3*x+2)*(5*x-6)}"
+608,"FINAL_ANSWERS:
+\boxed{54}"
+609,"FINAL_ANSWERS:
+\boxed{C}"
+610,"FINAL_ANSWERS:
+\boxed{16}"
+611,"FINAL_ANSWERS:
+\boxed{D}"
+612,"FINAL_ANSWERS:
+\boxed{F}"
+613,"FINAL_ANSWERS:
+\boxed{91.62}"
+614,"FINAL_ANSWERS:
+\boxed{9*x**(2)-49}"
+615,"FINAL_ANSWERS:
+\boxed{1296, 25}"
+616,"FINAL_ANSWERS:
+\boxed{620, 124}"
+617,"FINAL_ANSWERS:
+\boxed{J}"
+618,"FINAL_ANSWERS:
+\boxed{8*\sqrt{6}+7*\sqrt{3}}"
+619,"FINAL_ANSWERS:
+\boxed{C}"
+620,"FINAL_ANSWERS:
+\boxed{C}"
+621,"FINAL_ANSWERS:
+\boxed{F}"
+622,"FINAL_ANSWERS:
+\boxed{141.69}"
+623,"FINAL_ANSWERS:
+\boxed{C}"
+624,"FINAL_ANSWERS:
+\boxed{94.000, -85.200, 978.333}"
+625,"FINAL_ANSWERS:
+\boxed{F}"
+626,"FINAL_ANSWERS:
+\boxed{E}"
+627,"FINAL_ANSWERS:
+\boxed{C, A}"
+628,"FINAL_ANSWERS:
+\boxed{B, D, A}"
+629,"FINAL_ANSWERS:
+\boxed{QUANTITATIVE, CATEGORICAL, QUANTITATIVE, CATEGORICAL}"
+630,"FINAL_ANSWERS:
+\boxed{G}"
+631,"FINAL_ANSWERS:
+\boxed{2052}"
+632,"FINAL_ANSWERS:
+\boxed{30.98, 31.42}"
+633,"FINAL_ANSWERS:
+\boxed{-4}"
+634,"FINAL_ANSWERS:
+\boxed{A}"
+635,"FINAL_ANSWERS:
+\boxed{15+(4.84*x)/120, 2107.4380165}"
+636,"FINAL_ANSWERS:
+\boxed{C}"
+637,"FINAL_ANSWERS:
+\boxed{C}"
+638,"FINAL_ANSWERS:
+\boxed{C}"
+639,"FINAL_ANSWERS:
+\boxed{(-5*x)/(8*x-1)}"
+640,"FINAL_ANSWERS:
+\boxed{4/9}"
+641,"FINAL_ANSWERS:
+\boxed{7}"
+642,"FINAL_ANSWERS:
+\boxed{6264}"
+643,"FINAL_ANSWERS:
+\boxed{296}"
+644,"FINAL_ANSWERS:
+\boxed{2.997}"
+645,"FINAL_ANSWERS:
+\boxed{B, E, C, G}"
+646,"FINAL_ANSWERS:
+\boxed{0.65}"
+647,"FINAL_ANSWERS:
+\boxed{a, n}"
+648,"FINAL_ANSWERS:
+\boxed{75.974*(1.003)**(n), 0.227922*(1.003)**(n-1)}"
+649,"FINAL_ANSWERS:
+\boxed{0.18}"
+650,"FINAL_ANSWERS:
+\boxed{D, D, A}"
+651,"FINAL_ANSWERS:
+\boxed{0.812, 3.58, 39.347}"
+652,"FINAL_ANSWERS:
+\boxed{A}"
+653,"FINAL_ANSWERS:
+\boxed{H}"
+654,"FINAL_ANSWERS:
+\boxed{I}"
+655,"FINAL_ANSWERS:
+\boxed{15, 20, 25}"
+656,"FINAL_ANSWERS:
+\boxed{4.97, 1.88, A, 1.2954, 3.3046}"
+657,"FINAL_ANSWERS:
+\boxed{149.218143192}"
+658,"FINAL_ANSWERS:
+\boxed{3, 11, 7, 15}"
+659,"FINAL_ANSWERS:
+\boxed{35}"
+660,"FINAL_ANSWERS:
+\boxed{365*(d/93000000)**(3/2), 60298}"
+661,"FINAL_ANSWERS:
+\boxed{10*x=3*x+168, 24}"
+662,"FINAL_ANSWERS:
+\boxed{H}"
+663,"FINAL_ANSWERS:
+\boxed{G}"
+664,"FINAL_ANSWERS:
+\boxed{D, A}"
+665,"FINAL_ANSWERS:
+\boxed{A}"
+666,"FINAL_ANSWERS:
+\boxed{-2.074, (-infty,-1.771), 0.0272, A}"
+667,"FINAL_ANSWERS:
+\boxed{H}"
+668,"FINAL_ANSWERS:
+\boxed{16, 9}"
+669,"FINAL_ANSWERS:
+\boxed{J}"
+670,"FINAL_ANSWERS:
+\boxed{9, 9, 363, 218, 17}"
+671,"FINAL_ANSWERS:
+\boxed{4+tan(x), tan(4+x)}"
+672,"FINAL_ANSWERS:
+\boxed{D}"
+673,"FINAL_ANSWERS:
+\boxed{0.423283, 552.6, 5.099000, 1.059900, 0.144800}"
+674,"FINAL_ANSWERS:
+\boxed{-10/3}"
+675,"FINAL_ANSWERS:
+\boxed{153.48}"
+676,"FINAL_ANSWERS:
+\boxed{G}"
+677,"FINAL_ANSWERS:
+\boxed{A}"
+678,"FINAL_ANSWERS:
+\boxed{0.8, 0.55, 0.833, 0.9, 0.76, 0.66, 0.6, 0.45}"
+679,"FINAL_ANSWERS:
+\boxed{2.2278, 4.1722, 0.2005, 0.4999}"
+680,"FINAL_ANSWERS:
+\boxed{66}"
+681,"FINAL_ANSWERS:
+\boxed{110}"
+682,"FINAL_ANSWERS:
+\boxed{107.3, 8.493562268, 87.8, 5.911818671}"
+683,"FINAL_ANSWERS:
+\boxed{7000}"
+684,"FINAL_ANSWERS:
+\boxed{C, B, B}"
+685,"FINAL_ANSWERS:
+\boxed{H}"
+686,"FINAL_ANSWERS:
+\boxed{S}"
+687,"FINAL_ANSWERS:
+\boxed{A}"
+688,"FINAL_ANSWERS:
+\boxed{13}"
+689,"FINAL_ANSWERS:
+\boxed{37.7261}"
+690,"FINAL_ANSWERS:
+\boxed{T, F, H, C, O, I, L}"
+691,"FINAL_ANSWERS:
+\boxed{A, C}"
+692,"FINAL_ANSWERS:
+\boxed{E}"
+693,"FINAL_ANSWERS:
+\boxed{92.7}"
+694,"FINAL_ANSWERS:
+\boxed{-0.000100632*x+14.23633689, 11.61990489}"
+695,"FINAL_ANSWERS:
+\boxed{19.7927, 37.8502}"
+696,"FINAL_ANSWERS:
+\boxed{1, 8}"
+697,"FINAL_ANSWERS:
+\boxed{A}"
+698,"FINAL_ANSWERS:
+\boxed{5/8}"
+699,"FINAL_ANSWERS:
+\boxed{F}"
+700,"FINAL_ANSWERS:
+\boxed{H}"
+701,"FINAL_ANSWERS:
+\boxed{0, 0, [2,3], NONE}"
+702,"FINAL_ANSWERS:
+\boxed{0.01}"
+703,"FINAL_ANSWERS:
+\boxed{0, 0, 9, 0, -9, 0, 0, 4, 0, -4, \sqrt{65}, 0, -\sqrt{65}, 0, -7, 7, -3, 7, -11, 7, -7, 16, -7, -2, -7, 7+\sqrt{65}, -7, 7-\sqrt{65}, 6, 4, 10, 4, 2, 4, 6, 7, 6, 1, 6+\sqrt{7}, 4, 6-\sqrt{7}, 4}"
+704,"FINAL_ANSWERS:
+\boxed{B}"
+705,"FINAL_ANSWERS:
+\boxed{H}"
+706,"FINAL_ANSWERS:
+\boxed{2.743363193, 0.003038122}"
+707,"FINAL_ANSWERS:
+\boxed{CONTINUOUS, CONTINUOUS, DISCRETE, CONTINUOUS}"
+708,"FINAL_ANSWERS:
+\boxed{240, 400}"
+709,"FINAL_ANSWERS:
+\boxed{(-10,5)}"
+710,"FINAL_ANSWERS:
+\boxed{422.2, 573.8, C}"
+711,"FINAL_ANSWERS:
+\boxed{149}"
+712,"FINAL_ANSWERS:
+\boxed{2*x-10, x-3}"
+713,"FINAL_ANSWERS:
+\boxed{D, D, A}"
+714,"FINAL_ANSWERS:
+\boxed{p, q, p, q, f, d}"
+715,"FINAL_ANSWERS:
+\boxed{25-P**(2), quadratic}"
+716,"FINAL_ANSWERS:
+\boxed{-\sqrt{3}/2, \ (1)/(2), \-\sqrt{3}, \ 2, \-\sqrt{3}/3}"
+717,"FINAL_ANSWERS:
+\boxed{F}"
+718,"FINAL_ANSWERS:
+\boxed{1337, 435, 37.5}"
+719,"FINAL_ANSWERS:
+\boxed{A, C, D, G, A, D}"
+720,"FINAL_ANSWERS:
+\boxed{350000}"
+721,"FINAL_ANSWERS:
+\boxed{1, 163, 327, +, 1, 163, 327}"
+722,"FINAL_ANSWERS:
+\boxed{D, D, A}"
+723,"FINAL_ANSWERS:
+\boxed{22, -0.7719}"
+724,"FINAL_ANSWERS:
+\boxed{No, Yes, Yes, Yes, No}"
+725,"FINAL_ANSWERS:
+\boxed{A}"
+726,"FINAL_ANSWERS:
+\boxed{13750.98708314}"
+727,"FINAL_ANSWERS:
+\boxed{A, A, B}"
+728,"FINAL_ANSWERS:
+\boxed{F}"
+729,"FINAL_ANSWERS:
+\boxed{D}"
+730,"FINAL_ANSWERS:
+\boxed{-736}"
+731,"FINAL_ANSWERS:
+\boxed{19, 95}"
+732,"FINAL_ANSWERS:
+\boxed{B, A, D, C}"
+733,"FINAL_ANSWERS:
+\boxed{176, 160}"
+734,"FINAL_ANSWERS:
+\boxed{A}"
+735,"FINAL_ANSWERS:
+\boxed{J}"
+736,"FINAL_ANSWERS:
+\boxed{C}"
+737,"FINAL_ANSWERS:
+\boxed{16}"
+738,"FINAL_ANSWERS:
+\boxed{4.994, 26}"
+739,"FINAL_ANSWERS:
+\boxed{D}"
+740,"FINAL_ANSWERS:
+\boxed{C, A, A}"
+741,"FINAL_ANSWERS:
+\boxed{E}"
+742,"FINAL_ANSWERS:
+\boxed{I}"
+743,"FINAL_ANSWERS:
+\boxed{75}"
+744,"FINAL_ANSWERS:
+\boxed{I}"
+745,"FINAL_ANSWERS:
+\boxed{1.75*n=12.25, 7}"
+746,"FINAL_ANSWERS:
+\boxed{217, LARGER}"
+747,"FINAL_ANSWERS:
+\boxed{3, 2, 2}"
+748,"FINAL_ANSWERS:
+\boxed{3*x+3}"
+749,"FINAL_ANSWERS:
+\boxed{19.7}"
+750,"FINAL_ANSWERS:
+\boxed{C}"
+751,"FINAL_ANSWERS:
+\boxed{T=28-0.07*d}"
+752,"FINAL_ANSWERS:
+\boxed{AB, AD, DE, CDE, D, AC, B}"
+753,"FINAL_ANSWERS:
+\boxed{D}"
+754,"FINAL_ANSWERS:
+\boxed{13000*sin((pi)/(6)*(x-2))+39000}"
+755,"FINAL_ANSWERS:
+\boxed{142, 8, 17.75}"
+756,"FINAL_ANSWERS:
+\boxed{0.70, 0.06}"
+757,"FINAL_ANSWERS:
+\boxed{S}"
+758,"FINAL_ANSWERS:
+\boxed{A, A}"
+759,"FINAL_ANSWERS:
+\boxed{17, 8, >}"
+760,"FINAL_ANSWERS:
+\boxed{F}"
+761,"FINAL_ANSWERS:
+\boxed{188.91}"
+762,"FINAL_ANSWERS:
+\boxed{D}"
+763,"FINAL_ANSWERS:
+\boxed{80}"
+764,"FINAL_ANSWERS:
+\boxed{E}"
+765,"FINAL_ANSWERS:
+\boxed{J}"
+766,"FINAL_ANSWERS:
+\boxed{8, -2, 16, -3}"
+767,"FINAL_ANSWERS:
+\boxed{A, E, B, D, C, A, E, B, D, C, A, E, B, D, C}"
+768,"FINAL_ANSWERS:
+\boxed{10, 8.8, 5.5, 88}"
+769,"FINAL_ANSWERS:
+\boxed{7*p+3-6*\sqrt{7*p-6}}"
+770,"FINAL_ANSWERS:
+\boxed{\sqrt{3}/2, 1, \sqrt{3}/3, -\sqrt{3}/3, \sqrt{2}, 2}"
+771,"FINAL_ANSWERS:
+\boxed{2, 2, 1, 1, 2, 2, 0, 1, 3, 1, 0, 1}"
+772,"FINAL_ANSWERS:
+\boxed{J}"
+773,"FINAL_ANSWERS:
+\boxed{A, C, B, D}"
+774,"FINAL_ANSWERS:
+\boxed{AC}"
+775,"FINAL_ANSWERS:
+\boxed{143.431190106, 9.348439200, B}"
+776,"FINAL_ANSWERS:
+\boxed{11.47, 11, 19}"
+777,"FINAL_ANSWERS:
+\boxed{B}"
+778,"FINAL_ANSWERS:
+\boxed{5.000000000, 1.000000000, 31.16666667, 14.89310000, 0.526081400}"
+779,"FINAL_ANSWERS:
+\boxed{80, 76, 77, 78.5, 81, 78, 79.5, 82, 80.5, 83, 84.5, 80, A}"
+780,"FINAL_ANSWERS:
+\boxed{B, 2.34, 0.0096, A, 76.22, 88.98}"
+781,"FINAL_ANSWERS:
+\boxed{46.2, 462, 4620}"
+782,"FINAL_ANSWERS:
+\boxed{25, 16}"
+783,"FINAL_ANSWERS:
+\boxed{A, C, A, A}"
+784,"FINAL_ANSWERS:
+\boxed{D}"
+785,"FINAL_ANSWERS:
+\boxed{17, 4, 25, 4}"
+786,"FINAL_ANSWERS:
+\boxed{H}"
+787,"FINAL_ANSWERS:
+\boxed{117*x+\sqrt{(x)/(18875)},117*x-\sqrt{(x)/(18875)}}"
+788,"FINAL_ANSWERS:
+\boxed{4, 5, 1, 2, 3}"
+789,"FINAL_ANSWERS:
+\boxed{7700}"
+790,"FINAL_ANSWERS:
+\boxed{I}"
+791,"FINAL_ANSWERS:
+\boxed{M}"
+792,"FINAL_ANSWERS:
+\boxed{J}"
+793,"FINAL_ANSWERS:
+\boxed{C}"
+794,"FINAL_ANSWERS:
+\boxed{58.5}"
+795,"FINAL_ANSWERS:
+\boxed{66.80, 71.20}"
+796,"FINAL_ANSWERS:
+\boxed{B}"
+797,"FINAL_ANSWERS:
+\boxed{237948, 12017.46}"
+798,"FINAL_ANSWERS:
+\boxed{20.93}"
+799,"FINAL_ANSWERS:
+\boxed{I}"
+800,"FINAL_ANSWERS:
+\boxed{E}"
+801,"FINAL_ANSWERS:
+\boxed{45/14}"
+802,"FINAL_ANSWERS:
+\boxed{E}"
+803,"FINAL_ANSWERS:
+\boxed{1, (1)/(2), 8-x**(6)}"
+804,"FINAL_ANSWERS:
+\boxed{J}"
+805,"FINAL_ANSWERS:
+\boxed{B,C,D}"
+806,"FINAL_ANSWERS:
+\boxed{2.04}"
+807,"FINAL_ANSWERS:
+\boxed{H}"
+808,"FINAL_ANSWERS:
+\boxed{-0.814, -0.581, 0.814, -0.581, -0.814, -0.581, -0.814, 0.581}"
+809,"FINAL_ANSWERS:
+\boxed{32, 1.8, -40, 32, 91.4, 212, 91.4}"
+810,"FINAL_ANSWERS:
+\boxed{C}"
+811,"FINAL_ANSWERS:
+\boxed{0.4984}"
+812,"FINAL_ANSWERS:
+\boxed{B}"
+813,"FINAL_ANSWERS:
+\boxed{H}"
+814,"FINAL_ANSWERS:
+\boxed{D}"
+815,"FINAL_ANSWERS:
+\boxed{1.54285714286, 2.77, A, 2.4, 2.77, B, 5.4, 2.77, B}"
+816,"FINAL_ANSWERS:
+\boxed{G}"
+817,"FINAL_ANSWERS:
+\boxed{C}"
+818,"FINAL_ANSWERS:
+\boxed{7}"
+819,"FINAL_ANSWERS:
+\boxed{D}"
+820,"FINAL_ANSWERS:
+\boxed{F}"
+821,"FINAL_ANSWERS:
+\boxed{G}"
+822,"FINAL_ANSWERS:
+\boxed{2300}"
+823,"FINAL_ANSWERS:
+\boxed{A, C, DG, A, D, D}"
+824,"FINAL_ANSWERS:
+\boxed{-0.996, -1.645, B}"
+825,"FINAL_ANSWERS:
+\boxed{do not reject, reject, reject}"
+826,"FINAL_ANSWERS:
+\boxed{E}"
+827,"FINAL_ANSWERS:
+\boxed{C,F}"
+828,"FINAL_ANSWERS:
+\boxed{17}"
+829,"FINAL_ANSWERS:
+\boxed{neither, odd, even, odd, neither, even, even, odd}"
+830,"FINAL_ANSWERS:
+\boxed{B}"
+831,"FINAL_ANSWERS:
+\boxed{H}"
+832,"FINAL_ANSWERS:
+\boxed{4}"
+833,"FINAL_ANSWERS:
+\boxed{17.5-17.5*sin((pi t)/(3))}"
+834,"FINAL_ANSWERS:
+\boxed{A}"
+835,"FINAL_ANSWERS:
+\boxed{7.78}"
+836,"FINAL_ANSWERS:
+\boxed{-(9+4*\sqrt{2})/7}"
+837,"FINAL_ANSWERS:
+\boxed{25, 64, 9, -64}"
+838,"FINAL_ANSWERS:
+\boxed{198}"
+839,"FINAL_ANSWERS:
+\boxed{999. But that seems too straightforward. Let's check the problem statement again. ""Vaysha has a board with 999*consecutive numbers written and 999*labels of the form 'This number is not divisible by i',for i ∈ {2,3,…,1000}"". So labels are for i=2*to 1000*(999*labels). ""Each number has exactly one label"". So it's a bijection. ""For each true statement on the stickers,Vaysha gets a piece of candy."" The question is: what's the minimal number of true statements she can guarantee,i.e.,the smallest number such that for every S (999*consecutive numbers),there exists a bijection with at least that many true statements. In the small case with n=2*(S has 2*consecutive numbers,labels i=2,3),we saw she can get 2*candies. For n=1*(trivial),but n=999. Wait,but in the set S={1,2} (2*numbers),labels i=2,3.-n=1: labels i=2,3*are true (1*not divisible by 2*or 3).-n=2: label i=2*is false,i=3*is true. Vaysha can assign label 2*to n=1*(true),label 3*to n=2*(true). So she gets 2*candies. Another example: S={1000}"
+840,"FINAL_ANSWERS:
+\boxed{B}"
+841,"FINAL_ANSWERS:
+\boxed{3}"
+842,"FINAL_ANSWERS:
+\boxed{E}"
+843,"FINAL_ANSWERS:
+\boxed{7**(7**(x)), 7**(x**(7)), 7**(7*x), x**(49)}"
+844,"FINAL_ANSWERS:
+\boxed{C}"
+845,"FINAL_ANSWERS:
+\boxed{C}"
+846,"FINAL_ANSWERS:
+\boxed{4.2639}"
+847,"FINAL_ANSWERS:
+\boxed{C}"
+848,"FINAL_ANSWERS:
+\boxed{(-4,4), -4,4}"
+849,"FINAL_ANSWERS:
+\boxed{G}"
+850,"FINAL_ANSWERS:
+\boxed{240, (109*pi)/(90)}"
+851,"FINAL_ANSWERS:
+\boxed{21}"
+852,"FINAL_ANSWERS:
+\boxed{A}"
+853,"FINAL_ANSWERS:
+\boxed{A}"
+854,"FINAL_ANSWERS:
+\boxed{646.8, 37.46}"
+855,"FINAL_ANSWERS:
+\boxed{k-15}"
+856,"FINAL_ANSWERS:
+\boxed{A}"
+857,"FINAL_ANSWERS:
+\boxed{E}"
+858,"FINAL_ANSWERS:
+\boxed{12}"
+859,"FINAL_ANSWERS:
+\boxed{C}"
+860,"FINAL_ANSWERS:
+\boxed{D, A, B}"
+861,"FINAL_ANSWERS:
+\boxed{11/5}"
+862,"FINAL_ANSWERS:
+\boxed{0.125, 6}"
+863,"FINAL_ANSWERS:
+\boxed{43120}"
+864,"FINAL_ANSWERS:
+\boxed{9}"
+865,"FINAL_ANSWERS:
+\boxed{C}"
+866,"FINAL_ANSWERS:
+\boxed{1, 4/5}"
+867,"FINAL_ANSWERS:
+\boxed{D}"
+868,"FINAL_ANSWERS:
+\boxed{-162}"
+869,"FINAL_ANSWERS:
+\boxed{700}"
+870,"FINAL_ANSWERS:
+\boxed{A}"
+871,"FINAL_ANSWERS:
+\boxed{(7.676146954,15.023853046)}"
+872,"FINAL_ANSWERS:
+\boxed{A, A}"
+873,"FINAL_ANSWERS:
+\boxed{5*a, 10*a, 25*a, 10*a+25, 170}"
+874,"FINAL_ANSWERS:
+\boxed{3400.091427}"
+875,"FINAL_ANSWERS:
+\boxed{H}"
+876,"FINAL_ANSWERS:
+\boxed{65161.431278565, 69080.789373025, 40470.553036}"
+877,"FINAL_ANSWERS:
+\boxed{A, A, C, A}"
+878,"FINAL_ANSWERS:
+\boxed{J}"
+879,"FINAL_ANSWERS:
+\boxed{J}"
+880,"FINAL_ANSWERS:
+\boxed{D}"
+881,"FINAL_ANSWERS:
+\boxed{18}"
+882,"FINAL_ANSWERS:
+\boxed{1.5, 6.17}"
+883,"FINAL_ANSWERS:
+\boxed{72, 22, 17, 17}"
+884,"FINAL_ANSWERS:
+\boxed{40108+2.75*x, 4.86*x, 2.11*x-40108, 19009}"
+885,"FINAL_ANSWERS:
+\boxed{I}"
+886,"FINAL_ANSWERS:
+\boxed{A}"
+887,"FINAL_ANSWERS:
+\boxed{C}"
+888,"FINAL_ANSWERS:
+\boxed{1732.56, yes}"
+889,"FINAL_ANSWERS:
+\boxed{H}"
+890,"FINAL_ANSWERS:
+\boxed{1.29}"
+891,"FINAL_ANSWERS:
+\boxed{H}"
+892,"FINAL_ANSWERS:
+\boxed{0.8575*x+1.6073, 32, extrapolation, interpolation, extrapolation, interpolation}"
+893,"FINAL_ANSWERS:
+\boxed{A, A}"
+894,"FINAL_ANSWERS:
+\boxed{C}"
+895,"FINAL_ANSWERS:
+\boxed{25.774}"
+896,"FINAL_ANSWERS:
+\boxed{B}"
+897,"FINAL_ANSWERS:
+\boxed{(t+7)*(t-8)}"
+898,"FINAL_ANSWERS:
+\boxed{7/5}"
+899,"FINAL_ANSWERS:
+\boxed{1, 1/27}"
+900,"FINAL_ANSWERS:
+\boxed{54.44444444, 240.69135791, 15.51423087, 49.00000000, 6.00000000, 2.449489743, 2.96000000, 0.21840000, 0.46733280}"
+901,"FINAL_ANSWERS:
+\boxed{D}"
+902,"FINAL_ANSWERS:
+\boxed{35}"
+903,"FINAL_ANSWERS:
+\boxed{64.52587918, 66.67412082, 34.36631970, 36.43368030, 38.70361121, 40.49638879, 28.11535121, 29.88464879}"
+904,"FINAL_ANSWERS:
+\boxed{897.59090909*t+33348.3181818}"
+905,"FINAL_ANSWERS:
+\boxed{531}"
+906,"FINAL_ANSWERS:
+\boxed{F}"
+907,"FINAL_ANSWERS:
+\boxed{x**(2)+22*x+120}"
+908,"FINAL_ANSWERS:
+\boxed{0.5, 0, 0.25, 1.25, Biology}"
+909,"FINAL_ANSWERS:
+\boxed{(8/29)*N+1115/29, 80.6551724138}"
+910,"FINAL_ANSWERS:
+\boxed{8.101832903}"
+911,"FINAL_ANSWERS:
+\boxed{576}"
+912,"FINAL_ANSWERS:
+\boxed{G}"
+913,"FINAL_ANSWERS:
+\boxed{8}"
+914,"FINAL_ANSWERS:
+\boxed{32}"
+915,"FINAL_ANSWERS:
+\boxed{CE, OS, OS}"
+916,"FINAL_ANSWERS:
+\boxed{170-90*cos((pi t)/(5))}"
+917,"FINAL_ANSWERS:
+\boxed{18.2842712475}"
+918,"FINAL_ANSWERS:
+\boxed{7597, 7795, 7957}"
+919,"FINAL_ANSWERS:
+\boxed{I}"
+920,"FINAL_ANSWERS:
+\boxed{(34.92463,42.27537)}"
+921,"FINAL_ANSWERS:
+\boxed{79.72727272727273, 82, SKEWED LEFT}"
+922,"FINAL_ANSWERS:
+\boxed{32}"
+923,"FINAL_ANSWERS:
+\boxed{-4, (1)/(5), -2}"
+924,"FINAL_ANSWERS:
+\boxed{16.32}"
+925,"FINAL_ANSWERS:
+\boxed{64.71428571, 10.87220937}"
+926,"FINAL_ANSWERS:
+\boxed{28, 1.673320053}"
+927,"FINAL_ANSWERS:
+\boxed{S}"
+928,"FINAL_ANSWERS:
+\boxed{F}"
+929,"FINAL_ANSWERS:
+\boxed{J}"
+930,"FINAL_ANSWERS:
+\boxed{18**(6)}"
+931,"FINAL_ANSWERS:
+\boxed{C, A, A}"
+932,"FINAL_ANSWERS:
+\boxed{0.9475000000, B, -2.353140000, 0.162632000, 9.844260000}"
+933,"FINAL_ANSWERS:
+\boxed{D}"
+934,"FINAL_ANSWERS:
+\boxed{497-112*\sqrt{7}}"
+935,"FINAL_ANSWERS:
+\boxed{C}"
+936,"FINAL_ANSWERS:
+\boxed{C}"
+937,"FINAL_ANSWERS:
+\boxed{9.371, 13.029, 8.943, 13.457}"
+938,"FINAL_ANSWERS:
+\boxed{9*a+4*p, 7.90}"
+939,"FINAL_ANSWERS:
+\boxed{14.2}"
+940,"FINAL_ANSWERS:
+\boxed{5.234, 4.876, 6.123, 7.456, 6.543, 7.890, No, E}"
+941,"FINAL_ANSWERS:
+\boxed{equivalent, not equivalent, equivalent, not equivalent, not equivalent}"
+942,"FINAL_ANSWERS:
+\boxed{B}"
+943,"FINAL_ANSWERS:
+\boxed{55.188, 55.188, 0.55188}"
+944,"FINAL_ANSWERS:
+\boxed{J}"
+945,"FINAL_ANSWERS:
+\boxed{premises, terms, variable, variables, variable, number}"
+946,"FINAL_ANSWERS:
+\boxed{S}"
+947,"FINAL_ANSWERS:
+\boxed{1040}"
+948,"FINAL_ANSWERS:
+\boxed{C}"
+949,"FINAL_ANSWERS:
+\boxed{A, D, A}"
+950,"FINAL_ANSWERS:
+\boxed{973, 111}"
+951,"FINAL_ANSWERS:
+\boxed{-15/13, -13/15}"
+952,"FINAL_ANSWERS:
+\boxed{A}"
+953,"FINAL_ANSWERS:
+\boxed{0.145, 0.252}"
+954,"FINAL_ANSWERS:
+\boxed{4878.72}"
+955,"FINAL_ANSWERS:
+\boxed{10}"
+956,"FINAL_ANSWERS:
+\boxed{A}"
+957,"FINAL_ANSWERS:
+\boxed{J}"
+958,"FINAL_ANSWERS:
+\boxed{C}"
+959,"FINAL_ANSWERS:
+\boxed{A}"
+960,"FINAL_ANSWERS:
+\boxed{480, 4800, 48000}"
+961,"FINAL_ANSWERS:
+\boxed{S}"
+962,"FINAL_ANSWERS:
+\boxed{C}"
+963,"FINAL_ANSWERS:
+\boxed{506.25, 507.5}"
+964,"FINAL_ANSWERS:
+\boxed{6, 6*i}"
+965,"FINAL_ANSWERS:
+\boxed{A}"
+966,"FINAL_ANSWERS:
+\boxed{5, 0.1, 10, 0.2, 10, 0.2, 16, 0.32, 5, 0.1, 4, 0.08, 0, 0}"
+967,"FINAL_ANSWERS:
+\boxed{y=0.25*x+15.7, 22.2, 53}"
+968,"FINAL_ANSWERS:
+\boxed{G}"
+969,"FINAL_ANSWERS:
+\boxed{inversely proportional, 1480/n, 16}"
+970,"FINAL_ANSWERS:
+\boxed{F}"
+971,"FINAL_ANSWERS:
+\boxed{D}"
+972,"FINAL_ANSWERS:
+\boxed{L}"
+973,"FINAL_ANSWERS:
+\boxed{C}"
+974,"FINAL_ANSWERS:
+\boxed{G}"
+975,"FINAL_ANSWERS:
+\boxed{2.4, -1.25}"
+976,"FINAL_ANSWERS:
+\boxed{68.86}"
+977,"FINAL_ANSWERS:
+\boxed{\dfrac{xsqrt(36-x**(2))}{x**(2)-18}}"
+978,"FINAL_ANSWERS:
+\boxed{0.01586}"
+979,"FINAL_ANSWERS:
+\boxed{D}"
+980,"FINAL_ANSWERS:
+\boxed{1957.20, 660}"
+981,"FINAL_ANSWERS:
+\boxed{I}"
+982,"FINAL_ANSWERS:
+\boxed{2045, 2080}"
+983,"FINAL_ANSWERS:
+\boxed{18/5, 3, 2, 9/7}"
+984,"FINAL_ANSWERS:
+\boxed{H}"
+985,"FINAL_ANSWERS:
+\boxed{-4,5}"
+986,"FINAL_ANSWERS:
+\boxed{J}"
+987,"FINAL_ANSWERS:
+\boxed{2.947, 0.928}"
+988,"FINAL_ANSWERS:
+\boxed{87, 24, 520, 85, 74, 175, 160, 250}"
+989,"FINAL_ANSWERS:
+\boxed{F}"
+990,"FINAL_ANSWERS:
+\boxed{250*(2/25)**(t/2), 67.75, 49.38975, (2*ln(250/y))/(ln(25/2)), 3.0977}"
+991,"FINAL_ANSWERS:
+\boxed{46}"
+992,"FINAL_ANSWERS:
+\boxed{3.000000}"
+993,"FINAL_ANSWERS:
+\boxed{F}"
+994,"FINAL_ANSWERS:
+\boxed{A, C}"
+995,"FINAL_ANSWERS:
+\boxed{H}"
+996,"FINAL_ANSWERS:
+\boxed{3, 4, 5, 1, 2}"
+997,"FINAL_ANSWERS:
+\boxed{2*x+(150)/(x)}"
+998,"FINAL_ANSWERS:
+\boxed{A}"
+999,"FINAL_ANSWERS:
+\boxed{18, 36}"
+1000,"FINAL_ANSWERS:
+\boxed{\arctan((1)/(8))}"
+1001,"FINAL_ANSWERS:
+\boxed{E}"
+1002,"FINAL_ANSWERS:
+\boxed{E, 5*C-1750}"
+1003,"FINAL_ANSWERS:
+\boxed{1/x, 8*x+1}"
+1004,"FINAL_ANSWERS:
+\boxed{E}"
+1005,"FINAL_ANSWERS:
+\boxed{-19/8, -19/8}"
+1006,"FINAL_ANSWERS:
+\boxed{B}"
+1007,"FINAL_ANSWERS:
+\boxed{32, 96, 52}"
+1008,"FINAL_ANSWERS:
+\boxed{C}"
+1009,"FINAL_ANSWERS:
+\boxed{-0.00728, A}"
+1010,"FINAL_ANSWERS:
+\boxed{C, B, A, D}"
+1011,"FINAL_ANSWERS:
+\boxed{8, -(pi)/(6)}"
+1012,"FINAL_ANSWERS:
+\boxed{E}"
+1013,"FINAL_ANSWERS:
+\boxed{2.131, 280.307, 310.493}"
+1014,"FINAL_ANSWERS:
+\boxed{B}"
+1015,"FINAL_ANSWERS:
+\boxed{I}"
+1016,"FINAL_ANSWERS:
+\boxed{(7*x+6)/(8-7*x)}"
+1017,"FINAL_ANSWERS:
+\boxed{I}"
+1018,"FINAL_ANSWERS:
+\boxed{0.4841082333, 0.5725584333}"
+1019,"FINAL_ANSWERS:
+\boxed{F}"
+1020,"FINAL_ANSWERS:
+\boxed{469.7674418605, 27199.5348837209}"
+1021,"FINAL_ANSWERS:
+\boxed{F}"
+1022,"FINAL_ANSWERS:
+\boxed{5}"
+1023,"FINAL_ANSWERS:
+\boxed{C}"
+1024,"FINAL_ANSWERS:
+\boxed{D}"
+1025,"FINAL_ANSWERS:
+\boxed{1.2pi, 1153.5928000000001, 0.06283185307179586, 13.2pi}"
+1026,"FINAL_ANSWERS:
+\boxed{65}"
+1027,"FINAL_ANSWERS:
+\boxed{470*x-390, 9.7021276596}"
+1028,"FINAL_ANSWERS:
+\boxed{1.308483000, 3.18, A, -0.056800000, 2.101, -2.101, B}"
+1029,"FINAL_ANSWERS:
+\boxed{52}"
+1030,"FINAL_ANSWERS:
+\boxed{F, T, F, T}"
+1031,"FINAL_ANSWERS:
+\boxed{A,C,D}"
+1032,"FINAL_ANSWERS:
+\boxed{X}"
+1033,"FINAL_ANSWERS:
+\boxed{exponential, linear, linear, neither, exponential, neither}"
+1034,"FINAL_ANSWERS:
+\boxed{G}"
+1035,"FINAL_ANSWERS:
+\boxed{G}"
+1036,"FINAL_ANSWERS:
+\boxed{F}"
+1037,"FINAL_ANSWERS:
+\boxed{A}"
+1038,"FINAL_ANSWERS:
+\boxed{D, D, A}"
+1039,"FINAL_ANSWERS:
+\boxed{B, A, D, C}"
+1040,"FINAL_ANSWERS:
+\boxed{1}"
+1041,"FINAL_ANSWERS:
+\boxed{34.123, 52.123, 89.921}"
+1042,"FINAL_ANSWERS:
+\boxed{4838400}"
+1043,"FINAL_ANSWERS:
+\boxed{E}"
+1044,"FINAL_ANSWERS:
+\boxed{E}"
+1045,"FINAL_ANSWERS:
+\boxed{J}"
+1046,"FINAL_ANSWERS:
+\boxed{4/57}"
+1047,"FINAL_ANSWERS:
+\boxed{818.1}"
+1048,"FINAL_ANSWERS:
+\boxed{2+4*\sqrt{30},2-4*\sqrt{30}}"
+1049,"FINAL_ANSWERS:
+\boxed{(0.01447,0.25553)}"
+1050,"FINAL_ANSWERS:
+\boxed{-39}"
+1051,"FINAL_ANSWERS:
+\boxed{H}"
+1052,"FINAL_ANSWERS:
+\boxed{120, 135, 240, 450, 360}"
+1053,"FINAL_ANSWERS:
+\boxed{S}"
+1054,"FINAL_ANSWERS:
+\boxed{2, 3}"
+1055,"FINAL_ANSWERS:
+\boxed{43, 200.19444444, 14.14900837}"
+1056,"FINAL_ANSWERS:
+\boxed{A,E}"
+1057,"FINAL_ANSWERS:
+\boxed{(0.000,4.500)}"
+1058,"FINAL_ANSWERS:
+\boxed{22.62}"
+1059,"FINAL_ANSWERS:
+\boxed{I}"
+1060,"FINAL_ANSWERS:
+\boxed{J}"
+1061,"FINAL_ANSWERS:
+\boxed{\sqrt{113}*sin(5*t+pi-\arctan((7)/(8)))}"
+1062,"FINAL_ANSWERS:
+\boxed{3}"
+1063,"FINAL_ANSWERS:
+\boxed{-2.636, (-infty,-2.20)*U(2.20,infty), 0.0184, C}"
+1064,"FINAL_ANSWERS:
+\boxed{9}"
+1065,"FINAL_ANSWERS:
+\boxed{1.08}"
+1066,"FINAL_ANSWERS:
+\boxed{5}"
+1067,"FINAL_ANSWERS:
+\boxed{0.7}"
+1068,"FINAL_ANSWERS:
+\boxed{G}"
+1069,"FINAL_ANSWERS:
+\boxed{3675}"
+1070,"FINAL_ANSWERS:
+\boxed{J}"
+1071,"FINAL_ANSWERS:
+\boxed{I}"
+1072,"FINAL_ANSWERS:
+\boxed{E}"
+1073,"FINAL_ANSWERS:
+\boxed{F}"
+1074,"FINAL_ANSWERS:
+\boxed{8, 16, -24}"
+1075,"FINAL_ANSWERS:
+\boxed{S}"
+1076,"FINAL_ANSWERS:
+\boxed{8, (1)/(9), 4, (1)/(11)}"
+1077,"FINAL_ANSWERS:
+\boxed{1136, 5, 03334, 5699, 7, 8, 235}"
+1078,"FINAL_ANSWERS:
+\boxed{B,C,D}"
+1079,"FINAL_ANSWERS:
+\boxed{A,E}"
+1080,"FINAL_ANSWERS:
+\boxed{23-10*x, [-57,23]}"
+1081,"FINAL_ANSWERS:
+\boxed{8000, 62}"
+1082,"FINAL_ANSWERS:
+\boxed{[-1,(13)/(7)]}"
+1083,"FINAL_ANSWERS:
+\boxed{22.50*n+117.00, 1, 59, 18.50*n+58.00, 60}"
+1084,"FINAL_ANSWERS:
+\boxed{C}"
+1085,"FINAL_ANSWERS:
+\boxed{C}"
+1086,"FINAL_ANSWERS:
+\boxed{29.46933, 21.43471095, 30.80891356, B, A, C, 0.360646}"
+1087,"FINAL_ANSWERS:
+\boxed{I}"
+1088,"FINAL_ANSWERS:
+\boxed{A, D, A}"
+1089,"FINAL_ANSWERS:
+\boxed{707.1428571428571}"
+1090,"FINAL_ANSWERS:
+\boxed{5*sin(t)-5*cos(t)}"
+1091,"FINAL_ANSWERS:
+\boxed{C}"
+1092,"FINAL_ANSWERS:
+\boxed{60}"
+1093,"FINAL_ANSWERS:
+\boxed{J}"
+1094,"FINAL_ANSWERS:
+\boxed{(6,7), 6}"
+1095,"FINAL_ANSWERS:
+\boxed{1}"
+1096,"FINAL_ANSWERS:
+\boxed{1540, 1353.3333333333}"
+1097,"FINAL_ANSWERS:
+\boxed{43.5558333333, 0.6890000000, 77, 15, 39}"
+1098,"FINAL_ANSWERS:
+\boxed{10/3}"
+1099,"FINAL_ANSWERS:
+\boxed{B}"
+1100,"FINAL_ANSWERS:
+\boxed{13.81963353}"
+1101,"FINAL_ANSWERS:
+\boxed{F}"
+1102,"FINAL_ANSWERS:
+\boxed{(A,B,C,D,F), (C,D,E,F,H,I), 3, 4, 4, (A,B,C,D,E)}"
+1103,"FINAL_ANSWERS:
+\boxed{5/13, -12/13, 12/13, 5/13, 123201*X**(2)+219024*Y**(2)-2217618*X+876096*Y+8884161, ellipse, (69-5*\sqrt{7})/13, (98-12*\sqrt{7})/13, (69+5*\sqrt{7})/13, (98+12*\sqrt{7})/13, 1, 12*x-5*y-26, y+1, y+1}"
+1104,"FINAL_ANSWERS:
+\boxed{A, C}"
+1105,"FINAL_ANSWERS:
+\boxed{G}"
+1106,"FINAL_ANSWERS:
+\boxed{2250/x, 264.7058823529}"
+1107,"FINAL_ANSWERS:
+\boxed{B}"
+1108,"FINAL_ANSWERS:
+\boxed{5*k**(4), 3*x**(7)}"
+1109,"FINAL_ANSWERS:
+\boxed{3/1=x/8, 24}"
+1110,"FINAL_ANSWERS:
+\boxed{C}"
+1111,"FINAL_ANSWERS:
+\boxed{2.8990, 1.6449, B, 4.0420, -2.3263, B, 2.8990, 1.9600, -1.9600, A}"
+1112,"FINAL_ANSWERS:
+\boxed{7/4,-7/4}"
+1113,"FINAL_ANSWERS:
+\boxed{0.90040415, 20.4, 2.511, 4.35, 0.90040415, 54.740569}"
+1114,"FINAL_ANSWERS:
+\boxed{64/7, 53/7}"
+1115,"FINAL_ANSWERS:
+\boxed{17.2222222222222}"
+1116,"FINAL_ANSWERS:
+\boxed{A}"
+1117,"FINAL_ANSWERS:
+\boxed{C}"
+1118,"FINAL_ANSWERS:
+\boxed{T'=\{ 1001-t|t \in T\}}"
+1119,"FINAL_ANSWERS:
+\boxed{1260, 130}"
+1120,"FINAL_ANSWERS:
+\boxed{16, 10}"
+1121,"FINAL_ANSWERS:
+\boxed{0, 10+r}"
+1122,"FINAL_ANSWERS:
+\boxed{2*pi/3+k*pi}"
+1123,"FINAL_ANSWERS:
+\boxed{24}"
+1124,"FINAL_ANSWERS:
+\boxed{5, increasing}"
+1125,"FINAL_ANSWERS:
+\boxed{D, D, A}"

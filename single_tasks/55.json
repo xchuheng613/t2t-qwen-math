@@ -1,0 +1,1 @@
+{"id": "55", "instruction": "Let $u(x)=e^{8x}$ and $v(x)=6x+6$. Find a simplified formula for the function below. $v \\big(u(x)^2 \\big)=$ [ANS] $+$ [ANS]", "output": "6*e^(16*x), 6"}

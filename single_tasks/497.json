@@ -1,0 +1,1 @@
+{"id": "497", "instruction": "Note that in general $a^b$ does not equal $a\\times b$. Evaluate the following arithmetic expressions and enter them as an integer. $4^2-4 \\times 2=$ [ANS]. $6^2-6 \\times 2=$ [ANS].", "output": "8, 24"}
