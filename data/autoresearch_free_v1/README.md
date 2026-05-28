@@ -34,7 +34,7 @@ Rows are free-response only and randomly sampled after filtering out:
 - Missing or malformed `FINAL_ANSWERS:\n\boxed{...}` targets.
 - Letter-only targets.
 - Reasoning traces longer than 700 words.
-- Answer shapes that are unstable under the local judge, including `\text{...}`, units, labels, commas, currency, and `\dfrac`.
+- Answer shapes that are unstable under the local judge, including `\text{...}`, units, labels, commas, currency, percentages, and `\dfrac`.
 
 ## Benchmark Sanity Check
 
@@ -44,6 +44,12 @@ Fresh oracle benchmark scoring was run with gold answers as predictions:
 - `holdout_benchmark.jsonl`: 1000/1000 = 100.00%
 
 The oracle results are recorded in `results/autoresearch_free_v1/summary.csv`.
+
+The 5,000-row training split was also audited with the same local judge extraction path:
+
+- flagged answer-format patterns: 0
+- extraction failures: 0
+- oracle scoring failures: 0
 
 ## Intended Use
 

@@ -103,7 +103,7 @@ def is_judge_stable_answer(answer: str) -> bool:
     """Conservative filter for benchmark rows scored by the local judge."""
     answer = str(answer).strip()
     lowered = answer.lower()
-    if "," in answer or "$" in answer or ":" in answer or "=" in answer:
+    if "," in answer or "$" in answer or ":" in answer or "=" in answer or "%" in answer:
         return False
     if any(marker in lowered for marker in ["\\text", "\\mathrm", "\\mathbf", "\\mbox", "\\dfrac"]):
         return False

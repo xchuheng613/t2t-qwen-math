@@ -2,11 +2,11 @@
   "seed": 151,
   "input": "data/hf_mixed_math_free_100k/train.jsonl",
   "input_rows": 100000,
-  "usable_rows": 43878,
+  "usable_rows": 42423,
   "oracle_score_filter": false,
   "max_reasoning_words": 700,
   "train_rows": 5000,
-  "unused_train_pool_rows": 36878,
+  "unused_train_pool_rows": 35423,
   "dev_rows": 1000,
   "holdout_rows": 1000,
   "train_parts": [
