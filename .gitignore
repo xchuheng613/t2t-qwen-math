@@ -7,3 +7,4 @@ checkpoints/
 LICENSE
 data/hf_mixed_math_100k/train.jsonl
 data/hf_mixed_math_free_100k/train.jsonl
+results_autoresearch_free.tsv

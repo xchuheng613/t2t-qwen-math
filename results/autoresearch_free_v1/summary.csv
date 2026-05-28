@@ -1,0 +1,3 @@
+run_name,prediction_path,data_path,total,correct,accuracy,mcq_correct,mcq_total,mcq_accuracy,free_correct,free_total,free_accuracy,truncation_count,no_extraction_count,count_mismatch_count,mcq_format_error_count,format_error_count,fallback_used,stage0_repair_used,postprocess_used,avg_response_chars,avg_raw_response_chars
+oracle_dev,results/autoresearch_free_v1/oracle_dev/submission.jsonl,data/autoresearch_free_v1/dev_benchmark.jsonl,1000,1000,1.000000,0,0,,1000,1000,1.000000,0,0,0,0,0,0,0,0,25.893,25.893
+oracle_holdout,results/autoresearch_free_v1/oracle_holdout/submission.jsonl,data/autoresearch_free_v1/holdout_benchmark.jsonl,1000,1000,1.000000,0,0,,1000,1000,1.000000,0,0,0,0,0,0,0,0,25.877,25.877
