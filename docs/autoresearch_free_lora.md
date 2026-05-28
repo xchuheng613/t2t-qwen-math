@@ -577,7 +577,7 @@ FREE_TRAIN_FILE=data/autoresearch_free_v1/train.jsonl
 FREE_DEV_SFT_FILE=data/autoresearch_free_v1/dev_sft.jsonl
 FREE_DEV_FILE=data/autoresearch_free_v1/dev_benchmark.jsonl
 FREE_HOLDOUT_FILE=data/autoresearch_free_v1/holdout_benchmark.jsonl
-FULL_FREE_TRAIN_FILE=data/hf_mixed_math_free_100k/train.jsonl
+FULL_FREE_TRAIN_FILE=data/autoresearch_free_full_clean/train.jsonl
 BASE_MODEL=Qwen/Qwen3-4B-Thinking-2507
 ```
 
@@ -630,15 +630,26 @@ extraction failures: 0
 oracle scoring failures: 0
 ```
 
+The final full clean training split was built from the 100k free-response source and audited with the same local judge extraction path:
+
+```text
+full clean train rows: 42402
+flagged answer-format patterns: 0
+extraction failures: 0
+oracle scoring failures: 0
+```
+
 ## Search-Then-Full-Train Policy
 
 Use `data/autoresearch_free_v1/train.jsonl` for first-stage hyperparameter search.
 
-After selecting the best simple configuration by generated dev accuracy and confirming once on holdout, retrain that configuration on the full free-response dataset:
+After selecting the best simple configuration by generated dev accuracy and confirming once on holdout, retrain that configuration on the full clean free-response dataset:
 
 ```bash
-FULL_FREE_TRAIN_FILE=data/hf_mixed_math_free_100k/train.jsonl
+FULL_FREE_TRAIN_FILE=data/autoresearch_free_full_clean/train.jsonl
 ```
+
+Do not retrain directly on `data/hf_mixed_math_free_100k/train.jsonl`; that raw 100k file contains rows with answer formats that are unstable under the local judge.
 
 ## Suggested Run Tag
 
@@ -654,4 +665,3 @@ Before creating it, verify it does not already exist:
 git branch --list "autoresearch/free-may27"
 git ls-remote --heads origin "autoresearch/free-may27"
 ```
-

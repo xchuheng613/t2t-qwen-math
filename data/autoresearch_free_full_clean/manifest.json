@@ -1,0 +1,18 @@
+{
+  "seed": 151,
+  "input": "data/hf_mixed_math_free_100k/train.jsonl",
+  "input_rows": 100000,
+  "usable_rows": 42402,
+  "oracle_score_filter": false,
+  "max_reasoning_words": 700,
+  "train_rows": 42402,
+  "use_all_train": true,
+  "unused_train_pool_rows": 0,
+  "dev_rows": 0,
+  "holdout_rows": 0,
+  "train_parts": [
+    "train_parts/train-0000.jsonl",
+    "train_parts/train-0001.jsonl"
+  ],
+  "notes": "Free-response only. Dev/holdout are random rows held out from training."
+}

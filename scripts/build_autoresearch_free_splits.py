@@ -103,9 +103,9 @@ def is_judge_stable_answer(answer: str) -> bool:
     """Conservative filter for benchmark rows scored by the local judge."""
     answer = str(answer).strip()
     lowered = answer.lower()
-    if "," in answer or "$" in answer or ":" in answer or "=" in answer or "%" in answer:
+    if any(ch in answer for ch in [",", "，", "$", ":", "：", "=", "%", "∃", "∈", "∉"]):
         return False
-    if any(marker in lowered for marker in ["\\text", "\\mathrm", "\\mathbf", "\\mbox", "\\dfrac"]):
+    if any(marker in lowered for marker in ["\\text", "\\mathrm", "\\mathbf", "\\mbox", "\\dfrac", "\\tfrac"]):
         return False
     if re.search(r"\b(inches?|feet|meters?|cm|hours?|minutes?|seconds?|dollars?|units?)\b", lowered):
         return False
@@ -186,6 +186,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--dev-size", type=int, default=1000)
     parser.add_argument("--holdout-size", type=int, default=1000)
     parser.add_argument("--train-size", type=int, default=5000)
+    parser.add_argument(
+        "--use-all-train",
+        action="store_true",
+        help="Use every remaining usable row for training after dev/holdout are removed.",
+    )
     parser.add_argument("--max-reasoning-words", type=int, default=700)
     parser.add_argument("--no-oracle-score-filter", action="store_true")
     parser.add_argument("--part-size", type=int, default=25000)
@@ -199,7 +204,7 @@ def main() -> None:
     if not args.no_oracle_score_filter:
         judger = Judger(strict_extract=False)
         usable = [row for idx, row in enumerate(usable) if is_oracle_scoreable(row, judger, idx)]
-    needed = args.train_size + args.dev_size + args.holdout_size
+    needed = args.dev_size + args.holdout_size if args.use_all_train else args.train_size + args.dev_size + args.holdout_size
     if len(usable) <= needed:
         raise SystemExit(f"not enough usable rows: {len(usable)} <= {needed}")
 
@@ -209,7 +214,7 @@ def main() -> None:
     dev = usable[: args.dev_size]
     holdout = usable[args.dev_size : args.dev_size + args.holdout_size]
     train_pool = usable[args.dev_size + args.holdout_size :]
-    train = train_pool[: args.train_size]
+    train = train_pool if args.use_all_train else train_pool[: args.train_size]
     rng.shuffle(train)
 
     args.out_dir.mkdir(parents=True, exist_ok=True)
@@ -234,6 +239,7 @@ def main() -> None:
         "oracle_score_filter": not args.no_oracle_score_filter,
         "max_reasoning_words": args.max_reasoning_words,
         "train_rows": len(train),
+        "use_all_train": args.use_all_train,
         "unused_train_pool_rows": len(train_pool) - len(train),
         "dev_rows": len(dev),
         "holdout_rows": len(holdout),
