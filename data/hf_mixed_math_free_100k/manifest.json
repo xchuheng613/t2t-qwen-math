@@ -1,0 +1,19 @@
+{
+  "seed": 151,
+  "requested_counts": {
+    "AI-MO/NuminaMath-CoT": 75000,
+    "EleutherAI/hendrycks_math": 12000,
+    "allenai/math_qa": 0,
+    "microsoft/orca-math-word-problems-200k": 13000
+  },
+  "free_only": true,
+  "train_rows": 100000,
+  "dev_rows": 0,
+  "train_source_counts": {
+    "AI-MO/NuminaMath-CoT": 75000,
+    "microsoft/orca-math-word-problems-200k": 13000,
+    "EleutherAI/hendrycks_math": 12000
+  },
+  "dev_source_counts": {},
+  "format": "messages JSONL"
+}
