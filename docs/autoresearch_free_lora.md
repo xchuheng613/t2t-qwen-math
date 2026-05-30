@@ -573,11 +573,11 @@ If no LoRA model beats the base model on holdout, keep the base model and focus 
 Use these concrete files for the first AutoResearch stage:
 
 ```bash
-FREE_TRAIN_FILE=data/autoresearch_free_v1/train.jsonl
+FREE_TRAIN_FILE=data/autoresearch_free_concise_v2/search/train.jsonl
 FREE_DEV_SFT_FILE=data/autoresearch_free_v1/dev_sft.jsonl
 FREE_DEV_FILE=data/autoresearch_free_v1/dev_benchmark.jsonl
 FREE_HOLDOUT_FILE=data/autoresearch_free_v1/holdout_benchmark.jsonl
-FULL_FREE_TRAIN_FILE=data/autoresearch_free_full_clean/train.jsonl
+FULL_FREE_TRAIN_FILE=data/autoresearch_free_concise_v2/full/train.jsonl
 BASE_MODEL=Qwen/Qwen3-4B-Thinking-2507
 ```
 
@@ -604,6 +604,9 @@ COMMON_POST="--routing-mode legacy \
   --prompt-module prompts.compact_prompt_pack \
   --free-prompt compact \
   --free-config greedy_n1 \
+  --max-tokens 4096 \
+  --dynamic-free-continuation \
+  --dynamic-free-max-tokens 32768 \
   --stage0-postprocess \
   --normalize-free-final-answers \
   --rank-free-samples"
@@ -639,29 +642,40 @@ extraction failures: 0
 oracle scoring failures: 0
 ```
 
+The May 29 concise replacement dataset should be preferred for new experiments because the previous training traces were too verbose for the 4B model:
+
+```text
+search train rows: 10000
+full train rows: 50000
+avg reasoning words: about 123
+max reasoning words: 400
+bad_schema: 0
+oracle_fail: 0
+```
+
 ## Search-Then-Full-Train Policy
 
-Use `data/autoresearch_free_v1/train.jsonl` for first-stage hyperparameter search.
+Use `data/autoresearch_free_concise_v2/search/train.jsonl` for first-stage hyperparameter search.
 
 After selecting the best simple configuration by generated dev accuracy and confirming once on holdout, retrain that configuration on the full clean free-response dataset:
 
 ```bash
-FULL_FREE_TRAIN_FILE=data/autoresearch_free_full_clean/train.jsonl
+FULL_FREE_TRAIN_FILE=data/autoresearch_free_concise_v2/full/train.jsonl
 ```
 
-Do not retrain directly on `data/hf_mixed_math_free_100k/train.jsonl`; that raw 100k file contains rows with answer formats that are unstable under the local judge.
+Do not retrain directly on `data/hf_mixed_math_free_100k/train.jsonl`; that raw 100k file contains rows with answer formats that are unstable under the local judge and reasoning traces that can encourage overthinking.
 
 ## Suggested Run Tag
 
 Suggested fresh branch tag for the actual AutoResearch loop:
 
 ```bash
-autoresearch/free-may27
+autoresearch/free-may29
 ```
 
 Before creating it, verify it does not already exist:
 
 ```bash
-git branch --list "autoresearch/free-may27"
-git ls-remote --heads origin "autoresearch/free-may27"
+git branch --list "autoresearch/free-may29"
+git ls-remote --heads origin "autoresearch/free-may29"
 ```

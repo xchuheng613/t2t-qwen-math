@@ -1,0 +1,26 @@
+{
+  "seed": 529,
+  "source_counts": {
+    "numina": 33500,
+    "hendrycks_math": 8000,
+    "gsm8k": 8500
+  },
+  "max_reasoning_words_filter": 400,
+  "excluded_eval_files": [
+    "data/autoresearch_free_v1/dev_benchmark.jsonl",
+    "data/autoresearch_free_v1/holdout_benchmark.jsonl"
+  ],
+  "excluded_eval_question_count": 1998,
+  "train_rows": 50000,
+  "train_parts": [
+    "train_parts/train-0000.jsonl",
+    "train_parts/train-0001.jsonl"
+  ],
+  "audit": {
+    "rows": 50000,
+    "bad_schema": 0,
+    "oracle_fail": 0,
+    "avg_reasoning_words": 123.22,
+    "max_reasoning_words": 400
+  }
+}

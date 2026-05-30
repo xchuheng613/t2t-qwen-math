@@ -717,6 +717,8 @@ def generate_legacy_group(
     max_model_len: int = 32768,
     context_safety_margin: int = 512,
     enable_stage0_postprocess: bool = True,
+    dynamic_free_continuation: bool = False,
+    dynamic_free_max_tokens: int = 32768,
 ) -> list[dict[str, Any]]:
     from tqdm import tqdm
     from vllm import SamplingParams
@@ -803,20 +805,53 @@ def generate_legacy_group(
         records.append(record)
 
     if fallback_indices:
-        unresolved = _run_fallback_stage(
-            llm,
-            tokenizer,
-            judger,
-            prompt_name,
-            records,
-            items,
-            routes,
-            fallback_indices,
-            prompt_module,
-            stage="continuation",
-            max_tokens=fallback_max_tokens,
-            tail_tokens=fallback_tail_tokens,
-        )
+        unresolved: list[int] = []
+        if dynamic_free_continuation:
+            dynamic_indices: list[int] = []
+            non_dynamic_indices: list[int] = []
+            for idx in fallback_indices:
+                route = routes[idx]
+                finishes = records[idx].get("finish_reasons") or []
+                chosen_idx = int(records[idx].get("chosen_idx") or 0)
+                finish = finishes[chosen_idx] if chosen_idx < len(finishes) else None
+                if route.format_type == FORMAT_FREE_RESPONSE and str(finish).lower() == "length":
+                    dynamic_indices.append(idx)
+                else:
+                    non_dynamic_indices.append(idx)
+
+            token_budget = max_tokens * 2
+            while dynamic_indices and token_budget <= dynamic_free_max_tokens:
+                dynamic_indices = _run_fallback_stage(
+                    llm,
+                    tokenizer,
+                    judger,
+                    prompt_name,
+                    records,
+                    items,
+                    routes,
+                    dynamic_indices,
+                    prompt_module,
+                    stage="continuation",
+                    max_tokens=token_budget,
+                    tail_tokens=fallback_tail_tokens,
+                )
+                token_budget *= 2
+            unresolved = non_dynamic_indices + dynamic_indices
+        else:
+            unresolved = _run_fallback_stage(
+                llm,
+                tokenizer,
+                judger,
+                prompt_name,
+                records,
+                items,
+                routes,
+                fallback_indices,
+                prompt_module,
+                stage="continuation",
+                max_tokens=fallback_max_tokens,
+                tail_tokens=fallback_tail_tokens,
+            )
         unresolved = _run_fallback_stage(
             llm,
             tokenizer,
@@ -1031,6 +1066,8 @@ def run_hybrid_submission(args: argparse.Namespace, rows: list[dict[str, Any]]) 
             max_model_len=args.max_model_len,
             context_safety_margin=args.context_safety_margin,
             enable_stage0_postprocess=args.stage0_postprocess,
+            dynamic_free_continuation=args.dynamic_free_continuation,
+            dynamic_free_max_tokens=args.dynamic_free_max_tokens,
         )
         for record in free_records:
             record.update(
@@ -1087,6 +1124,8 @@ def run_legacy_submission(args: argparse.Namespace, rows: list[dict[str, Any]]) 
                 max_model_len=args.max_model_len,
                 context_safety_margin=args.context_safety_margin,
                 enable_stage0_postprocess=args.stage0_postprocess,
+                dynamic_free_continuation=args.dynamic_free_continuation,
+                dynamic_free_max_tokens=args.dynamic_free_max_tokens,
             )
         )
     return records
@@ -1134,6 +1173,17 @@ def parse_args() -> argparse.Namespace:
         help="After staged fallback fails, rerun unresolved rows with a larger dynamic generation budget.",
     )
     parser.add_argument("--high-budget-max-tokens", type=int, default=32768)
+    parser.add_argument(
+        "--dynamic-free-continuation",
+        action="store_true",
+        help=(
+            "For legacy/hybrid free-response rows only: when the first generation "
+            "truncates and no final answer can be recovered, continue from the "
+            "previous reasoning with doubled token budgets until resolved or "
+            "--dynamic-free-max-tokens is reached."
+        ),
+    )
+    parser.add_argument("--dynamic-free-max-tokens", type=int, default=32768)
     parser.add_argument("--context-safety-margin", type=int, default=512)
     parser.add_argument("--no-fallback", action="store_true")
     parser.add_argument("--no-repair", action="store_true")

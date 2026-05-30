@@ -1,0 +1,25 @@
+{
+  "seed": 529,
+  "source_counts": {
+    "AI-MO/NuminaMath-CoT": 6701,
+    "openai/gsm8k": 1693,
+    "EleutherAI/hendrycks_math": 1606
+  },
+  "max_reasoning_words_filter": 400,
+  "excluded_eval_files": [
+    "data/autoresearch_free_v1/dev_benchmark.jsonl",
+    "data/autoresearch_free_v1/holdout_benchmark.jsonl"
+  ],
+  "excluded_eval_question_count": 1998,
+  "train_rows": 10000,
+  "train_parts": [
+    "train_parts/train-0000.jsonl"
+  ],
+  "audit": {
+    "rows": 10000,
+    "bad_schema": 0,
+    "oracle_fail": 0,
+    "avg_reasoning_words": 123.29,
+    "max_reasoning_words": 400
+  }
+}

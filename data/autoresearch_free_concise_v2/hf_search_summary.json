@@ -1,0 +1,10 @@
+{
+  "local_sample_seed": 529,
+  "decision": "Use concise-filtered AI-MO/NuminaMath-CoT, EleutherAI/hendrycks_math, and openai/gsm8k. Exclude Orca because final answers are not reliably extractable from raw rows despite concise reasoning.",
+  "full_counts": {
+    "numina": 33500,
+    "hendrycks_math": 8000,
+    "gsm8k": 8500
+  },
+  "reasoning_cap_words": 400
+}
