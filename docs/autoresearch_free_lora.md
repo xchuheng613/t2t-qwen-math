@@ -717,7 +717,44 @@ Interpretation:
 
 Use the new concise dataset and dynamic free-response continuation before trying more complex LoRA changes.
 
-Start with these runs:
+Because the May 29 setup changes both the prompt and the inference token policy, the May 27 base-model score is no longer the active baseline. Rerun the base model first with the May 29 `COMMON_POST` flags before training any LoRA. Use this new generated-answer score as the reference for all May 29 LoRA decisions.
+
+Baseline run names:
+
+```text
+M29-BASE-dev:     base_qwen3_4b_thinking_2507_may29_dynamic_dev
+M29-BASE-holdout: base_qwen3_4b_thinking_2507_may29_dynamic_holdout
+```
+
+Example baseline commands:
+
+```bash
+python scripts/create_submission.py \
+  --model "$BASE_MODEL" \
+  --data-path "$FREE_DEV_FILE" \
+  --output-dir "results/autoresearch/base_qwen3_4b_thinking_2507_may29_dynamic_dev" \
+  $COMMON_POST
+
+python scripts/score_benchmark.py \
+  "results/autoresearch/base_qwen3_4b_thinking_2507_may29_dynamic_dev" \
+  --data-path "$FREE_DEV_FILE" \
+  --name "base_qwen3_4b_thinking_2507_may29_dynamic_dev" \
+  --summary-csv "results/autoresearch/summary.csv"
+
+python scripts/create_submission.py \
+  --model "$BASE_MODEL" \
+  --data-path "$FREE_HOLDOUT_FILE" \
+  --output-dir "results/autoresearch/base_qwen3_4b_thinking_2507_may29_dynamic_holdout" \
+  $COMMON_POST
+
+python scripts/score_benchmark.py \
+  "results/autoresearch/base_qwen3_4b_thinking_2507_may29_dynamic_holdout" \
+  --data-path "$FREE_HOLDOUT_FILE" \
+  --name "base_qwen3_4b_thinking_2507_may29_dynamic_holdout" \
+  --summary-csv "results/autoresearch/summary.csv"
+```
+
+After the May 29 baseline is recorded, start with these LoRA runs:
 
 ```text
 M29-A: rank=8,  alpha=16, dropout=0.0,  lr=2e-5, epochs=1, effective_batch=32, max_seq=4096, attention_mlp
@@ -752,7 +789,7 @@ The expected behavior is:
 4. If still truncated/unresolved, continue with 32768.
 5. Do not restart the solution during continuation retries.
 
-Stop this May 29 dataset line if none of M29-A through M29-D improves dev over the base and May 27 best-dev reference. Only evaluate holdout for a run that beats dev by a meaningful margin and does not increase truncation/format errors.
+Stop this May 29 dataset line if none of M29-A through M29-D improves dev over the May 29 rerun baseline. Treat the May 27 best-dev result as context only, because it used the older prompt/inference condition and older training data. Only evaluate holdout for a LoRA run that beats the May 29 baseline dev score by a meaningful margin and does not increase truncation, format errors, count mismatch, or average response length instability.
 
 ## Suggested Run Tag
 
