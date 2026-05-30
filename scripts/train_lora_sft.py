@@ -116,7 +116,7 @@ def tokenize_assistant_only_dataset(dataset: Any, tokenizer: Any, max_length: in
         messages = example.get("messages")
         if not messages:
             text = str(example.get("text", ""))
-            if tokenizer.eos_token and not text.endswith(tokenizer.eos_token):
+            if tokenizer.eos_token and not text.rstrip().endswith(tokenizer.eos_token):
                 text += tokenizer.eos_token
             input_ids = _tokenize_text(tokenizer, text)
             return {
@@ -136,7 +136,7 @@ def tokenize_assistant_only_dataset(dataset: Any, tokenizer: Any, max_length: in
             tokenize=False,
             add_generation_prompt=False,
         )
-        if tokenizer.eos_token and not full_text.endswith(tokenizer.eos_token):
+        if tokenizer.eos_token and not full_text.rstrip().endswith(tokenizer.eos_token):
             full_text += tokenizer.eos_token
 
         if full_text.startswith(prompt_text):
@@ -179,7 +179,7 @@ def flatten_messages_dataset(dataset: Any, tokenizer: Any) -> Any:
             )
         else:
             text = str(example.get("text", ""))
-        if tokenizer.eos_token and not text.endswith(tokenizer.eos_token):
+        if tokenizer.eos_token and not text.rstrip().endswith(tokenizer.eos_token):
             text += tokenizer.eos_token
         return {"text": text}
 
