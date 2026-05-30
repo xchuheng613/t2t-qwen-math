@@ -665,6 +665,95 @@ FULL_FREE_TRAIN_FILE=data/autoresearch_free_concise_v2/full/train.jsonl
 
 Do not retrain directly on `data/hf_mixed_math_free_100k/train.jsonl`; that raw 100k file contains rows with answer formats that are unstable under the local judge and reasoning traces that can encourage overthinking.
 
+## May 27 Hyperparameter Evidence
+
+Previous AutoResearch runs used the older, messier free-response dataset. They are still useful for deciding what not to repeat.
+
+Base model reference on the fixed 1,000-row free-response benchmark:
+
+```text
+dev:     726/1000 = 72.6%
+holdout: 747/1000 = 74.7%
+```
+
+Best confirmed holdout LoRA from May 27:
+
+```text
+Config A holdout: 748/1000 = 74.8%
+```
+
+This is only +1 question over base, so it is not a strong win.
+
+May 27 dev results:
+
+```text
+config_a_rank8_alpha16_dropout0p05_lr2e-5:        735/1000 = 73.5%
+config_b_rank16_alpha32_dropout0p05_lr2e-5:       718/1000 = 71.8%
+config_c_rank16_alpha32_dropout0p05_lr5e-5:       611/1000 = 61.1%
+config_d_rank32_alpha64_dropout0p05_lr2e-5:       653/1000 = 65.3%
+attention_only:                                   722/1000 = 72.2%
+dropout0p1:                                       738/1000 = 73.8%
+dropout0p0:                                       741/1000 = 74.1%
+batch64_dropout0p0:                               728/1000 = 72.8%
+lr1e-5_dropout0p0:                                726/1000 = 72.6%
+maxseq8192_dropout0p0:                            730/1000 = 73.0%
+warmup0p05_dropout0p0:                            731/1000 = 73.1%
+weight_decay0p01_dropout0p0:                      736/1000 = 73.6%
+reasoning_le200_dropout0p0:                       725/1000 = 72.5%
+medium_only_epoch2_dropout0p0:                    732/1000 = 73.2%
+plain_numeric_dropout0p0:                         739/1000 = 73.9%
+rank4_dropout0p0:                                 730/1000 = 73.0%
+```
+
+Interpretation:
+
+- Aggressive capacity or learning rate hurt badly: rank 32 / alpha 64 and LR `5e-5` were clear regressions.
+- Dropout `0.0` looked best on dev among the May 27 runs.
+- Rank 8 / alpha 16 was the only setting tested on holdout and only improved by one question.
+- Increasing batch size, max sequence length, warmup, weight decay, and two-epoch medium-only data did not produce a clear improvement.
+- The old dataset increased raw response length and likely encouraged overthinking. The May 29 concise dataset is intended to test whether cleaner, shorter traces fix that failure mode.
+
+## May 29 Recommended Program
+
+Use the new concise dataset and dynamic free-response continuation before trying more complex LoRA changes.
+
+Start with these runs:
+
+```text
+M29-A: rank=8,  alpha=16, dropout=0.0,  lr=2e-5, epochs=1, effective_batch=32, max_seq=4096, attention_mlp
+M29-B: rank=8,  alpha=16, dropout=0.05, lr=2e-5, epochs=1, effective_batch=32, max_seq=4096, attention_mlp
+M29-C: rank=16, alpha=32, dropout=0.0,  lr=2e-5, epochs=1, effective_batch=32, max_seq=4096, attention_mlp
+M29-D: rank=8,  alpha=16, dropout=0.0,  lr=1e-5, epochs=1, effective_batch=32, max_seq=4096, attention_mlp
+```
+
+Avoid these unless the new concise dataset clearly changes the trend:
+
+```text
+lr=5e-5
+rank=32 / alpha=64
+epochs=2+
+effective_batch=64
+max_seq_length=8192 for training
+```
+
+For evaluation, keep the generation budget adaptive:
+
+```bash
+--max-tokens 4096 \
+--dynamic-free-continuation \
+--dynamic-free-max-tokens 32768
+```
+
+The expected behavior is:
+
+1. Try 4096 output tokens first.
+2. If the output truncates and no final answer can be recovered, continue from the previous reasoning with 8192 tokens.
+3. If still truncated/unresolved, continue with 16384.
+4. If still truncated/unresolved, continue with 32768.
+5. Do not restart the solution during continuation retries.
+
+Stop this May 29 dataset line if none of M29-A through M29-D improves dev over the base and May 27 best-dev reference. Only evaluate holdout for a run that beats dev by a meaningful margin and does not increase truncation/format errors.
+
 ## Suggested Run Tag
 
 Suggested fresh branch tag for the actual AutoResearch loop:
