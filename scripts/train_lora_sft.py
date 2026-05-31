@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import inspect
 import json
+import sys
 from pathlib import Path
 from typing import Any
 
@@ -15,6 +16,9 @@ from peft import LoraConfig, prepare_model_for_kbit_training
 from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 from trl import SFTConfig, SFTTrainer
 
+
+ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT))
 
 DEFAULT_HF_SYSTEM_PROMPT = """Solve the math problem. Reason carefully and end with a final boxed answer."""
 
@@ -74,6 +78,22 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--hf-eval-split", default="", help="Optional explicit HF eval split. If omitted, split eval rows from train.")
     parser.add_argument("--hf-eval-size", type=int, default=256, help="Eval rows held out from the HF train split when --hf-eval-split is omitted.")
     parser.add_argument("--hf-eval-seed", type=int, default=529)
+    parser.add_argument(
+        "--hf-local-eval-file",
+        default="",
+        help=(
+            "Optional local JSONL eval file to use with --hf-dataset instead of "
+            "an HF eval split/holdout. Supports message/text SFT rows or public "
+            "benchmark rows with question/answer fields."
+        ),
+    )
+    parser.add_argument(
+        "--hf-local-eval-format",
+        choices=["auto", "messages", "public"],
+        default="auto",
+        help="Schema for --hf-local-eval-file. 'auto' uses messages/text if present, else question/answer.",
+    )
+    parser.add_argument("--hf-local-eval-prompt", default="compact")
     parser.add_argument("--hf-problem-field", default="problem")
     parser.add_argument("--hf-solution-field", default="solution")
     parser.add_argument("--hf-system-prompt", default=DEFAULT_HF_SYSTEM_PROMPT)
@@ -142,6 +162,12 @@ def _clean_text(value: Any) -> str:
     return "" if value is None else str(value).strip()
 
 
+def _answer_values(row: dict[str, Any]) -> list[str]:
+    answer = row.get("answer", row.get("answers", row.get("gold")))
+    values = answer if isinstance(answer, list) else [answer]
+    return [_clean_text(value) for value in values]
+
+
 def problem_solution_to_messages(dataset: Any, args: argparse.Namespace) -> Any:
     """Convert HF rows with problem/solution fields to the chat-message schema."""
 
@@ -163,10 +189,48 @@ def problem_solution_to_messages(dataset: Any, args: argparse.Namespace) -> Any:
     return dataset.map(format_row, remove_columns=dataset.column_names)
 
 
+def public_eval_to_messages(dataset: Any, args: argparse.Namespace) -> Any:
+    """Convert public benchmark rows to compact-prompt eval messages."""
+    from prompts.compact_prompt_pack import build_routed_prompt, rebuild_final_response
+
+    def format_row(example: dict[str, Any]) -> dict[str, list[dict[str, str]]]:
+        question = _clean_text(example.get("question", example.get(args.hf_problem_field)))
+        answers = _answer_values(example)
+        options = example.get("options") or None
+        if not question or not answers or any(answer == "" for answer in answers):
+            row_id = example.get("id", "<unknown>")
+            raise ValueError(f"Local eval row {row_id} is missing a non-empty question or answer.")
+        system, user = build_routed_prompt(args.hf_local_eval_prompt, question, options)
+        return {
+            "messages": [
+                {"role": "system", "content": system},
+                {"role": "user", "content": user},
+                {"role": "assistant", "content": rebuild_final_response(answers, question)},
+            ]
+        }
+
+    return dataset.map(format_row, remove_columns=dataset.column_names)
+
+
+def load_local_eval_dataset(args: argparse.Namespace) -> Any:
+    dataset = load_dataset("json", data_files=args.hf_local_eval_file, split="train")
+    if args.hf_local_eval_format == "messages":
+        return dataset
+    if args.hf_local_eval_format == "auto" and (
+        "messages" in dataset.column_names or "text" in dataset.column_names
+    ):
+        return dataset
+    return public_eval_to_messages(dataset, args)
+
+
 def load_train_eval_datasets(args: argparse.Namespace) -> tuple[Any, Any]:
     if args.hf_dataset:
         train_dataset = load_dataset(args.hf_dataset, split=args.hf_train_split)
-        if args.hf_eval_split:
+        eval_is_local = False
+        if args.hf_local_eval_file:
+            eval_dataset = load_local_eval_dataset(args)
+            eval_is_local = True
+        elif args.hf_eval_split:
             eval_dataset = load_dataset(args.hf_dataset, split=args.hf_eval_split)
         elif args.hf_eval_size > 0:
             if len(train_dataset) <= args.hf_eval_size:
@@ -181,7 +245,7 @@ def load_train_eval_datasets(args: argparse.Namespace) -> tuple[Any, Any]:
         else:
             eval_dataset = None
         train_dataset = problem_solution_to_messages(train_dataset, args)
-        if eval_dataset is not None:
+        if eval_dataset is not None and not eval_is_local:
             eval_dataset = problem_solution_to_messages(eval_dataset, args)
         return train_dataset, eval_dataset
 
@@ -314,7 +378,14 @@ def write_training_manifest(args: argparse.Namespace, train_dataset: Any, eval_d
         "hf_dataset": args.hf_dataset or None,
         "hf_train_split": args.hf_train_split if args.hf_dataset else None,
         "hf_eval_split": args.hf_eval_split or None,
-        "hf_eval_size": args.hf_eval_size if args.hf_dataset and not args.hf_eval_split else None,
+        "hf_eval_size": (
+            args.hf_eval_size
+            if args.hf_dataset and not args.hf_eval_split and not args.hf_local_eval_file
+            else None
+        ),
+        "hf_local_eval_file": args.hf_local_eval_file or None,
+        "hf_local_eval_format": args.hf_local_eval_format if args.hf_local_eval_file else None,
+        "hf_local_eval_prompt": args.hf_local_eval_prompt if args.hf_local_eval_file else None,
         "train_rows": len(train_dataset),
         "eval_rows": len(eval_dataset) if eval_dataset is not None else 0,
         "max_seq_length": args.max_seq_length,

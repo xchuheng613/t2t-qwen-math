@@ -28,6 +28,9 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--batch-size", type=int, default=1)
     parser.add_argument("--grad-accum", type=int, default=8)
     parser.add_argument("--eval-size", type=int, default=256)
+    parser.add_argument("--local-eval-file", default="")
+    parser.add_argument("--local-eval-format", choices=["auto", "messages", "public"], default="auto")
+    parser.add_argument("--local-eval-prompt", default="compact")
     parser.add_argument("--eval-strategy", choices=["no", "steps", "epoch"], default="epoch")
     parser.add_argument("--logging-steps", type=int, default=10)
     parser.add_argument("--eval-steps", type=int, default=50)
@@ -100,11 +103,24 @@ def build_command(args: argparse.Namespace) -> list[str]:
         str(args.logging_steps),
         "--eval-steps",
         str(args.eval_steps),
-        "--hf-eval-size",
-        str(args.eval_size),
         "--target-modules",
         *ALL_TARGETS,
     ]
+    if args.local_eval_file:
+        cmd.extend(
+            [
+                "--hf-local-eval-file",
+                args.local_eval_file,
+                "--hf-local-eval-format",
+                args.local_eval_format,
+                "--hf-local-eval-prompt",
+                args.local_eval_prompt,
+                "--hf-eval-size",
+                "0",
+            ]
+        )
+    else:
+        cmd.extend(["--hf-eval-size", str(args.eval_size)])
     if resume_checkpoint:
         cmd.extend(["--resume-from-checkpoint", resume_checkpoint])
     return cmd
