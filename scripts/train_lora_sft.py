@@ -1,18 +1,22 @@
 #!/usr/bin/env python3
-"""Train a small LoRA SFT adapter on compact-prompt JSONL data."""
+"""Train a small LoRA SFT adapter on JSONL or Hugging Face SFT data."""
 
 from __future__ import annotations
 
 import argparse
 import inspect
+import json
 from pathlib import Path
 from typing import Any
 
 import torch
 from datasets import load_dataset
-from peft import LoraConfig
-from transformers import AutoModelForCausalLM, AutoTokenizer
+from peft import LoraConfig, prepare_model_for_kbit_training
+from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 from trl import SFTConfig, SFTTrainer
+
+
+DEFAULT_HF_SYSTEM_PROMPT = """Solve the math problem. Reason carefully and end with a final boxed answer."""
 
 
 def supported_kwargs(cls: type[Any], kwargs: dict[str, Any]) -> dict[str, Any]:
@@ -44,16 +48,19 @@ def build_sft_config(args: argparse.Namespace) -> SFTConfig:
         "logging_steps": args.logging_steps,
         "eval_steps": args.eval_steps,
         "save_steps": args.save_steps,
-        "eval_strategy": "steps",
-        "evaluation_strategy": "steps",
-        "save_strategy": "steps",
+        "eval_strategy": args.eval_strategy,
+        "evaluation_strategy": args.eval_strategy,
+        "save_strategy": args.save_strategy,
         "bf16": args.bf16,
         "fp16": args.fp16,
-        "gradient_checkpointing": True,
+        "gradient_checkpointing": args.gradient_checkpointing,
+        "gradient_checkpointing_kwargs": {"use_reentrant": False},
         "assistant_only_loss": assistant_only_loss,
         "report_to": "none",
         "packing": False,
     }
+    if args.save_total_limit > 0:
+        kwargs["save_total_limit"] = args.save_total_limit
     return SFTConfig(**supported_kwargs(SFTConfig, kwargs))
 
 
@@ -62,6 +69,14 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--model", default="Qwen/Qwen3-4B-Thinking-2507")
     parser.add_argument("--train-file", default="data/sft_free_v1/train.jsonl")
     parser.add_argument("--eval-file", default="data/sft_free_v1/dev.jsonl")
+    parser.add_argument("--hf-dataset", default="", help="Optional Hugging Face dataset ID to load instead of JSONL files.")
+    parser.add_argument("--hf-train-split", default="train")
+    parser.add_argument("--hf-eval-split", default="", help="Optional explicit HF eval split. If omitted, split eval rows from train.")
+    parser.add_argument("--hf-eval-size", type=int, default=256, help="Eval rows held out from the HF train split when --hf-eval-split is omitted.")
+    parser.add_argument("--hf-eval-seed", type=int, default=529)
+    parser.add_argument("--hf-problem-field", default="problem")
+    parser.add_argument("--hf-solution-field", default="solution")
+    parser.add_argument("--hf-system-prompt", default=DEFAULT_HF_SYSTEM_PROMPT)
     parser.add_argument("--output-dir", default="checkpoints/qwen3_4b_free_lora_v1")
     parser.add_argument("--max-seq-length", type=int, default=4096)
     parser.add_argument("--epochs", type=float, default=1.0)
@@ -82,12 +97,26 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--grad-accum", type=int, default=16)
     parser.add_argument("--batch-size", type=int, default=1)
+    parser.add_argument("--gradient-checkpointing", action=argparse.BooleanOptionalAction, default=True)
     parser.add_argument("--logging-steps", type=int, default=10)
     parser.add_argument("--eval-steps", type=int, default=50)
     parser.add_argument("--save-steps", type=int, default=50)
+    parser.add_argument("--eval-strategy", choices=["no", "steps", "epoch"], default="steps")
+    parser.add_argument("--save-strategy", choices=["no", "steps", "epoch"], default="steps")
+    parser.add_argument("--save-total-limit", type=int, default=0)
     parser.add_argument("--limit-train", type=int, default=0)
     parser.add_argument("--limit-eval", type=int, default=0)
     parser.add_argument("--max-steps", type=int, default=-1)
+    parser.add_argument("--resume-from-checkpoint", default="", help="Resume trainer state from a checkpoint directory.")
+    parser.add_argument("--quantization-bit", type=int, choices=[0, 4, 8], default=0)
+    parser.add_argument("--bnb-4bit-quant-type", default="nf4")
+    parser.add_argument("--bnb-4bit-use-double-quant", action=argparse.BooleanOptionalAction, default=True)
+    parser.add_argument(
+        "--attn-implementation",
+        default="",
+        choices=["", "eager", "sdpa", "flash_attention_2", "fa2"],
+        help="Attention backend passed to transformers. Use fa2 for flash_attention_2.",
+    )
     parser.add_argument("--fp16", action="store_true")
     parser.add_argument("--bf16", action=argparse.BooleanOptionalAction, default=True)
     parser.add_argument("--assistant-only-loss", action=argparse.BooleanOptionalAction, default=True)
@@ -107,6 +136,60 @@ def _tokenize_text(tokenizer: Any, text: str) -> list[int]:
 def _tokenize_with_offsets(tokenizer: Any, text: str) -> tuple[list[int], list[tuple[int, int]]]:
     encoded = tokenizer(text, add_special_tokens=False, return_offsets_mapping=True)
     return encoded["input_ids"], encoded["offset_mapping"]
+
+
+def _clean_text(value: Any) -> str:
+    return "" if value is None else str(value).strip()
+
+
+def problem_solution_to_messages(dataset: Any, args: argparse.Namespace) -> Any:
+    """Convert HF rows with problem/solution fields to the chat-message schema."""
+
+    def format_row(example: dict[str, Any]) -> dict[str, list[dict[str, str]]]:
+        problem = _clean_text(example.get(args.hf_problem_field))
+        solution = _clean_text(example.get(args.hf_solution_field))
+        if not problem or not solution:
+            raise ValueError(
+                f"HF row is missing non-empty {args.hf_problem_field!r} or {args.hf_solution_field!r}."
+            )
+        return {
+            "messages": [
+                {"role": "system", "content": args.hf_system_prompt},
+                {"role": "user", "content": problem},
+                {"role": "assistant", "content": solution},
+            ]
+        }
+
+    return dataset.map(format_row, remove_columns=dataset.column_names)
+
+
+def load_train_eval_datasets(args: argparse.Namespace) -> tuple[Any, Any]:
+    if args.hf_dataset:
+        train_dataset = load_dataset(args.hf_dataset, split=args.hf_train_split)
+        if args.hf_eval_split:
+            eval_dataset = load_dataset(args.hf_dataset, split=args.hf_eval_split)
+        elif args.hf_eval_size > 0:
+            if len(train_dataset) <= args.hf_eval_size:
+                raise ValueError("--hf-eval-size must be smaller than the HF train split.")
+            split = train_dataset.train_test_split(
+                test_size=args.hf_eval_size,
+                seed=args.hf_eval_seed,
+                shuffle=True,
+            )
+            train_dataset = split["train"]
+            eval_dataset = split["test"]
+        else:
+            eval_dataset = None
+        train_dataset = problem_solution_to_messages(train_dataset, args)
+        if eval_dataset is not None:
+            eval_dataset = problem_solution_to_messages(eval_dataset, args)
+        return train_dataset, eval_dataset
+
+    train_dataset = load_dataset("json", data_files=args.train_file, split="train")
+    eval_dataset = None
+    if args.eval_strategy != "no":
+        eval_dataset = load_dataset("json", data_files=args.eval_file, split="train")
+    return train_dataset, eval_dataset
 
 
 def tokenize_assistant_only_dataset(dataset: Any, tokenizer: Any, max_length: int) -> Any:
@@ -186,6 +269,72 @@ def flatten_messages_dataset(dataset: Any, tokenizer: Any) -> Any:
     return dataset.map(format_row, remove_columns=dataset.column_names)
 
 
+def torch_dtype_from_args(args: argparse.Namespace) -> torch.dtype:
+    if args.bf16:
+        return torch.bfloat16
+    if args.fp16:
+        return torch.float16
+    return torch.float32
+
+
+def normalized_attn_implementation(value: str) -> str | None:
+    if not value:
+        return None
+    if value == "fa2":
+        return "flash_attention_2"
+    return value
+
+
+def model_load_kwargs(args: argparse.Namespace) -> dict[str, Any]:
+    dtype = torch_dtype_from_args(args)
+    kwargs: dict[str, Any] = {
+        "device_map": "auto",
+        "trust_remote_code": True,
+        "torch_dtype": dtype,
+    }
+    attn_implementation = normalized_attn_implementation(args.attn_implementation)
+    if attn_implementation:
+        kwargs["attn_implementation"] = attn_implementation
+    if args.quantization_bit == 4:
+        kwargs["quantization_config"] = BitsAndBytesConfig(
+            load_in_4bit=True,
+            bnb_4bit_quant_type=args.bnb_4bit_quant_type,
+            bnb_4bit_compute_dtype=dtype,
+            bnb_4bit_use_double_quant=args.bnb_4bit_use_double_quant,
+        )
+    elif args.quantization_bit == 8:
+        kwargs["quantization_config"] = BitsAndBytesConfig(load_in_8bit=True)
+    return kwargs
+
+
+def write_training_manifest(args: argparse.Namespace, train_dataset: Any, eval_dataset: Any | None) -> None:
+    manifest = {
+        "model": args.model,
+        "output_dir": args.output_dir,
+        "hf_dataset": args.hf_dataset or None,
+        "hf_train_split": args.hf_train_split if args.hf_dataset else None,
+        "hf_eval_split": args.hf_eval_split or None,
+        "hf_eval_size": args.hf_eval_size if args.hf_dataset and not args.hf_eval_split else None,
+        "train_rows": len(train_dataset),
+        "eval_rows": len(eval_dataset) if eval_dataset is not None else 0,
+        "max_seq_length": args.max_seq_length,
+        "epochs": args.epochs,
+        "learning_rate": args.lr,
+        "batch_size": args.batch_size,
+        "grad_accum": args.grad_accum,
+        "effective_batch": args.batch_size * args.grad_accum,
+        "rank": args.rank,
+        "alpha": args.alpha,
+        "dropout": args.dropout,
+        "target_modules": args.target_modules,
+        "quantization_bit": args.quantization_bit,
+        "attn_implementation": normalized_attn_implementation(args.attn_implementation),
+        "resume_from_checkpoint": args.resume_from_checkpoint or None,
+    }
+    path = Path(args.output_dir) / "training_manifest.json"
+    path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+
+
 def main() -> None:
     args = parse_args()
     Path(args.output_dir).mkdir(parents=True, exist_ok=True)
@@ -194,27 +343,34 @@ def main() -> None:
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
 
-    train_dataset = load_dataset("json", data_files=args.train_file, split="train")
-    eval_dataset = load_dataset("json", data_files=args.eval_file, split="train")
+    train_dataset, eval_dataset = load_train_eval_datasets(args)
+    if eval_dataset is None:
+        args.eval_strategy = "no"
     if args.limit_train > 0:
         train_dataset = train_dataset.select(range(min(args.limit_train, len(train_dataset))))
-    if args.limit_eval > 0:
+    if eval_dataset is not None and args.limit_eval > 0:
         eval_dataset = eval_dataset.select(range(min(args.limit_eval, len(eval_dataset))))
     if args.flatten_messages and args.assistant_only_loss:
         train_dataset = tokenize_assistant_only_dataset(train_dataset, tokenizer, args.max_seq_length)
-        eval_dataset = tokenize_assistant_only_dataset(eval_dataset, tokenizer, args.max_seq_length)
+        if eval_dataset is not None:
+            eval_dataset = tokenize_assistant_only_dataset(eval_dataset, tokenizer, args.max_seq_length)
         print("Using manual assistant-only labels with flattened chat messages.", flush=True)
     elif args.flatten_messages:
         train_dataset = flatten_messages_dataset(train_dataset, tokenizer)
-        eval_dataset = flatten_messages_dataset(eval_dataset, tokenizer)
+        if eval_dataset is not None:
+            eval_dataset = flatten_messages_dataset(eval_dataset, tokenizer)
+    write_training_manifest(args, train_dataset, eval_dataset)
 
     model = AutoModelForCausalLM.from_pretrained(
         args.model,
-        torch_dtype=torch.bfloat16 if args.bf16 else torch.float16 if args.fp16 else torch.float32,
-        device_map="auto",
-        trust_remote_code=True,
+        **model_load_kwargs(args),
     )
     model.config.use_cache = False
+    if args.quantization_bit:
+        model = prepare_model_for_kbit_training(
+            model,
+            use_gradient_checkpointing=args.gradient_checkpointing,
+        )
 
     peft_config = LoraConfig(
         r=args.rank,
@@ -229,14 +385,15 @@ def main() -> None:
         "model": model,
         "args": build_sft_config(args),
         "train_dataset": train_dataset,
-        "eval_dataset": eval_dataset,
         "peft_config": peft_config,
         "processing_class": tokenizer,
         "tokenizer": tokenizer,
         "dataset_text_field": "text",
     }
+    if eval_dataset is not None:
+        trainer_kwargs["eval_dataset"] = eval_dataset
     trainer = SFTTrainer(**supported_kwargs(SFTTrainer, trainer_kwargs))
-    trainer.train()
+    trainer.train(resume_from_checkpoint=args.resume_from_checkpoint or None)
     trainer.save_model(args.output_dir)
     tokenizer.save_pretrained(args.output_dir)
 
