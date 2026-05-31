@@ -1,0 +1,28 @@
+.venv/bin/python scripts/train_lora_sft.py --model Qwen/Qwen3-4B-Thinking-2507 --hf-dataset UWNSL/Mix-Long_long_0.2_short_0.8 --output-dir checkpoints/uwnsl_mix_long_lora/mix_long_r16_a32_q4_publicfree_eval_epoch1 --epochs 1 --lr 0.0001 --rank 16 --alpha 32 --dropout 0.0 --batch-size 1 --grad-accum 8 --max-seq-length 16384 --quantization-bit 4 --attn-implementation fa2 --gradient-checkpointing --save-strategy epoch --eval-strategy epoch --save-total-limit 3 --logging-steps 10 --eval-steps 50 --target-modules q_proj k_proj v_proj o_proj gate_proj up_proj down_proj --hf-local-eval-file data/public_free_response.jsonl --hf-local-eval-format public --hf-local-eval-prompt compact --hf-eval-size 0
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Generating train split:   0%|          | 0/5383 [00:00<?, ? examples/s]Generating train split: 100%|██████████| 5383/5383 [00:00<00:00, 225135.50 examples/s]
+Map:   0%|          | 0/655 [00:00<?, ? examples/s]Map: 100%|██████████| 655/655 [00:00<00:00, 10025.36 examples/s]
+Map:   0%|          | 0/5383 [00:00<?, ? examples/s]Map: 100%|██████████| 5383/5383 [00:00<00:00, 77480.65 examples/s]
+Map:   0%|          | 0/655 [00:00<?, ? examples/s]Map:   0%|          | 0/655 [00:00<?, ? examples/s]
+Traceback (most recent call last):
+  File "/home/chuheng/Desktop/t2t-qwen-math/scripts/train_lora_sft.py", line 471, in <module>
+    main()
+  File "/home/chuheng/Desktop/t2t-qwen-math/scripts/train_lora_sft.py", line 415, in main
+    train_dataset, eval_dataset = load_train_eval_datasets(args)
+  File "/home/chuheng/Desktop/t2t-qwen-math/scripts/train_lora_sft.py", line 247, in load_train_eval_datasets
+    eval_dataset = problem_solution_to_messages(eval_dataset, args)
+  File "/home/chuheng/Desktop/t2t-qwen-math/scripts/train_lora_sft.py", line 189, in problem_solution_to_messages
+    return dataset.map(format_row, remove_columns=dataset.column_names)
+  File "/home/chuheng/Desktop/t2t-qwen-math/.venv/lib/python3.10/site-packages/datasets/arrow_dataset.py", line 575, in wrapper
+    out: Union["Dataset", "DatasetDict"] = func(self, *args, **kwargs)
+  File "/home/chuheng/Desktop/t2t-qwen-math/.venv/lib/python3.10/site-packages/datasets/arrow_dataset.py", line 3633, in map
+    for rank, done, content in Dataset._map_single(**unprocessed_kwargs):
+  File "/home/chuheng/Desktop/t2t-qwen-math/.venv/lib/python3.10/site-packages/datasets/arrow_dataset.py", line 3973, in _map_single
+    for i, example in iter_outputs(shard_iterable):
+  File "/home/chuheng/Desktop/t2t-qwen-math/.venv/lib/python3.10/site-packages/datasets/arrow_dataset.py", line 3951, in iter_outputs
+    yield i, apply_function(example, i, offset=offset)
+  File "/home/chuheng/Desktop/t2t-qwen-math/.venv/lib/python3.10/site-packages/datasets/arrow_dataset.py", line 3872, in apply_function
+    processed_inputs = function(*fn_args, *additional_args, **fn_kwargs)
+  File "/home/chuheng/Desktop/t2t-qwen-math/scripts/train_lora_sft.py", line 178, in format_row
+    raise ValueError(
+ValueError: HF row is missing non-empty 'problem' or 'solution'.

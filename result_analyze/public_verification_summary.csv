@@ -1,2 +1,4 @@
 timestamp,run_name,prediction_path,data_path,total,correct,accuracy,mcq_correct,mcq_total,mcq_accuracy,free_correct,free_total,free_accuracy,analysis_path,html_path
 2026-05-26T20:36:51,public_compact_v3_postfix_full,results/public_compact_v3_postfix_full/submission.jsonl,data/public.jsonl,1126,757,0.672291,371,471,0.787686,386,655,0.589313,result_analyze/public_compact_v3_postfix_full.jsonl,
+2026-05-29T23:03:32,base_qwen3_4b_thinking_2507_may29_dynamic_public,results/autoresearch/base_qwen3_4b_thinking_2507_may29_dynamic_public/submission.jsonl,data/public.jsonl,1126,643,0.571048,253,471,0.537155,390,655,0.595420,result_analyze/base_qwen3_4b_thinking_2507_may29_dynamic_public.jsonl,
+2026-05-29T23:14:15,public_compact_v3_postfix_full_current_judge_check,results/public_compact_v3_postfix_full/submission.jsonl,data/public.jsonl,1126,761,0.675844,371,471,0.787686,390,655,0.595420,result_analyze/public_compact_v3_postfix_full_current_judge_check.jsonl,
