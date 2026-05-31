@@ -1,11 +1,5 @@
 #!/usr/bin/env python3
-"""Generate a private-set submission CSV.
-
-The default submission path uses the current problem-type-separated prompt
-package in :mod:`prompts.math_reasoning_prompts`, matching the pipeline used
-for the full-public 32GB balanced run. The older MCQ/free split is still
-available with ``--routing-mode legacy`` and defaults to ``prompts.legacy_prompts``.
-"""
+"""Generate a private-set submission CSV with the active compact prompt path."""
 
 from __future__ import annotations
 
@@ -26,9 +20,9 @@ DEFAULT_MODEL_ID = "Qwen/Qwen3-4B-Thinking-2507"
 DEFAULT_DATA_PATH = "data/private.jsonl"
 DEFAULT_OUTPUT_DIR = "results/private_submission"
 DEFAULT_SUBMISSION_NAME = "submission.csv"
-DEFAULT_MCQ_PROMPT = "general_mcq_eliminate"
-DEFAULT_FREE_PROMPT = "baseline"
-DEFAULT_PROMPT_MODULE = "prompts.legacy_prompts"
+DEFAULT_MCQ_PROMPT = "compact"
+DEFAULT_FREE_PROMPT = "compact"
+DEFAULT_PROMPT_MODULE = "prompts.compact_prompt_pack"
 
 FORMAT_MCQ = "mcq"
 FORMAT_FREE_RESPONSE = "free_response"
@@ -89,7 +83,7 @@ def load_prompt_module(module_name: str) -> Any:
 
 
 def is_problem_type_mcq_like(row: dict[str, Any]) -> bool:
-    """Mirror run_math_prompts' MCQ routing for the hybrid submission path."""
+    """Detect explicit or inline multiple-choice rows."""
     if row.get("options"):
         return True
     question = str(row.get("question", ""))
@@ -962,124 +956,6 @@ def make_llm(args: argparse.Namespace) -> tuple[Any, Any]:
     return llm, tokenizer
 
 
-def run_problem_type_submission(args: argparse.Namespace, rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    from run_math_prompts import run_submission
-
-    llm, tokenizer = make_llm(args)
-    config = CONFIGS[args.config]
-    print(
-        f"[problem_type / {config.name}] generating {len(rows)} prompts with "
-        "prompts.math_reasoning_prompts ...",
-        flush=True,
-    )
-    return run_submission(
-        rows,
-        llm,
-        tokenizer,
-        config,
-        args.max_tokens,
-        include_few_shot=args.include_few_shot,
-        math_type=args.math_type,
-        enable_repair=not args.no_repair and not args.no_fallback,
-        normalize_free_final_answers=args.normalize_free_final_answers,
-        rank_free_samples=args.rank_free_samples,
-    )
-
-
-def run_hybrid_submission(args: argparse.Namespace, rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    """Use run_math_prompts for MCQ-like rows and updated legacy prompts for free rows."""
-    from judger import Judger
-    from run_math_prompts import run_submission
-
-    prompt_module = load_prompt_module(args.prompt_module)
-    free_names = {name for name, *_ in prompt_module.FREE_PROMPTS}
-    if args.free_prompt not in free_names:
-        raise SystemExit(f"Unknown free prompt for {args.prompt_module}: {args.free_prompt}")
-
-    mcq_rows = [row for row in rows if is_problem_type_mcq_like(row)]
-    free_rows = [row for row in rows if not is_problem_type_mcq_like(row)]
-    print(
-        f"Hybrid counts: run_math_prompts_mcq_like={len(mcq_rows)}  "
-        f"updated_free_response={len(free_rows)}",
-        flush=True,
-    )
-
-    llm, tokenizer = make_llm(args)
-    records: list[dict[str, Any]] = []
-
-    if mcq_rows:
-        config = CONFIGS[args.config]
-        print(
-            f"[hybrid mcq / run_math_prompts / {config.name}] generating {len(mcq_rows)} prompts ...",
-            flush=True,
-        )
-        mcq_records = run_submission(
-            mcq_rows,
-            llm,
-            tokenizer,
-            config,
-            args.max_tokens,
-            include_few_shot=args.include_few_shot,
-            math_type=args.math_type,
-            enable_repair=not args.no_repair and not args.no_fallback,
-            normalize_free_final_answers=args.normalize_free_final_answers,
-            rank_free_samples=args.rank_free_samples,
-        )
-        for record in mcq_records:
-            record.update(
-                routing_mode="hybrid",
-                hybrid_source="run_math_prompts",
-                prompt="prompts.math_reasoning_prompts",
-                config=config.name,
-            )
-        records.extend(mcq_records)
-
-    if free_rows:
-        judger = Judger(strict_extract=False)
-        free_route_items = [
-            (
-                item,
-                Route(
-                    format_type=FORMAT_FREE_RESPONSE,
-                    prompt_family=args.free_prompt,
-                    config_name=args.free_config,
-                    expected_answers=max(1, str(item.get("question", "")).count("[ANS]")),
-                    notes=("hybrid_updated_free", args.prompt_module),
-                ),
-            )
-            for item in free_rows
-        ]
-        free_records = generate_legacy_group(
-            llm,
-            tokenizer,
-            judger,
-            args.free_prompt,
-            CONFIGS[args.free_config],
-            free_route_items,
-            args.max_tokens,
-            args.fallback_max_tokens,
-            not args.no_fallback,
-            prompt_module,
-            fallback_tail_tokens=args.fallback_tail_tokens,
-            enable_high_budget_fallback=args.high_budget_fallback,
-            high_budget_max_tokens=args.high_budget_max_tokens,
-            max_model_len=args.max_model_len,
-            context_safety_margin=args.context_safety_margin,
-            enable_stage0_postprocess=args.stage0_postprocess,
-            dynamic_free_continuation=args.dynamic_free_continuation,
-            dynamic_free_max_tokens=args.dynamic_free_max_tokens,
-        )
-        for record in free_records:
-            record.update(
-                routing_mode="hybrid",
-                hybrid_source="updated_free_prompt",
-                prompt_module=args.prompt_module,
-            )
-        records.extend(free_records)
-
-    return records
-
-
 def run_legacy_submission(args: argparse.Namespace, rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
     from judger import Judger
 
@@ -1140,13 +1016,9 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--gpu-id", default="0")
     parser.add_argument(
         "--routing-mode",
-        choices=["problem_type", "legacy", "format", "hybrid"],
-        default="problem_type",
-        help=(
-            "'problem_type' uses the latest separated prompt package. "
-            "'hybrid' uses run_math_prompts for MCQ-like rows and --prompt-module/--free-prompt for free rows. "
-            "'format' is a deprecated alias."
-        ),
+        choices=["compact", "legacy"],
+        default="compact",
+        help="'compact' and 'legacy' both use the active dynamic prompt module.",
     )
     parser.add_argument("--config", default="sc_n3", choices=sorted(CONFIGS))
     parser.add_argument("--prompt-module", default=DEFAULT_PROMPT_MODULE)
@@ -1177,7 +1049,7 @@ def parse_args() -> argparse.Namespace:
         "--dynamic-free-continuation",
         action="store_true",
         help=(
-            "For legacy/hybrid free-response rows only: when the first generation "
+            "For compact free-response rows only: when the first generation "
             "truncates and no final answer can be recovered, continue from the "
             "previous reasoning with doubled token budgets until resolved or "
             "--dynamic-free-max-tokens is reached."
@@ -1191,21 +1063,7 @@ def parse_args() -> argparse.Namespace:
         "--stage0-postprocess",
         action=argparse.BooleanOptionalAction,
         default=True,
-        help="For legacy/hybrid free paths, rebuild clean final-answer blocks before fallback.",
-    )
-    parser.add_argument("--math-type", default=None)
-    parser.add_argument("--include-few-shot", action="store_true")
-    parser.add_argument(
-        "--normalize-free-final-answers",
-        action=argparse.BooleanOptionalAction,
-        default=True,
-        help="Normalize non-option final boxed answers to plain ASCII in problem_type mode.",
-    )
-    parser.add_argument(
-        "--rank-free-samples",
-        action=argparse.BooleanOptionalAction,
-        default=True,
-        help="For non-option n>1 problem_type runs, choose the best formatted/precision sample.",
+        help="For compact free paths, rebuild clean final-answer blocks before fallback.",
     )
     parser.add_argument("--max-model-len", type=int, default=32768)
     parser.add_argument("--gpu-memory-utilization", type=float, default=0.85)
@@ -1223,22 +1081,12 @@ def main() -> None:
     output_dir = Path(args.output_dir)
     submission_path = output_dir / args.submission_name
     rows, original_ids = load_private(Path(args.data_path))
-    routing_mode = "problem_type" if args.routing_mode == "format" else args.routing_mode
+    routing_mode = args.routing_mode
 
     print(f"Private set: {len(original_ids)} total")
     print(f"Routing mode: {routing_mode}")
-    if routing_mode == "problem_type":
-        print("Prompt pipeline: prompts.math_reasoning_prompts submission_response_mode")
-        records = run_problem_type_submission(args, rows)
-    elif routing_mode == "hybrid":
-        print(
-            "Prompt pipeline: hybrid run_math_prompts MCQ + "
-            f"{args.prompt_module}.{args.free_prompt} free response"
-        )
-        records = run_hybrid_submission(args, rows)
-    else:
-        print(f"Prompt pipeline: legacy split via {args.prompt_module}")
-        records = run_legacy_submission(args, rows)
+    print(f"Prompt pipeline: compact split via {args.prompt_module}")
+    records = run_legacy_submission(args, rows)
 
     csv_path, audit_path = write_outputs(output_dir, submission_path, records, original_ids)
     print(f"Submission written to {csv_path}")

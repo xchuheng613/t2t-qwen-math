@@ -12,10 +12,9 @@ Default rate model:
   model runs add marginal kWh, not monthly account days.
 
 Usage:
-    python scripts/power_cost_monitor.py --label public-smoke -- \
-      python scripts/run_16gb_fast.py --mode submission_response_mode \
-        --data-path data/public.jsonl --limit 50 \
-        --output-dir results/16gb_fast_check
+    python scripts/power_cost_monitor.py --label grpo-smoke -- \
+      python scripts/train_grpo_full.py --train-limit 16 --eval-limit 16 \
+        --max-steps 5 --num-generations 4 --max-completion-length 1024
 
 Notes:
   - NVIDIA GPU power uses nvidia-smi.

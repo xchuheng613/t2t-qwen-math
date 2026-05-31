@@ -189,16 +189,24 @@ def merge_command(args: argparse.Namespace, exp: Experiment) -> list[str]:
 def eval_command(args: argparse.Namespace, exp: Experiment, split: str, data_path: str) -> list[str]:
     return [
         args.python,
-        "scripts/run_math_prompts.py",
-        "--mode",
-        "submission_response_mode",
+        "scripts/create_submission.py",
         "--data-path",
         data_path,
         "--output-dir",
         str(Path(args.results_root) / exp.name / split),
         "--model",
         str(Path(args.merged_root) / exp.name),
-        "--config",
+        "--routing-mode",
+        "compact",
+        "--prompt-module",
+        "prompts.compact_prompt_pack",
+        "--mcq-prompt",
+        "compact",
+        "--free-prompt",
+        "compact",
+        "--mcq-config",
+        "greedy_n1",
+        "--free-config",
         "greedy_n1",
         "--max-tokens",
         str(args.max_tokens),
@@ -206,7 +214,6 @@ def eval_command(args: argparse.Namespace, exp: Experiment, split: str, data_pat
         str(args.max_model_len),
         "--gpu-memory-utilization",
         str(args.gpu_memory_utilization),
-        "--normalize-free-final-answers",
     ]
 
 
