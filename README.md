@@ -46,7 +46,7 @@ Model weights:
 Hardware/runtime used for final generation:
 
 - GPU type for private-set inference: NVIDIA RTX 5090.
-- Approximate total private-set generation/inference time: about 1 hour.
+- Approximate total private-set generation/inference time: about 2.5 hours.
 - GRPO training/checkpoint generation also used a dual NVIDIA RTX PRO 6000
   96GB setup; see `docs/full_grpo_runbook.md`.
 
