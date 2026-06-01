@@ -12,14 +12,13 @@ run_inference(
     data_path="data/private.jsonl",
     output_dir="results/final_run_inference",
     submission_name="submission.csv",
-    free_model_id="YOUR-HF-USERNAME/YOUR-GRPO-CHECKPOINT81-MODEL",
+    free_model_id="sengBJY/CSE151B_FinalProject",
 )
 ```
 
 Equivalent CLI:
 
 ```bash
-export T2T_QWEN_GRPO_MODEL_ID="YOUR-HF-USERNAME/YOUR-GRPO-CHECKPOINT81-MODEL"
 python run_inference.py \
   --data-path data/private.jsonl \
   --output-dir results/final_run_inference \
@@ -28,19 +27,20 @@ python run_inference.py \
 
 The function runs the full final pipeline: it loads the base
 `Qwen/Qwen3-4B-Thinking-2507` model for MCQ-like rows, loads the fine-tuned
-GRPO checkpoint from `T2T_QWEN_GRPO_MODEL_ID` for free-response rows, applies
-the compact prompt post-processing/fallback logic, merges the routed outputs,
-and writes a Kaggle-compatible CSV. MCQ-like rows run with greedy `n=1`;
-free-response rows run with self-consistency `n=3`.
+GRPO checkpoint from `sengBJY/CSE151B_FinalProject` by default for
+free-response rows, applies the compact prompt post-processing/fallback logic,
+merges the routed outputs, and writes a Kaggle-compatible CSV. MCQ-like rows
+run with greedy `n=1`; free-response rows run with self-consistency `n=3`.
 
 Model weights:
 
 - Base MCQ model: downloaded automatically by HuggingFace/vLLM from
   `Qwen/Qwen3-4B-Thinking-2507`.
 - Fine-tuned GRPO free-response model: upload the checkpoint-81 model to
-  HuggingFace Hub, then set `T2T_QWEN_GRPO_MODEL_ID` to that repo ID before
-  calling `run_inference()`. The code also accepts a local HuggingFace model
-  directory through `run_inference(free_model_id="...")` or
+  HuggingFace Hub at `sengBJY/CSE151B_FinalProject`. That repo ID is the
+  default in `run_inference.py`, so no manual weight placement is needed. To
+  override it, set `T2T_QWEN_GRPO_MODEL_ID`, call
+  `run_inference(free_model_id="...")`, or pass
   `python run_inference.py --free-model-id ...`.
 
 Hardware/runtime used for final generation:
