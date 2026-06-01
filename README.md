@@ -97,7 +97,7 @@ Hardware/runtime used for the current model and final output generation:
 
 - GRPO training/checkpoint generation hardware: 2 x NVIDIA RTX PRO 6000.
 - Approximate GRPO training time for the current checkpoint: about 8 hours.
-- Approximate total private-set output generation/inference time for _submission A_ 2x RTX PRO 6000: about 1 hour.
+- Approximate total private-set output generation/inference time for _submission A_ using 2x RTX PRO 6000: about 1 hour.
 - Approximate total private-set output generation/inference time for _submission B_ using 1x RTX 5090: about 2.5 hours.
 - See `docs/full_grpo_runbook.md` for the dual RTX PRO 6000 run details.
 
