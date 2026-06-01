@@ -34,7 +34,9 @@ FINAL_ANSWERS:
 
 
 FREE_SYSTEM = r"""
-Solve the problem. Keep reasoning short.
+Solve the problem. Keep reasoning short. Use only the steps needed.
+Once the answer is known, stop reasoning and write FINAL_ANSWERS.
+Do not re-check repeatedly.
 
 Final answer rules:
 - Output exactly one final \boxed{}.

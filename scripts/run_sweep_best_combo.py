@@ -24,9 +24,9 @@ from typing import Any
 DEFAULT_MODEL_ID = "Qwen/Qwen3-4B-Thinking-2507"
 DEFAULT_DATA_PATH = "data/public.jsonl"
 DEFAULT_OUTPUT_DIR = "results/sweep_best100"
-DEFAULT_MCQ_PROMPT = "eliminate"
-DEFAULT_FREE_PROMPT = "baseline"
-DEFAULT_PROMPT_MODULE = "prompts.legacy_prompts"
+DEFAULT_MCQ_PROMPT = "compact"
+DEFAULT_FREE_PROMPT = "compact"
+DEFAULT_PROMPT_MODULE = "prompts.compact_prompt_pack"
 DEFAULT_SEED = 42
 
 
@@ -522,8 +522,7 @@ def parse_args() -> argparse.Namespace:
         "--prompt-module",
         default=DEFAULT_PROMPT_MODULE,
         help=(
-            "Prompt module to use. Defaults to prompts.legacy_prompts; use "
-            "prompts.legacy_prompts_v2 to opt into the new routed free prompts."
+            "Prompt module to use. Defaults to prompts.compact_prompt_pack."
         ),
     )
     parser.add_argument("--data-path", default=DEFAULT_DATA_PATH)

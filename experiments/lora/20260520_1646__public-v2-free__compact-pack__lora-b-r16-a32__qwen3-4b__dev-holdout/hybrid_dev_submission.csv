@@ -1,0 +1,361 @@
+id,response
+0,"FINAL_ANSWERS:
+\boxed{105950}"
+3,"FINAL_ANSWERS:
+\boxed{5/8}"
+7,"FINAL_ANSWERS:
+\boxed{13/9}"
+8,"FINAL_ANSWERS:
+\boxed{0.4471}"
+16,"FINAL_ANSWERS:
+\boxed{1.365, 3.142}"
+18,"FINAL_ANSWERS:
+\boxed{I}"
+31,"FINAL_ANSWERS:
+\boxed{K, I, J, F, B, H}"
+33,"FINAL_ANSWERS:
+\boxed{B}"
+42,"FINAL_ANSWERS:
+\boxed{J}"
+45,"FINAL_ANSWERS:
+\boxed{C}"
+56,"FINAL_ANSWERS:
+\boxed{A, C}"
+61,"FINAL_ANSWERS:
+\boxed{B,C,E,G}"
+65,"FINAL_ANSWERS:
+\boxed{-(15)/(13), (13)/(15), -(15)/(13), -(13)/(15), (13)/(15), -(13)/(15)}"
+68,"FINAL_ANSWERS:
+\boxed{C}"
+79,"FINAL_ANSWERS:
+\boxed{2.777777777777777}"
+81,"FINAL_ANSWERS:
+\boxed{C}"
+84,"FINAL_ANSWERS:
+\boxed{-1+isqrt(6),-1-isqrt(6)}"
+89,"FINAL_ANSWERS:
+\boxed{E}"
+91,"FINAL_ANSWERS:
+\boxed{H}"
+99,"FINAL_ANSWERS:
+\boxed{B}"
+108,"FINAL_ANSWERS:
+\boxed{84}"
+112,"FINAL_ANSWERS:
+\boxed{F}"
+118,"FINAL_ANSWERS:
+\boxed{47069}"
+125,"FINAL_ANSWERS:
+\boxed{13}"
+127,"FINAL_ANSWERS:
+\boxed{171.234, 175.678, 5.234, 5.890, 0.456, 91.734, 0.492, 179.456, 0.226, 1.984, 179.230, 179.682, 176.345, 183.645, information}"
+136,"FINAL_ANSWERS:
+\boxed{True, True, False, True}"
+151,"FINAL_ANSWERS:
+\boxed{0.564642473395035, 0.825335614909678, 0.684040286651337}"
+152,"FINAL_ANSWERS:
+\boxed{1/2, 1/5, 55.25, 13.26}"
+158,"FINAL_ANSWERS:
+\boxed{A, C}"
+166,"FINAL_ANSWERS:
+\boxed{1/80}"
+175,"FINAL_ANSWERS:
+\boxed{G}"
+176,"FINAL_ANSWERS:
+\boxed{C}"
+184,"FINAL_ANSWERS:
+\boxed{0,-11/8}"
+196,"FINAL_ANSWERS:
+\boxed{68, 340}"
+199,"FINAL_ANSWERS:
+\boxed{250, 6}"
+203,"FINAL_ANSWERS:
+\boxed{448*t**(2)-236.8*t-65.28, 7.21}"
+208,"FINAL_ANSWERS:
+\boxed{(pi)/(6),(5*pi)/(6)}"
+216,"FINAL_ANSWERS:
+\boxed{C, A, A}"
+228,"FINAL_ANSWERS:
+\boxed{I}"
+229,"FINAL_ANSWERS:
+\boxed{11, 61}"
+233,"FINAL_ANSWERS:
+\boxed{I}"
+234,"FINAL_ANSWERS:
+\boxed{S}"
+237,"FINAL_ANSWERS:
+\boxed{7, 0, 7}"
+247,"FINAL_ANSWERS:
+\boxed{B}"
+249,"FINAL_ANSWERS:
+\boxed{12.17}"
+253,"FINAL_ANSWERS:
+\boxed{F}"
+263,"FINAL_ANSWERS:
+\boxed{-1.0825317547, (-infty,-1.750686078), 0.1395430000, C}"
+266,"FINAL_ANSWERS:
+\boxed{S}"
+268,"FINAL_ANSWERS:
+\boxed{16, 8}"
+269,"FINAL_ANSWERS:
+\boxed{5.9329587897}"
+271,"FINAL_ANSWERS:
+\boxed{C}"
+276,"FINAL_ANSWERS:
+\boxed{F}"
+287,"FINAL_ANSWERS:
+\boxed{J}"
+288,"FINAL_ANSWERS:
+\boxed{C}"
+300,"FINAL_ANSWERS:
+\boxed{2.43, 0.105, B, 5.76, 0.008, B}"
+310,"FINAL_ANSWERS:
+\boxed{C}"
+312,"FINAL_ANSWERS:
+\boxed{0.6375049066, 0.7297678206}"
+316,"FINAL_ANSWERS:
+\boxed{H}"
+322,"FINAL_ANSWERS:
+\boxed{log(6)+log(x-y)+log(x+y)}"
+326,"FINAL_ANSWERS:
+\boxed{mm, ft, mi, ft, km, in}"
+337,"FINAL_ANSWERS:
+\boxed{F, F, C}"
+339,"FINAL_ANSWERS:
+\boxed{-\sqrt{3}, \frac{\sqrt{3}}{3}, 1, -2, \frac{2\sqrt{3}}{3}}"
+348,"FINAL_ANSWERS:
+\boxed{G}"
+354,"FINAL_ANSWERS:
+\boxed{7.6349858687, -6.4229202220, -4.1275297780, 0}"
+360,"FINAL_ANSWERS:
+\boxed{5*(x+1/5)**(2)-1/5, -1/5}"
+361,"FINAL_ANSWERS:
+\boxed{G}"
+367,"FINAL_ANSWERS:
+\boxed{15, 3}"
+380,"FINAL_ANSWERS:
+\boxed{0.015424, 0.041773}"
+386,"FINAL_ANSWERS:
+\boxed{negative, 0.680625}"
+387,"FINAL_ANSWERS:
+\boxed{I}"
+395,"FINAL_ANSWERS:
+\boxed{B}"
+401,"FINAL_ANSWERS:
+\boxed{C,D}"
+402,"FINAL_ANSWERS:
+\boxed{D}"
+404,"FINAL_ANSWERS:
+\boxed{6020.00}"
+406,"FINAL_ANSWERS:
+\boxed{h=84+0.8*t}"
+417,"FINAL_ANSWERS:
+\boxed{E}"
+428,"FINAL_ANSWERS:
+\boxed{D}"
+431,"FINAL_ANSWERS:
+\boxed{B}"
+433,"FINAL_ANSWERS:
+\boxed{G}"
+439,"FINAL_ANSWERS:
+\boxed{I}"
+445,"FINAL_ANSWERS:
+\boxed{8.90117918517108, 22.69800690222222}"
+463,"FINAL_ANSWERS:
+\boxed{A, B}"
+465,"FINAL_ANSWERS:
+\boxed{E}"
+468,"FINAL_ANSWERS:
+\boxed{111.1111111111111}"
+470,"FINAL_ANSWERS:
+\boxed{40*3**(n-1)}"
+476,"FINAL_ANSWERS:
+\boxed{31.1633+2.7126*x}"
+483,"FINAL_ANSWERS:
+\boxed{8.21}"
+486,"FINAL_ANSWERS:
+\boxed{J}"
+487,"FINAL_ANSWERS:
+\boxed{166.668, 3709.332, 3876*(0.957)**(t/10), 0.44}"
+489,"FINAL_ANSWERS:
+\boxed{12.5, 51.25}"
+494,"FINAL_ANSWERS:
+\boxed{interval, interval, ordinal, ordinal}"
+501,"FINAL_ANSWERS:
+\boxed{-6, 6.5, A}"
+502,"FINAL_ANSWERS:
+\boxed{90, 44}"
+504,"FINAL_ANSWERS:
+\boxed{8, 4}"
+509,"FINAL_ANSWERS:
+\boxed{\frac{\sqrt{7}}{5}}"
+521,"FINAL_ANSWERS:
+\boxed{60, 15}"
+530,"FINAL_ANSWERS:
+\boxed{J}"
+538,"FINAL_ANSWERS:
+\boxed{17/64}"
+552,"FINAL_ANSWERS:
+\boxed{J}"
+556,"FINAL_ANSWERS:
+\boxed{35.19205977822222}"
+561,"FINAL_ANSWERS:
+\boxed{241}"
+570,"FINAL_ANSWERS:
+\boxed{0.07}"
+591,"FINAL_ANSWERS:
+\boxed{43}"
+599,"FINAL_ANSWERS:
+\boxed{25/343, 11 4/7}"
+605,"FINAL_ANSWERS:
+\boxed{700, 620}"
+611,"FINAL_ANSWERS:
+\boxed{D}"
+617,"FINAL_ANSWERS:
+\boxed{J}"
+633,"FINAL_ANSWERS:
+\boxed{-4}"
+636,"FINAL_ANSWERS:
+\boxed{C}"
+638,"FINAL_ANSWERS:
+\boxed{C}"
+643,"FINAL_ANSWERS:
+\boxed{296}"
+672,"FINAL_ANSWERS:
+\boxed{D}"
+680,"FINAL_ANSWERS:
+\boxed{66}"
+700,"FINAL_ANSWERS:
+\boxed{H}"
+701,"FINAL_ANSWERS:
+\boxed{0, 0, [2,3], NONE}"
+702,"FINAL_ANSWERS:
+\boxed{0.01}"
+706,"FINAL_ANSWERS:
+\boxed{2.74, 0.0031}"
+709,"FINAL_ANSWERS:
+\boxed{(-10,5)}"
+712,"FINAL_ANSWERS:
+\boxed{2*x-10, x-3}"
+714,"FINAL_ANSWERS:
+\boxed{p, q, p, q, f, d}"
+717,"FINAL_ANSWERS:
+\boxed{F}"
+732,"FINAL_ANSWERS:
+\boxed{B, A, D, C}"
+738,"FINAL_ANSWERS:
+\boxed{4.994, 26}"
+739,"FINAL_ANSWERS:
+\boxed{D}"
+741,"FINAL_ANSWERS:
+\boxed{E}"
+746,"FINAL_ANSWERS:
+\boxed{217, LARGER}"
+760,"FINAL_ANSWERS:
+\boxed{F}"
+772,"FINAL_ANSWERS:
+\boxed{J}"
+782,"FINAL_ANSWERS:
+\boxed{25, 16}"
+784,"FINAL_ANSWERS:
+\boxed{D}"
+793,"FINAL_ANSWERS:
+\boxed{C}"
+799,"FINAL_ANSWERS:
+\boxed{I}"
+807,"FINAL_ANSWERS:
+\boxed{H}"
+808,"FINAL_ANSWERS:
+\boxed{-0.814, -0.581, 0.814, -0.581, -0.814, -0.581, -0.814, 0.581}"
+810,"FINAL_ANSWERS:
+\boxed{C}"
+821,"FINAL_ANSWERS:
+\boxed{G}"
+828,"FINAL_ANSWERS:
+\boxed{17}"
+832,"FINAL_ANSWERS:
+\boxed{4}"
+847,"FINAL_ANSWERS:
+\boxed{C}"
+862,"FINAL_ANSWERS:
+\boxed{0.125, 6}"
+863,"FINAL_ANSWERS:
+\boxed{43120}"
+864,"FINAL_ANSWERS:
+\boxed{9}"
+876,"FINAL_ANSWERS:
+\boxed{65161.431278565, 69080.789373025, 40470.553036}"
+877,"FINAL_ANSWERS:
+\boxed{A, A, C, A}"
+884,"FINAL_ANSWERS:
+\boxed{40108+2.75*x, 4.86*x, 2.11*x-40108, 19009}"
+894,"FINAL_ANSWERS:
+\boxed{C}"
+898,"FINAL_ANSWERS:
+\boxed{7/5}"
+901,"FINAL_ANSWERS:
+\boxed{I}"
+902,"FINAL_ANSWERS:
+\boxed{35}"
+903,"FINAL_ANSWERS:
+\boxed{64.505, 66.695, 34.348, 36.453, 38.687, 40.513, 28.098, 29.902}"
+910,"FINAL_ANSWERS:
+\boxed{8.10}"
+912,"FINAL_ANSWERS:
+\boxed{G}"
+913,"FINAL_ANSWERS:
+\boxed{8}"
+921,"FINAL_ANSWERS:
+\boxed{79.7272727272727, 82, SKEWED LEFT}"
+931,"FINAL_ANSWERS:
+\boxed{C, A, A}"
+937,"FINAL_ANSWERS:
+\boxed{9.370919700, 13.029080300, 8.942819700, 13.457180300}"
+941,"FINAL_ANSWERS:
+\boxed{equivalent, not equivalent, equivalent, not equivalent, not equivalent}"
+951,"FINAL_ANSWERS:
+\boxed{-15/13, -13/15}"
+963,"FINAL_ANSWERS:
+\boxed{506.25, 507.5}"
+970,"FINAL_ANSWERS:
+\boxed{F}"
+984,"FINAL_ANSWERS:
+\boxed{H}"
+992,"FINAL_ANSWERS:
+\boxed{3.000000}"
+996,"FINAL_ANSWERS:
+\boxed{3, 4, 5, 1, 2}"
+1008,"FINAL_ANSWERS:
+\boxed{C}"
+1023,"FINAL_ANSWERS:
+\boxed{C}"
+1024,"FINAL_ANSWERS:
+\boxed{D}"
+1038,"FINAL_ANSWERS:
+\boxed{D, D, A}"
+1046,"FINAL_ANSWERS:
+\boxed{4/57}"
+1047,"FINAL_ANSWERS:
+\boxed{68.2}"
+1050,"FINAL_ANSWERS:
+\boxed{-39}"
+1054,"FINAL_ANSWERS:
+\boxed{2, 3}"
+1062,"FINAL_ANSWERS:
+\boxed{2}"
+1077,"FINAL_ANSWERS:
+\boxed{1136, 5, 03334, 5699, 7, 8, 235}"
+1088,"FINAL_ANSWERS:
+\boxed{A, D, A}"
+1091,"FINAL_ANSWERS:
+\boxed{C}"
+1092,"FINAL_ANSWERS:
+\boxed{60}"
+1099,"FINAL_ANSWERS:
+\boxed{B}"
+1100,"FINAL_ANSWERS:
+\boxed{13.81963808}"
+1101,"FINAL_ANSWERS:
+\boxed{F}"
+1119,"FINAL_ANSWERS:
+\boxed{1260, 130}"

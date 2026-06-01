@@ -1,0 +1,17 @@
+{
+  "source": "data/private.jsonl",
+  "expected_rows": 943,
+  "part_counts": [
+    472,
+    471
+  ],
+  "merged_rows": 943,
+  "submission": "submissions/20260531_final/submission.csv",
+  "columns": [
+    "id",
+    "response"
+  ],
+  "missing": 0,
+  "extra": 0,
+  "empty": 0
+}

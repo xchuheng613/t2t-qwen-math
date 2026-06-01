@@ -10,8 +10,8 @@ Outputs:
 
 Run:
   python prompt_sweep.py
-  python prompt_sweep.py --qtype free --free-prompt baseline --config sc_n3
-  python prompt_sweep.py --qtype mcq --mcq-prompt eliminate --config greedy_n1
+  python prompt_sweep.py --qtype free --free-prompt compact --config sc_n3
+  python prompt_sweep.py --qtype mcq --mcq-prompt compact --config greedy_n1
 """
 from __future__ import annotations
 
@@ -47,7 +47,7 @@ from tqdm import tqdm
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from judger import Judger
 
-DEFAULT_PROMPT_MODULE = "prompts.legacy_prompts"
+DEFAULT_PROMPT_MODULE = "prompts.compact_prompt_pack"
 MCQ_PROMPTS = []
 FREE_PROMPTS = []
 build_mcq_prompt = None
@@ -453,8 +453,7 @@ def parse_args() -> argparse.Namespace:
         "--prompt-module",
         default=DEFAULT_PROMPT_MODULE,
         help=(
-            "Prompt module to use. Defaults to prompts.legacy_prompts; use "
-            "prompts.legacy_prompts_v2 to opt into the new routed free prompts."
+            "Prompt module to use. Defaults to prompts.compact_prompt_pack."
         ),
     )
     parser.add_argument(
