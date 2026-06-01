@@ -1,4 +1,4 @@
-# Out of Tokens
+# Token Spenders: CSE 151B Final Project
 CSE 151B Final Project — Qwen3-4B-Thinking on the public/private math dataset.
 
 ## Final code submission
