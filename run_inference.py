@@ -37,6 +37,7 @@ from scripts.create_submission import (  # noqa: E402
 
 
 BASE_MODEL_ID = "Qwen/Qwen3-4B-Thinking-2507"
+DEFAULT_GRPO_MODEL_ID = "sengBJY/CSE151B_FinalProject"
 GRPO_MODEL_ENV = "T2T_QWEN_GRPO_MODEL_ID"
 DEFAULT_DATA_PATH = Path("data/private.jsonl")
 DEFAULT_OUTPUT_DIR = Path("results/final_run_inference")
@@ -216,12 +217,13 @@ def run_inference(
 
     ``free_model_id`` must point to the uploaded full-parameter GRPO checkpoint
     on HuggingFace Hub, or to a local HuggingFace/vLLM-compatible model
-    directory. If omitted, it is read from ``T2T_QWEN_GRPO_MODEL_ID``.
+    directory. If omitted, it is read from ``T2T_QWEN_GRPO_MODEL_ID`` or falls
+    back to ``sengBJY/CSE151B_FinalProject``.
     """
 
     data_path = Path(data_path)
     output_dir = Path(output_dir)
-    free_model_id = free_model_id or os.environ.get(GRPO_MODEL_ENV)
+    free_model_id = free_model_id or os.environ.get(GRPO_MODEL_ENV) or DEFAULT_GRPO_MODEL_ID
     if not free_model_id:
         raise ValueError(
             f"Missing GRPO model id. Pass free_model_id=... or set {GRPO_MODEL_ENV} "
