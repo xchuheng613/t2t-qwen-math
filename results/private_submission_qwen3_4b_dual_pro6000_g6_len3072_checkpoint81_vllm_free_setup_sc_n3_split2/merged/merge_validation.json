@@ -1,0 +1,17 @@
+{
+  "source": "data/private.jsonl",
+  "expected_rows": 943,
+  "part_counts": [
+    472,
+    471
+  ],
+  "merged_rows": 943,
+  "submission": "results/private_submission_qwen3_4b_dual_pro6000_g6_len3072_checkpoint81_vllm_free_setup_sc_n3_split2/merged/submission.csv",
+  "columns": [
+    "id",
+    "response"
+  ],
+  "missing": 0,
+  "extra": 0,
+  "empty": 0
+}
