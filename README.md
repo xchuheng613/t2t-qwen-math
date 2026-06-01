@@ -25,30 +25,78 @@ python run_inference.py \
   --submission-name submission.csv
 ```
 
-The function runs the full final pipeline: it loads the base
-`Qwen/Qwen3-4B-Thinking-2507` model for MCQ-like rows, loads the fine-tuned
-GRPO checkpoint from `sengBJY/CSE151B_FinalProject` by default for
+Current `run_inference.py` defaults use the large-token Qwen3-4B-Thinking-2507
+budget and run the `sengBJY/CSE151B_FinalProject` GRPO checkpoint for both
+MCQ-like and free-response rows:
+
+- `max_tokens=81920`
+- `fallback_max_tokens=81920`
+- `max_model_len=262144`
+- `high_budget_max_tokens=81920`
+- `dynamic_free_max_tokens=81920`
+- MCQ-like rows: GRPO checkpoint, compact prompt, `greedy_n1`
+- Free-response rows: GRPO checkpoint, compact prompt, `sc_n3`
+
+This is the maximum benchmark-style output budget from the Qwen3-4B-Thinking
+model card, paired with the model's native 256K context window. It may require
+more VRAM than the final local 32GB run.
+
+The 2026-05-31 final submitted private CSV used the stable 32GB balanced
+inference preset:
+
+- `max_tokens=16384`
+- `fallback_max_tokens=8192`
+- `fallback_tail_tokens=6000`
+- `max_model_len=32768`
+- `gpu_memory_utilization=0.85`
+- `max_num_seqs=32`
+- `max_num_batched_tokens=16384`
+- `enforce_eager=False`
+- MCQ-like rows: base `Qwen/Qwen3-4B-Thinking-2507`, compact prompt,
+  `greedy_n1`
+- Free-response rows: GRPO checkpoint, compact prompt, `sc_n3`
+
+To reproduce the submitted budget explicitly:
+
+```bash
+python run_inference.py \
+  --data-path data/private.jsonl \
+  --output-dir results/final_run_inference \
+  --submission-name submission.csv \
+  --mcq-model-id Qwen/Qwen3-4B-Thinking-2507 \
+  --max-tokens 16384 \
+  --fallback-max-tokens 8192 \
+  --fallback-tail-tokens 6000 \
+  --max-model-len 32768 \
+  --gpu-memory-utilization 0.85 \
+  --max-num-seqs 32 \
+  --max-num-batched-tokens 16384
+```
+
+The function runs the full final pipeline: by default it loads the fine-tuned
+GRPO checkpoint from `sengBJY/CSE151B_FinalProject` for both MCQ-like and
 free-response rows, applies the compact prompt post-processing/fallback logic,
 merges the routed outputs, and writes a Kaggle-compatible CSV. MCQ-like rows
 run with greedy `n=1`; free-response rows run with self-consistency `n=3`.
+Pass `--mcq-model-id Qwen/Qwen3-4B-Thinking-2507` if you want to recreate the
+older base-model MCQ hybrid.
 
 Model weights:
 
-- Base MCQ model: downloaded automatically by HuggingFace/vLLM from
-  `Qwen/Qwen3-4B-Thinking-2507`.
-- Fine-tuned GRPO free-response model: upload the checkpoint-81 model to
-  HuggingFace Hub at `sengBJY/CSE151B_FinalProject`. That repo ID is the
-  default in `run_inference.py`, so no manual weight placement is needed. To
-  override it, set `T2T_QWEN_GRPO_MODEL_ID`, call
-  `run_inference(free_model_id="...")`, or pass
-  `python run_inference.py --free-model-id ...`.
+- Fine-tuned GRPO model: hosted on HuggingFace Hub at
+  `sengBJY/CSE151B_FinalProject`. That repo ID is the default in
+  `run_inference.py`, so no manual weight placement is needed. To override it,
+  set `T2T_QWEN_GRPO_MODEL_ID`, call `run_inference(free_model_id="...")`, or
+  pass `python run_inference.py --free-model-id ...`.
+- Optional base MCQ model: pass `--mcq-model-id Qwen/Qwen3-4B-Thinking-2507`
+  to run MCQ-like rows with the base model instead of the GRPO checkpoint.
 
-Hardware/runtime used for final generation:
+Hardware/runtime used for the current model and final output generation:
 
-- GPU type for private-set inference: NVIDIA RTX 5090.
-- Approximate total private-set generation/inference time: about 2.5 hours.
-- GRPO training/checkpoint generation also used a dual NVIDIA RTX PRO 6000
-  96GB setup; see `docs/full_grpo_runbook.md`.
+- GRPO training/checkpoint generation hardware: 2 x NVIDIA RTX PRO 6000.
+- Approximate GRPO training time for the current checkpoint: about 8 hours.
+- Approximate total private-set output generation/inference time: about 1 hour.
+- See `docs/full_grpo_runbook.md` for the dual RTX PRO 6000 run details.
 
 Final submitted CSV in this working tree:
 
