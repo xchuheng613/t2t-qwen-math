@@ -1,12 +1,9 @@
 #!/usr/bin/env python3
 """Single entry point for the final Kaggle submission pipeline.
 
-The final submission is a routed hybrid:
-
-* MCQ-like rows use the base Qwen3-4B-Thinking model with the compact prompt
-  and the same post-processing used by ``scripts/create_submission.py``.
-* Free-response rows use the full-parameter GRPO checkpoint, loaded from
-  HuggingFace Hub or another HuggingFace/vLLM-compatible model path.
+The default submission path runs the full-parameter GRPO checkpoint for both
+MCQ-like and free-response rows, loaded from HuggingFace Hub or another
+HuggingFace/vLLM-compatible model path.
 
 Calling ``run_inference()`` writes a Kaggle-compatible ``id,response`` CSV plus
 JSONL audit files for the intermediate and merged predictions.
@@ -42,6 +39,11 @@ GRPO_MODEL_ENV = "T2T_QWEN_GRPO_MODEL_ID"
 DEFAULT_DATA_PATH = Path("data/private.jsonl")
 DEFAULT_OUTPUT_DIR = Path("results/final_run_inference")
 DEFAULT_SUBMISSION_NAME = "submission.csv"
+
+# Qwen3-4B-Thinking-2507 has a native 256K context window.  The model card's
+# largest recommended benchmark output budget is 81,920 tokens.
+QWEN3_4B_MAX_CONTEXT_TOKENS = 262144
+QWEN3_4B_MAX_BENCHMARK_OUTPUT_TOKENS = 81920
 
 
 def _phase_args(
@@ -152,8 +154,8 @@ def _write_merge_report(
         "output_submission": str(output_csv),
         "expected_rows": len(expected_ids),
         "merged_rows": len(final_records),
-        "mcq_like_rows_from_base": mcq_count,
-        "free_rows_from_grpo": free_count,
+        "mcq_like_rows_from_mcq_model": mcq_count,
+        "free_rows_from_free_model": free_count,
         "mcq_model_id": mcq_model_id,
         "free_model_id": free_model_id,
         "missing": missing,
@@ -197,33 +199,36 @@ def run_inference(
     data_path: str | Path = DEFAULT_DATA_PATH,
     output_dir: str | Path = DEFAULT_OUTPUT_DIR,
     submission_name: str = DEFAULT_SUBMISSION_NAME,
-    mcq_model_id: str = BASE_MODEL_ID,
+    mcq_model_id: str | None = None,
     free_model_id: str | None = None,
     gpu_id: str = "0",
-    max_tokens: int = 16384,
-    fallback_max_tokens: int = 8192,
+    max_tokens: int = QWEN3_4B_MAX_BENCHMARK_OUTPUT_TOKENS,
+    fallback_max_tokens: int = QWEN3_4B_MAX_BENCHMARK_OUTPUT_TOKENS,
     fallback_tail_tokens: int = 6000,
-    max_model_len: int = 32768,
+    max_model_len: int = QWEN3_4B_MAX_CONTEXT_TOKENS,
     gpu_memory_utilization: float = 0.85,
     max_num_seqs: int = 32,
     max_num_batched_tokens: int = 16384,
     enforce_eager: bool = False,
     high_budget_fallback: bool = False,
-    high_budget_max_tokens: int = 32768,
+    high_budget_max_tokens: int = QWEN3_4B_MAX_BENCHMARK_OUTPUT_TOKENS,
     dynamic_free_continuation: bool = False,
-    dynamic_free_max_tokens: int = 32768,
+    dynamic_free_max_tokens: int = QWEN3_4B_MAX_BENCHMARK_OUTPUT_TOKENS,
 ) -> Path:
     """Run the full final pipeline and return the final submission CSV path.
 
     ``free_model_id`` must point to the uploaded full-parameter GRPO checkpoint
     on HuggingFace Hub, or to a local HuggingFace/vLLM-compatible model
     directory. If omitted, it is read from ``T2T_QWEN_GRPO_MODEL_ID`` or falls
-    back to ``sengBJY/CSE151B_FinalProject``.
+    back to ``sengBJY/CSE151B_FinalProject``. By default MCQ-like rows use the
+    same GRPO model; pass ``mcq_model_id=BASE_MODEL_ID`` to recreate a
+    base-model MCQ hybrid.
     """
 
     data_path = Path(data_path)
     output_dir = Path(output_dir)
     free_model_id = free_model_id or os.environ.get(GRPO_MODEL_ENV) or DEFAULT_GRPO_MODEL_ID
+    mcq_model_id = mcq_model_id or free_model_id
     if not free_model_id:
         raise ValueError(
             f"Missing GRPO model id. Pass free_model_id=... or set {GRPO_MODEL_ENV} "
@@ -238,12 +243,12 @@ def run_inference(
     mcq_args = _phase_args(
         model=mcq_model_id,
         data_path=data_path,
-        output_dir=output_dir / "mcq_like_base",
+        output_dir=output_dir / "mcq_like_grpo",
         gpu_id=gpu_id,
         mcq_config="greedy_n1",
         # Some MCQ-like rows have inline A/B/C choices but no structured
         # ``options`` field, so the legacy runner treats them as free format.
-        # Keep those in the base-model MCQ phase and run them greedily too.
+        # Keep those in the MCQ-like phase and run them greedily too.
         free_config="greedy_n1",
         max_tokens=max_tokens,
         fallback_max_tokens=fallback_max_tokens,
@@ -280,7 +285,7 @@ def run_inference(
     )
 
     mcq_records = _run_phase(
-        label="mcq-like/base",
+        label="mcq-like/grpo",
         rows=mcq_like_rows,
         original_ids=[int(row["id"]) for row in mcq_like_rows],
         args=mcq_args,
@@ -296,7 +301,7 @@ def run_inference(
     by_id: dict[int, dict[str, Any]] = {}
     for record in mcq_records:
         merged = dict(record)
-        merged["hybrid_source"] = "base_mcq_like"
+        merged["hybrid_source"] = "grpo_mcq_like"
         merged["source_model_id"] = mcq_model_id
         by_id[int(record["id"])] = merged
     for record in free_records:
@@ -334,21 +339,25 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--data-path", default=str(DEFAULT_DATA_PATH))
     parser.add_argument("--output-dir", default=str(DEFAULT_OUTPUT_DIR))
     parser.add_argument("--submission-name", default=DEFAULT_SUBMISSION_NAME)
-    parser.add_argument("--mcq-model-id", default=BASE_MODEL_ID)
+    parser.add_argument(
+        "--mcq-model-id",
+        default=None,
+        help="Optional override for MCQ-like rows. Defaults to the GRPO free-response model.",
+    )
     parser.add_argument("--free-model-id", default=None)
     parser.add_argument("--gpu-id", default="0")
-    parser.add_argument("--max-tokens", type=int, default=16384)
-    parser.add_argument("--fallback-max-tokens", type=int, default=8192)
+    parser.add_argument("--max-tokens", type=int, default=QWEN3_4B_MAX_BENCHMARK_OUTPUT_TOKENS)
+    parser.add_argument("--fallback-max-tokens", type=int, default=QWEN3_4B_MAX_BENCHMARK_OUTPUT_TOKENS)
     parser.add_argument("--fallback-tail-tokens", type=int, default=6000)
-    parser.add_argument("--max-model-len", type=int, default=32768)
+    parser.add_argument("--max-model-len", type=int, default=QWEN3_4B_MAX_CONTEXT_TOKENS)
     parser.add_argument("--gpu-memory-utilization", type=float, default=0.85)
     parser.add_argument("--max-num-seqs", type=int, default=32)
     parser.add_argument("--max-num-batched-tokens", type=int, default=16384)
     parser.add_argument("--enforce-eager", action="store_true")
     parser.add_argument("--high-budget-fallback", action="store_true")
-    parser.add_argument("--high-budget-max-tokens", type=int, default=32768)
+    parser.add_argument("--high-budget-max-tokens", type=int, default=QWEN3_4B_MAX_BENCHMARK_OUTPUT_TOKENS)
     parser.add_argument("--dynamic-free-continuation", action="store_true")
-    parser.add_argument("--dynamic-free-max-tokens", type=int, default=32768)
+    parser.add_argument("--dynamic-free-max-tokens", type=int, default=QWEN3_4B_MAX_BENCHMARK_OUTPUT_TOKENS)
     return parser.parse_args()
 
 

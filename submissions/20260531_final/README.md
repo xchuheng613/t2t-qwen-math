@@ -20,3 +20,23 @@ Supporting files:
 
 The main reproducible path is still `run_inference.run_inference()`. These
 files are archived outputs from the submitted run.
+
+Submitted-run inference parameters:
+
+- `max_tokens=16384`
+- `fallback_max_tokens=8192`
+- `fallback_tail_tokens=6000`
+- `max_model_len=32768`
+- `gpu_memory_utilization=0.85`
+- `max_num_seqs=32`
+- `max_num_batched_tokens=16384`
+- `enforce_eager=False`
+- MCQ-like rows: base `Qwen/Qwen3-4B-Thinking-2507`, compact prompt,
+  `greedy_n1`
+- Free-response rows: GRPO checkpoint, compact prompt, `sc_n3`
+
+As of this archive update, `run_inference.py` defaults to a larger GRPO-only
+budget for both MCQ-like and free-response rows (`max_tokens=81920`,
+`fallback_max_tokens=81920`, `max_model_len=262144`). Pass the parameters above
+plus `--mcq-model-id Qwen/Qwen3-4B-Thinking-2507` explicitly to reproduce the
+submitted 32GB balanced hybrid run.
