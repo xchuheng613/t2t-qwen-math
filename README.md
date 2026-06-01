@@ -38,10 +38,10 @@ MCQ-like and free-response rows:
 - Free-response rows: GRPO checkpoint, compact prompt, `sc_n3`
 
 This is the maximum benchmark-style output budget from the Qwen3-4B-Thinking
-model card, paired with the model's native 256K context window. It may require
-more VRAM than the final local 32GB run.
+model card, paired with the model's native 256K context window. This setting was 
+used for the final/best submission on Kaggle.
 
-The 2026-05-31 final submitted private CSV used the stable 32GB balanced
+The other selected submission used the stable 32GB balanced
 inference preset:
 
 - `max_tokens=16384`
