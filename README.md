@@ -1,4 +1,4 @@
-# t2t-qwen-math
+# Out of Tokens
 CSE 151B Final Project — Qwen3-4B-Thinking on the public/private math dataset.
 
 ## Final code submission
@@ -25,6 +25,7 @@ python run_inference.py \
   --submission-name submission.csv
 ```
 
+## Submission A (Best Kaggle Submission)
 Current `run_inference.py` defaults use the large-token Qwen3-4B-Thinking-2507
 budget and run the `sengBJY/CSE151B_FinalProject` GRPO checkpoint for both
 MCQ-like and free-response rows:
@@ -41,7 +42,8 @@ This is the maximum benchmark-style output budget from the Qwen3-4B-Thinking
 model card, paired with the model's native 256K context window. This setting was 
 used for the final/best submission on Kaggle.
 
-The other selected submission used the stable 32GB balanced
+## Submission B (Other Selected Kaggle Submission)
+The other selected Kaggle submission used the stable 32GB balanced
 inference preset:
 
 - `max_tokens=16384`
@@ -95,7 +97,8 @@ Hardware/runtime used for the current model and final output generation:
 
 - GRPO training/checkpoint generation hardware: 2 x NVIDIA RTX PRO 6000.
 - Approximate GRPO training time for the current checkpoint: about 8 hours.
-- Approximate total private-set output generation/inference time: about 1 hour.
+- Approximate total private-set output generation/inference time for _submission A_ 2x RTX PRO 6000: about 1 hour.
+- Approximate total private-set output generation/inference time for _submission B_ using 1x RTX 5090: about 2.5 hours.
 - See `docs/full_grpo_runbook.md` for the dual RTX PRO 6000 run details.
 
 Final submitted CSV in this working tree:
