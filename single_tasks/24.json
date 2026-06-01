@@ -1,1 +1,0 @@
-{"id": "24", "instruction": "Compute the integral:\n$$\n\\int_{0}^3 \\frac{ 1 }{ x^2 + 2 \\cdot x - 8 } \\, dx\n$$\n\nOptions:\nA. ∞\nB. -3\nC. -2\nD. -1\nE. -∞\nF. 2\nG. -4", "output": "A"}

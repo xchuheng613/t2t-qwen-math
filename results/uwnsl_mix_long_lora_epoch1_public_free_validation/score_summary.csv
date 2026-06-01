@@ -1,2 +1,0 @@
-run_name,prediction_path,data_path,total,correct,accuracy,mcq_correct,mcq_total,mcq_accuracy,free_correct,free_total,free_accuracy,truncation_count,no_extraction_count,count_mismatch_count,mcq_format_error_count,format_error_count,fallback_used,stage0_repair_used,postprocess_used,avg_response_chars,avg_raw_response_chars
-uwnsl_mix_long_lora_epoch1_public_free_validation,results/uwnsl_mix_long_lora_epoch1_public_free_validation/submission.jsonl,data/public_free_response.jsonl,655,326,0.497710,0,0,,326,655,0.497710,4,0,38,0,38,21,623,0,56.31297709923664,871.4992366412214

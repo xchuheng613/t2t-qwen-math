@@ -1,6 +1,0 @@
-run_name,truncation_count,format_error_count,count_mismatch_count,stage0_repair_used,avg_response_chars,avg_raw_response_chars
-lora_B_dev_post,8,4,3,179,33.327778,10653.139
-base_dev_post,7,4,3,179,33.016667,11384.572
-base_holdout_free_post,2,1,1,98,40.26,8120.03
-lora_B_holdout_free_post,3,1,1,97,39.74,6911.18
-base_holdout_free_post_v2fix,2,1,1,98,40.26,8120.03

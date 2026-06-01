@@ -1,1 +1,0 @@
-{"id": "43", "instruction": "Find all real solutions of equation $2+7 z+z^2=0$.\nDoes the equation have real solutions? Input Yes or No: [ANS]\nIf your answer is Yes, input the solutions: $z_1=$ [ANS] and $z_2=$ [ANS] with $z_1\\le z_2$.", "output": "YES, -6.70156211871642, -0.298437881283576"}

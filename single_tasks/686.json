@@ -1,1 +1,0 @@
-{"id": "686", "instruction": "Determine the number of permutations of $1,2,3, 4,...,32$ such that if $m$ divides $n$ , the $m$ -th number divides the $n$ -th number.\n\nOptions:\nA. 240\nB. 235\nC. 238\nD. 243\nE. 239\nF. 242\nG. 241\nH. 236\nI. 234\nJ. 237", "output": "A"}

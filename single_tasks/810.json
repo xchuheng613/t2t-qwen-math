@@ -1,1 +1,0 @@
-{"id": "810", "instruction": "Let $P_{n}(x)$ be the n-th order Taylor polynomial of $f(x) = \\cos(x)$ about $a = 0$. Find the minimum $n$ such that the approximation $f(x) \\approx P_{n}(x)$ is accurate to within $0.00001$ for every value of $x$ satisfying $|x| \\le 0.1$.\n\nOptions:\nA. 8\nB. 1\nC. 2\nD. 10\nE. 3\nF. 5\nG. 7\nH. 9\nI. 4\nJ. 6", "output": "E"}

@@ -1,1 +1,0 @@
-{"id": "202", "instruction": "Suppose that the graph of $f(x)=Ca^x$ passes through the points (2, 15.3125) and (4, 46.89453125). Find a formula for $f(x)$.\n$f(x)$=[ANS]", "output": "5*1.75**x"}

@@ -1,1 +1,0 @@
-{"id": "89", "instruction": "Find the value of the integral\n$$\n\\int_{0}^{2 \\pi} \\frac{\\mathrm{d}x}{\\left(2+\\sqrt{3} \\cos x\\right)^2}\n$$\n\nOptions:\nA. $$\n0\n$$\nB. $$\n\\pi^2\n$$\nC. $$\n3 \\pi\n$$\nD. $$\n12 \\pi\n$$\nE. $$\n4 \\pi\n$$\nF. $$\n6 \\pi\n$$\nG. $$\n8 \\pi\n$$\nH. $$\n\\pi\n$$\nI. $$\n2 \\pi\n$$\nJ. $$\n10 \\pi\n$$", "output": "E"}

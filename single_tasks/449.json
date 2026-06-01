@@ -1,1 +1,0 @@
-{"id": "449", "instruction": "Let $x$ be the arithmetic mean of all positive integers $k<577$ such that\n$$$k^4\\equiv 144\\pmod {577}.$$$\nFind the greatest integer less than or equal to $x$\n\nOptions:\nA. 285\nB. 283\nC. 290\nD. 284\nE. 287.5\nF. 287\nG. 288\nH. 289\nI. 286", "output": "G"}

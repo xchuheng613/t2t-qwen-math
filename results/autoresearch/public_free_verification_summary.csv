@@ -1,2 +1,0 @@
-timestamp,run_name,prediction_path,data_path,total,correct,accuracy,mcq_correct,mcq_total,mcq_accuracy,free_correct,free_total,free_accuracy,analysis_path,html_path
-2026-05-28T16:21:16,autoresearch_free_may27_config_a_public_free,results/autoresearch/autoresearch_free_may27_config_a_public_free/submission.jsonl,data/public_free_response.jsonl,655,386,0.589313,0,0,,386,655,0.589313,result_analyze/autoresearch_free_may27_config_a_public_free.jsonl,

@@ -1,1 +1,0 @@
-{"id": "597", "instruction": "If there are $2^{5 6}$ cipher text per plain text and a total of $2^{1 8}$ plaintexts of length18 exist. Then determine the number of distinct ciphertexts.\n\nOptions:\nA. $2^{72}$\nB. 186\nC. $2^{78}$\nD. 761\nE. $2^{76}$\nF. $2^{89}$\nG. $2^{82}$\nH. $2^{68}$\nI. $2^{74}$\nJ. $2^{70}$", "output": "I"}

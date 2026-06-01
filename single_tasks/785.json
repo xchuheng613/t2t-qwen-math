@@ -1,1 +1,0 @@
-{"id": "785", "instruction": "$8+9$=[ANS]\n$8-4$=[ANS]\n$5 \\times 5$=[ANS]\n$20 \\div 5$=[ANS]", "output": "17, 4, 25, 4"}

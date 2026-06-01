@@ -1,4 +1,0 @@
-split,path,rows,mcq_like,free_like,avg_question_chars,avg_assistant_chars,avg_total_text_chars,avg_answer_items
-train,data/sft_lora_public_v2/train.jsonl,371,0,371,392.83019,242.39084,1061.221,2.6684636
-dev,data/sft_lora_public_v2/dev.jsonl,100,1,99,339.09,44.26,1679.44,2.37
-holdout,data/sft_lora_public_v2/holdout.jsonl,100,0,100,362.91,43.54,1695.06,2.68

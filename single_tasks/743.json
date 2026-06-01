@@ -1,1 +1,0 @@
-{"id": "743", "instruction": "Suppose that a regression yields the following sum of squares: $\\Sigma(y_i-\\bar{y})^2=360, \\quad \\Sigma(y_i-\\hat{y}_i)^2=90, \\quad \\Sigma(\\hat{y}_i-\\bar{y})^2=270$ Then the percentage of the variation in y that is explained by the variation in x is: Answer=[ANS] \\%", "output": "75"}

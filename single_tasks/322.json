@@ -1,1 +1,0 @@
-{"id": "322", "instruction": "Using laws of logarithms, write the expression below using sums and/or differences of logarithmic expressions which do not contain the logarithms of products, quotients, or powers. $ \\log \\left(6 (x^{2}-y^{2}) \\right)=$ [ANS]", "output": "log10(6)+log10(x+y)+log10(x-y)"}

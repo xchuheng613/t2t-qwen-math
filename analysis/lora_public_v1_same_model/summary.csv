@@ -1,2 +1,0 @@
-run,epochs,lr,optim,rank,alpha,dropout,target_modules,best_step,best_epoch,best_eval_loss,best_eval_token_accuracy,train_loss_at_best,train_token_accuracy_at_best,holdout_correct,holdout_total,holdout_accuracy,merged_model,best_checkpoint
-lora_public_v1_same_model_e6,6,5e-5,adamw_torch,16,32,0.05,q_proj k_proj v_proj o_proj gate_proj up_proj down_proj,150,6.0,0.31656935811042786,0.9147276735305786,0.3441124439239502,0.9133376746761556,23,100,0.23,checkpoints/merged_lora_public_v1_same_model_best,checkpoints/lora_public_v1_same_model_e6/checkpoint-150

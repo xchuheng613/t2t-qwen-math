@@ -1,4 +1,0 @@
-type,prompt,config,n,correct,acc,path,avg_response_chars,finish_non_stop,postprocess_used,err_correct,err_truncated,err_no_answer,err_out_of_range,err_count_mismatch,err_wrong,err_judge_error
-combined,mcq_compact__free_compact,mcq_greedy_n1__free_greedy_n1,200,144,0.72,,366.66,7,197,144,7,0,0,2,47,0
-mcq,compact,greedy_n1,100,79,0.79,results/compact_v3_expression_postprocess/mcq__compact__greedy_n1.jsonl,24.0,5,100,79,5,0,0,0,16,0
-free,compact,greedy_n1,100,65,0.65,results/compact_v3_expression_postprocess/free__compact__greedy_n1.jsonl,709.32,2,97,65,2,0,0,2,31,0

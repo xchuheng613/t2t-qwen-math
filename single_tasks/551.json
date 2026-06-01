@@ -1,1 +1,0 @@
-{"id": "551", "instruction": "Factor each trigonometric expression. $-2 \\sec^2(x)-\\sec(x)+1$=[ANS] $\\cdot$ [ANS]\n$16 \\tan^2(x)+24 \\tan(x)+9$=[ANS] $\\cdot$ [ANS]", "output": "-2*sec(x)+1, sec(x)+1, 4*tan(x)+3, 4*tan(x)+3"}

@@ -1,1 +1,0 @@
-{"id": "764", "instruction": "Compute $\\sqrt[3]{130}$ with accuracy $0.0001$.\n\nOptions:\nA. 5.0653\nB. 5.0651\nC. 5.0652\nD. 5.0657\nE. 5.0658\nF. 5.0654\nG. 5.0660\nH. 5.0659\nI. 5.0655\nJ. 5.0656", "output": "E"}

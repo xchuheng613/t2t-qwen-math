@@ -1,1 +1,0 @@
-{"id": "131", "instruction": "When $1 + 7 + 7^2 +...+ 7^{2004}$ is divided by $1000$ , a remainder of $N$ is obtained. Determine the value of $N$ .\n\nOptions:\nA. 802\nB. 700\nC. 701\nD. 601\nE. 803\nF. 702\nG. 501\nH. 901\nI. 703\nJ. 801", "output": "J"}

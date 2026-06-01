@@ -1,1 +1,0 @@
-{"id": "672", "instruction": "Let $f(x) = \\log_2(x)$ for all $x > 0$ . Find the sum of all $x$ for which\n$$ x^{95 + f\\left(x^{f(x) -18} \\right)} = 2^{126}$$\nholds true.\n\nOptions:\nA. 643\nB. 645\nC. 647\nD. 644\nE. 649\nF. 642\nG. 648\nH. 641\nI. 646\nJ. 640", "output": "D"}

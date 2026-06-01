@@ -1,1 +1,0 @@
-{"id": "1021", "instruction": "The number $[(3^5)^{(5^3)}]^{[(5^3)^{(3^5)}]}$ can be expressed in the form $p^{q^r}$ for positive primes $p$ , $q$ , and $r$ . Find $p + q + r$ .\n\nOptions:\nA. 733\nB. 747\nC. 745\nD. 743\nE. 735\nF. 741\nG. 742\nH. 739\nI. 738\nJ. 737", "output": "F"}

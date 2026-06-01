@@ -1,4 +1,0 @@
-step,epoch,loss,eval_loss,mean_token_accuracy,eval_mean_token_accuracy,grad_norm,entropy,eval_entropy,learning_rate,num_tokens,eval_num_tokens
-10,0.43126685,2.032494,,0.61713965,,0.82480013,0.91490835,,3.2608696e-05,58330,
-20,0.86253369,1.4613072,,0.67439351,,1.1316587,1.0818285,,1.0869565e-05,114175,
-24,1,,2.5072443,,0.51828397,,,1.7105736,,,131948

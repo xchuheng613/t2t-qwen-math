@@ -1,1 +1,0 @@
-{"id": "833", "instruction": "A ferris wheel is 35 meters in diameter and boarded at ground level. The wheel makes one full rotation every 6 minutes, and at time $t=0$ you are at the 9 o'clock position and descending. Let $f(t)$ denote your height (in meters) above ground at $t$ minutes. Find a formula for $f(t)$. $f(t)=$ [ANS]", "output": "-17.5*sin(2*pi/6*t)+17.5"}

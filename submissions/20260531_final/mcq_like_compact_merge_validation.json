@@ -1,0 +1,20 @@
+{
+  "variant": "mcq_like",
+  "source_data": "data/private.jsonl",
+  "grpo_source": "submissions/20260531_final/submission.csv",
+  "replacement_source": "results/private_compact_staged_n1_high_budget/submission.jsonl",
+  "output_submission": "results/private_submission_grpo_free_compact_mcq_like_hybrid/submission.csv",
+  "root_submission": "submission_mcq_like.csv",
+  "expected_rows": 943,
+  "merged_rows": 943,
+  "replacement_rows": 397,
+  "kept_grpo_rows": 546,
+  "explicit_options_rows_replaced": 300,
+  "inline_or_no_options_mcq_rows_replaced": 97,
+  "missing": [],
+  "extra": [],
+  "duplicate_count": 0,
+  "empty": 0,
+  "kept_changed_from_grpo_count": 0,
+  "replacement_not_matching_source_count": 0
+}

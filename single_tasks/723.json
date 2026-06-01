@@ -1,1 +1,0 @@
-{"id": "723", "instruction": "Convert the exponential equation to the form $Q=ae^{kt}$. In the blanks, give the corresponding values for the values of $a$ and $k$ once you have rewritten the formula. Give your answer for $k$ as a decimal, not a percent. $Q=22 (0.462)^t$ $a=$ [ANS]\n$k=$ [ANS]", "output": "22, ln(0.462)"}

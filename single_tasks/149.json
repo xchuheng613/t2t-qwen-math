@@ -1,1 +1,0 @@
-{"id": "149", "instruction": "Enter T or F depending on whether the statement is true or false (You must enter T or F--True and False will not work.) [ANS] 1. $y=\\tan (2x)$ has period $\\pi$ [ANS] 2. The domain of $\\tan (x)$ is all real numbers [ANS] 3. The range of $\\tan (x)$ is all real numbers [ANS] 4. $\\tan (x)$ and $\\cot x$ are odd functions", "output": "F, F, T, T"}

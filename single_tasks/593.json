@@ -1,1 +1,0 @@
-{"id": "593", "instruction": "Given that 695xy155 is a multiple of 99, find $x, \\mathbf{y}$.\n\nOptions:\nA. x=0,y=8\nB. x=4,y=7\nC. x=1,y=4\nD. x=8,y=0\nE. x=6,y=9\nF. x=9,y=6\nG. x=3,y=2\nH. x=2,y=3\nI. x=5,y=1\nJ. x=7,y=5", "output": "H"}

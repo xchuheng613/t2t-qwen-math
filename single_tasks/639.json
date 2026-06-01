@@ -1,1 +1,0 @@
-{"id": "639", "instruction": "Find the inverse function (if it exists) of $h(x)=\\frac{x}{8x+5}$. If the function is not invertible, enter NONE. $h^{-1}(x)=$ [ANS]\n(Write your inverse function in terms of the independent variable $x$.)", "output": "5*x/(1-8*x)"}

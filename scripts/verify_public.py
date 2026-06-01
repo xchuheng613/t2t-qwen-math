@@ -7,8 +7,8 @@ Examples:
     .venv/bin/python verify_public.py results/32gb_balanced_public/submission.jsonl
     .venv/bin/python verify_public.py results/32gb_balanced_public --no-visualize
 
-The script writes a visualization-compatible JSONL to ``result_analyze/`` and
-appends one row to ``result_analyze/public_verification_summary.csv``.
+The script writes a visualization-compatible JSONL to ``analysis/`` and
+appends one row to ``analysis/public_verification_summary.csv``.
 """
 
 from __future__ import annotations
@@ -26,7 +26,7 @@ from typing import Any
 
 
 DEFAULT_DATA_PATH = Path("data/public.jsonl")
-DEFAULT_ANALYSIS_DIR = Path("result_analyze")
+DEFAULT_ANALYSIS_DIR = Path("analysis")
 DEFAULT_SUMMARY_PATH = DEFAULT_ANALYSIS_DIR / "public_verification_summary.csv"
 
 _BOXED_LETTER_RE = re.compile(r"\\boxed\{\s*([A-Za-z])\s*\}")
@@ -357,7 +357,7 @@ def append_summary(
 
 def refresh_visualizations() -> None:
     subprocess.run(
-        [sys.executable, "result_analyze/visualize_wrong.py"],
+        [sys.executable, "analysis/visualize_wrong.py"],
         check=True,
     )
 

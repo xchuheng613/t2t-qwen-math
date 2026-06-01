@@ -1,1 +1,0 @@
-{"id": "389", "instruction": "Find points on a coordinate plane that satisfy the equation $x \\cdot (x-2) + y \\cdot (y+4) + 5 = 0$.\n\nOptions:\nA. (1, -4)\nB. (0, -3)\nC. (1, -3)\nD. (2, -2)\nE. (2, -3)\nF. (1,-2)\nG. (1, -1)\nH. (0, -2)", "output": "F"}

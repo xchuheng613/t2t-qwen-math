@@ -1,1 +1,0 @@
-{"id": "933", "instruction": "Let $S(n)$ be the sum of the squares of the digits of $n$ . How many positive integers $n>2007$ satisfy the inequality\n$$$n-S(n)\\le 2007?$$$\n\nOptions:\nA. 66\nB. 65\nC. 67\nD. 62\nE. 68\nF. 69\nG. 61\nH. 60\nI. 64\nJ. 63", "output": "J"}

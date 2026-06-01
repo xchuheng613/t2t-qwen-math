@@ -1,1 +1,0 @@
-{"id": "103", "instruction": "Find a formula for the $n$ th term of the following sequences:\n(a) $\\frac{1}{1},\\frac{-1}{16},\\frac{1}{81},\\ldots$ $a_n=$ [ANS]\n(b) $\\frac{3}{5},\\frac{4}{6},\\frac{5}{7},\\ldots$ $b_n=$ [ANS]\nAssume a starting index of $n=1$.", "output": "(-1)^(n+1)/(n^4), (n+2)/(n+4)"}

@@ -1,1 +1,0 @@
-{"id": "147", "instruction": "The equation of an ellipse with center $(5,3)$ that passes through the points $(9,3)$ and $(5,5)$ has the form $f(x,y)=1$. Find $f(x,0)$. [ANS]", "output": "(x-5)^{2} /16 + 9/4"}

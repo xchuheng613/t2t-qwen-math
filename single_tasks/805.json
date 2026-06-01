@@ -1,1 +1,0 @@
-{"id": "805", "instruction": "Which of these functions are neither odd nor even? [ANS] A. $f(x)=x+\\sin(x)$  B. $f(\\beta)=1+\\csc(\\beta)$  C. $f(t)=2+\\tan(t)$  D. $f(x)=\\cos(x)+\\sin(x)$  E. $f(x)=\\cos(2x)$  F. ${f(x)=\\frac{\\sin(x)}{x}}$", "output": "BCD"}

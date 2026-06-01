@@ -1,1 +1,0 @@
-{"id": "755", "instruction": "For the given data, find $\\Sigma x$, $n$, and $\\overline{x}$:\nx_1=20, \\ x_2=17, \\ x_3=18, \\ x_4=17, \\ x_5=22, \\ x_6=18, \\ x_7=12, \\ x_8=18\n$\\Sigma x=$ [ANS]\n$n=$ [ANS]\n$\\overline{x}=$ [ANS]", "output": "142, 8, 17.75"}

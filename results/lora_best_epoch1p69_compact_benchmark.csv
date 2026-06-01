@@ -1,2 +1,0 @@
-run_name,prediction_path,data_path,total,correct,accuracy,mcq_correct,mcq_total,mcq_accuracy,free_correct,free_total,free_accuracy,truncation_count,no_extraction_count,count_mismatch_count,mcq_format_error_count,format_error_count,fallback_used,stage0_repair_used,postprocess_used,avg_response_chars,avg_raw_response_chars
-lora_best_epoch1p69_holdout_compact_postprocess,results/lora_best_epoch1p69_holdout_compact_postprocess/submission.jsonl,data/public_holdout.jsonl,100,53,0.530000,0,0,,53,100,0.530000,2,0,5,0,5,3,95,0,56.26,514.97

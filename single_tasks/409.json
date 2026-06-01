@@ -1,1 +1,0 @@
-{"id": "409", "instruction": "Find all solutions to $ \\tan(\\theta)=-1$ in the interval $0 \\leq \\theta \\leq 2\\pi$. If there is more than one answer, enter your answers as a comma separated list. Your answers should be exact values (given as fractions, not decimal approximations). $\\theta$=[ANS]", "output": "(2.35619, 5.49779)"}

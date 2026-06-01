@@ -1,1 +1,0 @@
-{"id": "941", "instruction": "Determine whether the expressions are equivalent or not.\n[ANS] 1. $-a+2$ and $-(a-2)$\n[ANS] 2. $-a+2$ and $-2a+4/2$\n[ANS] 3. $-a+2$ and $2-a$\n[ANS] 4. $-a+2$ and $-(2-a)$\n[ANS] 5. $-a+2$ and $-(a+2)$", "output": "EQUIVALENT, NOT EQUIVALENT, EQUIVALENT, Not Equivalent, Not Equivalent"}

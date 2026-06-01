@@ -1,1 +1,0 @@
-{"id": "331", "instruction": "Add:\n$\\begin{array}{ccccccc}\\hline 788 & & 872 & & 467 & & 448 \\\\ \\hline+669 & &+715 & &+675 & &+928 \\\\ \\hline & & & & & & \\\\ \\hline [ANS] & & [ANS] & & [ANS] & & [ANS] \\\\ \\hline \\end{array}$", "output": "1457, 1587, 1142, 1376"}

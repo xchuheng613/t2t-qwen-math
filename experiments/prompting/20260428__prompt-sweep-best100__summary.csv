@@ -1,0 +1,4 @@
+type,prompt,config,n,correct,acc,path
+combined,mcq_eliminate__free_baseline,mcq_greedy_n1__free_sc_n3,100,68,0.68,
+mcq,eliminate,greedy_n1,50,36,0.72,results/sweep_best100/mcq__eliminate__greedy_n1.jsonl
+free,baseline,sc_n3,50,32,0.64,results/sweep_best100/free__baseline__sc_n3.jsonl

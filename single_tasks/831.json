@@ -1,1 +1,0 @@
-{"id": "831", "instruction": "Let the joint probability density function of the two-dimensional continuous random variable (X,Y) be f(x,y) = 24(1-x)y, where 0<y<x<1, find E(X|y), 0<y<1\n\nOptions:\nA. 2y/3 + 1/6\nB. y/4 + 1/2\nC. 2y/3 + 1/4\nD. 2y/3+1\nE. 3y/4+1/4\nF. y/3 + 1/2\nG. y/3+1/3\nH. 2y/3 + 1/3\nI. y/3 + 1/4\nJ. y/3 + 1/6", "output": "G"}

@@ -1,1 +1,0 @@
-{"id": "121", "instruction": "An integer $n$ is fixed with respect to $m$ if $n$ and $n^2$ leave the same remainder when divided by $m.$ Let $M$ be the largest integer such that $1000$ is fixed with respect to $M.$ Find the number of positive integer divisors of $M.$\n\nOptions:\nA. 129\nB. 130\nC. 122\nD. 119\nE. 112\nF. 121\nG. 120\nH. 128\nI. 126\nJ. 124", "output": "H"}

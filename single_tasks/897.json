@@ -1,1 +1,0 @@
-{"id": "897", "instruction": "Factor the given polynomial\n${t\\!\\left(t+7\\right)-8\\!\\left(t+7\\right)}=$ [ANS]\nIf the expression cannot be factored then answer with prime.", "output": "(t+7)*(t-8)"}

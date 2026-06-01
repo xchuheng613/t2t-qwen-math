@@ -1,1 +1,0 @@
-{"id": "970", "instruction": "Find the number of positive integers $n$ such that $1 \\le n \\le 1000$ and $\\left\\lfloor \\dfrac{2^n}{73} \\right\\rfloor$ is even.\n\nOptions:\nA. 662\nB. 670\nC. 669\nD. 666\nE. 663\nF. 667\nG. 661\nH. 665\nI. 668\nJ. 664", "output": "F"}

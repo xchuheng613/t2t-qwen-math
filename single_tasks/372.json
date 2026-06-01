@@ -1,1 +1,0 @@
-{"id": "372", "instruction": "Evaluate the triple integral $\\int_{0}^1{\\int_{1}^2{\\int_{z}^{z+1}{(y+1) d x} d y} d z}$ by using the transformation $u = x - z$, $v = 3 \\cdot y$, and $w = \\frac{ z }{ 2 }$.\n\nOptions:\nA. 9/4\nB. 15/8\nC. 7/4\nD. 11/4\nE. 7/2\nF. 5/2\nG. 13/4\nH. 3/2\nI. 19/8\nJ. 17/8", "output": "F"}

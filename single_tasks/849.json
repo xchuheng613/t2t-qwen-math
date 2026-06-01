@@ -1,1 +1,0 @@
-{"id": "849", "instruction": "Compute the sum of the prime divisors of $1^2 + 2^2 + 3^2 +...+ 2005^2$ .\n\nOptions:\nA. 679\nB. 682\nC. 687\nD. 684\nE. 688\nF. 686\nG. 680\nH. 681\nI. 685\nJ. 683", "output": "G"}

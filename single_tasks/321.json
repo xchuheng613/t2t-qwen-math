@@ -1,1 +1,0 @@
-{"id": "321", "instruction": "Calculate the composite functions $f \\circ g$ and $g \\circ f$. $f(x)=\\cos\\!\\left(x\\right), g(x)=8x^{3}+6x^{2}-6$ $f(g(x))=$ [ANS]\n$g(f(x))=$ [ANS]", "output": "cos(8*x^3+6*x^2-6), 8*[cos(x)]^3+6*[cos(x)]^2-6"}

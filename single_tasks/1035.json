@@ -1,1 +1,0 @@
-{"id": "1035", "instruction": "Given \\[ 11z^{10}+10iz^9+10iz-11=0, \\] find the value of $|z|$. (Here $z$ is a complex number and $i^2=-1$.)\n\nOptions:\nA. 1.5\nB. 2\nC. 1.1\nD. 0.5\nE. 0.75\nF. 1.25\nG. 1", "output": "G"}

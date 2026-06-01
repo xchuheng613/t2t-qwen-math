@@ -1,1 +1,0 @@
-{"id": "1010", "instruction": "Let $S=(0,\\infty)$, $T=(-\\infty,4]$, and $W=[-4,4)$. For each intersection or union, choose the correct notation for the resulting interval. [ANS] 1. $S\\cup W$ [ANS] 2. $S\\cap W$ [ANS] 3. $T\\cap W$ [ANS] 4. $S\\cup T$\nA. $[-4,4)$ B. $(0,4)$ C. $[-4,\\infty)$ D. $(-\\infty,\\infty)$", "output": "C, B, A, D"}

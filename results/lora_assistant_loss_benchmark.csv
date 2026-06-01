@@ -1,6 +1,0 @@
-run_name,prediction_path,data_path,total,correct,accuracy,mcq_correct,mcq_total,mcq_accuracy,free_correct,free_total,free_accuracy,truncation_count,no_extraction_count,count_mismatch_count,mcq_format_error_count,format_error_count,fallback_used,stage0_repair_used,postprocess_used,avg_response_chars,avg_raw_response_chars
-assistant_step20_holdout_free,results/lora_assistant_loss/step20_holdout_free/submission.jsonl,data/lora_public_v2/holdout_free.jsonl,100,59,0.590000,0,0,,59,100,0.590000,0,0,9,0,9,0,0,0,2231.61,2231.61
-assistant_step30_holdout_free,results/lora_assistant_loss/step30_holdout_free/submission.jsonl,data/lora_public_v2/holdout_free.jsonl,100,46,0.460000,0,0,,46,100,0.460000,0,0,10,0,10,0,0,0,654.56,654.56
-assistant_step40_holdout_free,results/lora_assistant_loss/step40_holdout_free/submission.jsonl,data/lora_public_v2/holdout_free.jsonl,100,48,0.480000,0,0,,48,100,0.480000,0,0,11,0,11,0,0,0,501.24,501.24
-assistant_step96_holdout_free,results/lora_assistant_loss/step96_holdout_free/submission.jsonl,data/lora_public_v2/holdout_free.jsonl,100,50,0.500000,0,0,,50,100,0.500000,0,0,10,0,10,0,0,0,453.53,453.53
-assistant_step20_public_dev,results/lora_assistant_loss/step20_public_dev/submission.jsonl,data/lora_public_v2/public_dev.jsonl,180,111,0.616667,50,81,0.617284,61,99,0.616162,0,0,12,0,12,0,0,0,3194.8611111111113,3194.8611111111113

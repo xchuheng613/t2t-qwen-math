@@ -1,1 +1,0 @@
-{"id": "961", "instruction": "Let $a_0 = 5/2$ and $a_k = a_{k-1}^2 - 2$ for $k \\geq 1$. Compute \\[ \\prod_{k=0}^\\infty \\left(1 - \\frac{1}{a_k} \\right) \\] in closed form.\n\nOptions:\nA. \\frac{3}{10}\nB. \\frac{3}{8}\nC. \\frac{4}{9}\nD. \\frac{2}{5}\nE. \\frac{3}{7}\nF. \\frac{5}{14}\nG. \\frac{3}{11}\nH. \\frac{4}{7}\nI. \\frac{5}{11}\nJ. \\frac{5}{12}", "output": "E"}

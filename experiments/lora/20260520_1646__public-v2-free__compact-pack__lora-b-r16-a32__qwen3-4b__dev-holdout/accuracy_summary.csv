@@ -1,0 +1,6 @@
+split,model,run_name,total,correct,accuracy,mcq_accuracy,free_accuracy,source
+validation,lora,lora_B_dev_post,180,129,0.716667,0.753086,0.686869,results/lora_bench_v2/lora_B_dev_post/submission.jsonl
+validation,base,base_dev_post,180,132,0.733333,0.814815,0.666667,results/lora_bench_v2/base_dev_post/submission.jsonl
+holdout,base,base_holdout_free_post,100,66,0.66,,0.66,results/lora_bench_v2/base_holdout_free_post/submission.jsonl
+holdout,lora,lora_B_holdout_free_post,100,65,0.65,,0.65,results/lora_bench_v2/lora_B_holdout_free_post/submission.jsonl
+holdout,base,base_holdout_free_post_v2fix,100,66,0.66,,0.66,results/lora_bench_v2/base_holdout_free_post_v2fix/submission.jsonl

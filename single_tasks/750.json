@@ -1,1 +1,0 @@
-{"id": "750", "instruction": "For real numbers $a,b,$ and $c,$ suppose that $\\tfrac{a+b}{c}$ and $\\tfrac{b+c}{a}$ are the roots of the polynomial $x^2 - 574 x + 17.$ Find $\\tfrac{a+c}{b}$ .\n\nOptions:\nA. 35\nB. 38\nC. 36\nD. 35.7\nE. 34\nF. 35.8\nG. 35.2\nH. 37\nI. 35.9\nJ. 35.5", "output": "C"}

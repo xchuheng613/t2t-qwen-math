@@ -1,1 +1,0 @@
-{"id": "405", "instruction": "The cost (in dollars) of producing $x$ air conditioners is $C=g(x)=630+50x$. Find a formula for the inverse function $g^{-1}(C)$. $g^{-1}(C)=$ [ANS]", "output": "(C-630)/50"}

@@ -1,1 +1,0 @@
-{"id": "478", "instruction": "If $\\cos(\\phi)=0.8855$ and $3 \\pi/2 \\leq \\phi \\leq 2 \\pi$, approximate the following to four decimal places.\n(a) $\\sin(\\phi)$=[ANS] (Round to four decimal places.)\n(b) $\\tan(\\phi)$=[ANS] (Round to four decimal places.)", "output": "-0.464639, -0.52472"}

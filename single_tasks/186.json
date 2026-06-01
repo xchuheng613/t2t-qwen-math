@@ -1,1 +1,0 @@
-{"id": "186", "instruction": "Find the greatest common factor of the following three terms\n${8x^{13}y^{9}}$, ${-64x^{11}y^{14}}$, ${56x^{5}y^{18}}$ [ANS]", "output": "8*x^5*y^9"}

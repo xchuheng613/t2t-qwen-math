@@ -1,1 +1,0 @@
-{"id": "143", "instruction": "The diagonal length ($D$) of a rectangle with side lengths $L$ and $W$ is given by:\n${D=\\sqrt{L^2+W^2}}$ Determine the diagonal length of rectangles with $L={7\\ {\\rm ft}}$ and $W={24\\ {\\rm ft}}$. The diagonal length of rectangles with $L={7\\ {\\rm ft}}$ and $W={24\\ {\\rm ft}}$ is [ANS].", "output": "25"}

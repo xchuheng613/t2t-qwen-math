@@ -1,1 +1,0 @@
-{"id": "1003", "instruction": "Write the function $h(x)=\\frac{1}{8x+1}$ as the composition of two functions $f(g(x))$. $f(x)$=[ANS]\n$g(x)$=[ANS]\nDo not use the identity function as one of your answers. That is, do not use $f(x)=x$ or $g(x)=x$.", "output": "1/x, 8*x+1"}

@@ -1,1 +1,0 @@
-{"id": "1048", "instruction": "Find all $y$ such that the distance between the points $(5, 2)$ and $(3, y)$ is 22. $y=$ [ANS]\nNote: Enter your answer as a comma separated list of numbers. If there are no such $y$, enter none. none.", "output": "(2+sqrt(480), 2-sqrt(480))"}

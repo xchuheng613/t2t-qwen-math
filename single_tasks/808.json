@@ -1,1 +1,0 @@
-{"id": "808", "instruction": "If $P(t)=(\\cos t, \\sin t)$ has coordinates (0.814,0.581), find the coordinates of a. $P(t+\\pi)$ $x$=[ANS] $y$=[ANS]\nb. $P(-t)$ $x$=[ANS] $y$=[ANS]\nc. $P(t-\\pi)$ $x$=[ANS] $y$=[ANS]\nc. $P(-t-\\pi)$ $x$=[ANS] $y$=[ANS]", "output": "-0.814, -0.581, 0.814, -0.581, -0.814, -0.581, -0.814, 0.581"}

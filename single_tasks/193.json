@@ -1,1 +1,0 @@
-{"id": "193", "instruction": "In testing the hypothesis: $H_0: \\beta_1=0$ $H_0: \\beta_1 \\not=0$ the following statistics are available: $n=167,\\quad b_0=-1.99,\\quad b_1=5.16,\\quad s_{b_1}=2.24,\\quad \\hat{y}=8$ Determine the value of the test statistic. Test Statistic=[ANS]", "output": "2.30357142857143"}

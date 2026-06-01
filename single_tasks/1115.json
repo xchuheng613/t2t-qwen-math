@@ -1,1 +1,0 @@
-{"id": "1115", "instruction": "The temperatures for a 24-hour period ranged between $-2^\\circ F$ and $29^\\circ F$, inclusive. What was the range in Celsius degrees? (Use $F=\\frac{9}{5}C+32.$) Answer: [ANS]", "output": "[5/9*(-32+-2),5/9*(-32+29)]"}

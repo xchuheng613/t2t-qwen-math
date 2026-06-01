@@ -1,1 +1,0 @@
-{"id": "803", "instruction": "Write the function $y=\\sqrt{8-x^{6}}$ in the form $y=k \\cdot (h(x))^p$ for some function $h(x)$ and some constants $k$ and $p$.\n$k$=[ANS]\n$p$=[ANS]\n$h(x)$=[ANS]", "output": "1, 0.5, 8-x^6"}

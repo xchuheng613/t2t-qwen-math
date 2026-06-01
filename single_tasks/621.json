@@ -1,1 +1,0 @@
-{"id": "621", "instruction": "Find $L=\\lim_{n \\to \\infty}\\left(x_{n}\\right)$, where $x_{n} = \\frac{ \\sqrt{n^2+1} + \\sqrt{n} }{ \\sqrt[4]{n^3+n} - \\sqrt{n} }$ is the general term of a sequence.\n\nOptions:\nA. 0\nB. 2\nC. 1\nD. -∞\nE. -1\nF. ∞", "output": "F"}

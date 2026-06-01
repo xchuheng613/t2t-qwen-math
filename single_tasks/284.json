@@ -1,1 +1,0 @@
-{"id": "284", "instruction": "Evaluate the integral:\n$$\n\\int_{0}^1 \\int_{-\\sqrt{1-x^2}}^{\\sqrt{1-x^2}} \\int_{-\\sqrt{1-x^2-y^2}}^{\\sqrt{1-x^2-y^2}} 1 \\, dz \\, dy \\, dx\n$$\n\nOptions:\nA. 4π/15\nB. 2π/3\nC. 8π/9\nD. 4π/5\nE. 4π/3\nF. 4π/12\nG. 4π/6\nH. 4π/9", "output": "B"}

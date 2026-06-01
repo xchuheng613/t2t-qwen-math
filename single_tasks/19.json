@@ -1,1 +1,0 @@
-{"id": "19", "instruction": "A sequence of positive reals defined by $a_0=x$ , $a_1=y$ , and $a_n\\cdot a_{n+2}=a_{n+1}$ for all integers $n\\ge 0$ . Given that $a_{2007}+a_{2008}=3$ and $a_{2007}\\cdot a_{2008}=\\frac 13$ , find $x^3+y^3$ .\n\nOptions:\nA. 652\nB. 650\nC. 647\nD. 645\nE. 648\nF. 651\nG. 649\nH. 646\nI. 653", "output": "E"}

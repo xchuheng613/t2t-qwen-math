@@ -1,1 +1,0 @@
-{"id": "938", "instruction": "(a) Write an expression for the total cost of buying 9 apples at \\$ $a$ each and 4 pears at \\$ $p$ each. Your expression should be in terms of $a$ and $p$. \\$ [ANS]\n(b) Find the total cost if apples cost \\$ $0.50$ each and pears cost \\$ $0.85$ each. \\$ [ANS]", "output": "9*a+4*p, 7.9"}

@@ -1,1 +1,0 @@
-{"id": "623", "instruction": "Let $\\mathbf{F}$ be the set $A = {\\frac{0.1}{a}} + {\\frac{0.3}{b}} + {\\frac{0.7}{c}} + {\\frac{0.8}{d}} + {\\frac{0.5}{e}}$. What is the value of the Haring ambiguity $d(A)$?\n\nOptions:\nA. 0.56\nB. 0.54\nC. 0.48\nD. 0.58\nE. 0.60\nF. 0.62\nG. 0.45\nH. 0.50\nI. 0.52\nJ. 0.63", "output": "A"}

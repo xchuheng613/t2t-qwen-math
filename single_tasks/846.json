@@ -1,1 +1,0 @@
-{"id": "846", "instruction": "Find a solution for $\\theta$ in radians. If no solution exists, enter NONE. $ \\tan{(\\theta-4)}=0.27$ $\\theta=$ [ANS]\n(enter your answer accurate to at least four decimal places)", "output": "atan(0.27)+4"}

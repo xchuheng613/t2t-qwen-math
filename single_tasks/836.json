@@ -1,1 +1,0 @@
-{"id": "836", "instruction": "Given $\\tan(\\alpha)=\\frac{7}{\\sqrt{32}}$ and $\\pi<\\alpha<3\\pi/2$, find the exact value of $\\hbox{} \\tan(\\alpha/2)$. Note: You are not allowed to use decimals in your answer. $\\tan(\\alpha/2)$=[ANS].", "output": "(1--1*[sqrt(32)]/9)/(-1*7/9)"}

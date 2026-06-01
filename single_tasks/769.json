@@ -1,1 +1,0 @@
-{"id": "769", "instruction": "Simplify. Assume that all expressions under radicals represent nonnegative numbers.\n$\\left(\\sqrt{7 p-6}-3\\right)^2=$ [ANS]\nWrite your answer using radical notation if necessary. Help:", "output": "7*p+3-6*sqrt(7*p-6)"}

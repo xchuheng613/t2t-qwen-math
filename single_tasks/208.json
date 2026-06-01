@@ -1,1 +1,0 @@
-{"id": "208", "instruction": "Find all solutions to the equation below for $0 \\leq \\alpha \\leq 2 \\pi$. If there is more than one answer, enter your solutions in a comma-separated list, and be sure to give exact answers without any rounding.\n2 \\sin{(\\alpha)}=1 $\\alpha=$ [ANS]", "output": "(0.523599, 2.61799)"}

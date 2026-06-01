@@ -1,1 +1,0 @@
-{"id": "607", "instruction": "Find the least common denominator (LCD) of the rational expressions: \\frac{11}{15x^{2}-8x-12} \\mbox{and} \\frac{1}{3x+2} LCD: [ANS]", "output": "(5*x-6)*(3*x+2)"}

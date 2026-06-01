@@ -1,1 +1,0 @@
-{"id": "288", "instruction": "Compute \\[ \\log_2 \\left( \\prod_{a=1}^{2015} \\prod_{b=1}^{2015} (1+e^{2\\pi i a b/2015}) \\right) \\] Here $i$ is the imaginary unit (that is, $i^2=-1$).\n\nOptions:\nA. 13721\nB. 13720\nC. 13725\nD. 13727\nE. 13723\nF. 13726\nG. 13724\nH. 13722\nI. 13728\nJ. 13729", "output": "C"}

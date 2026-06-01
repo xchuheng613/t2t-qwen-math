@@ -1,1 +1,0 @@
-{"id": "146", "instruction": "Evaluate the iterated integral:\n$$\n\\int_{e}^{e^2} \\int_{\\ln(u)}^2 \\left(v + \\ln(u)\\right) \\, dv \\, du\n$$\n\nOptions:\nA. e^2 - 5e/4\nB. e^2 - 7e/4\nC. e^2 - 3e/2\nD. e^2 - 4e/2\nE. e^2 - e/4\nF. e^2 - e/2\nG. e^2 - 2e/4\nH. e^2 - 3e/4\nI. e^2 - 2e/2", "output": "F"}

@@ -1,1 +1,0 @@
-{"id": "359", "instruction": "Consider the following data set: \\begin{array}{ccccccccc} 53 & 65 & 43 & 46 & 54 & 69 & 82 & 66 & 53\\\\ 69 & 85 & 83 & 41 & 41 & 53 & 71 & 50 & 78 \\end{array} Find the 16th and 86th percentiles for this data. 16th percentile=[ANS]\n86th percentile=[ANS]", "output": "43.12, 82.34"}

@@ -1,1 +1,0 @@
-{"id": "942", "instruction": "Let 400 shells be fired independently at a target, with a known ground hit rate of 0.2 for each shell. Please use the central limit theorem to calculate, what is the probability of hitting 60 to 100?\n\nOptions:\nA. 0.5432\nB. 0.9876\nC. 0.7654\nD. 0.4321\nE. 0.9999\nF. 0.6543\nG. 0.2198\nH. 0.3219\nI. 0.8765\nJ. 0.1987", "output": "B"}

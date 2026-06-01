@@ -1,1 +1,0 @@
-{"id": "1107", "instruction": "The sequence $a_n$ is defined by\n$$$a_n=\\frac{a_{n-1} \\cdot a_{n-2}}{x}.$$$\nGiven that $a_1=350$ and $a_2=1190$ , find the greatest value of $x$ such that $a_n$ is always an integer.\n\nOptions:\nA. 350\nB. 70\nC. 210\nD. 35\nE. 175\nF. 105\nG. 14\nH. 140\nI. 100", "output": "B"}

@@ -1,1 +1,0 @@
-{"id": "546", "instruction": "Given the following table of values, what is the minimum number of roots that $f(x)$ can have?\n$\\begin{array}{cccccc}\\hline x &-4 &-2 & 0 & 2 & 4 \\\\ \\hline f(x) & 5 & 2 & 2 & 4 &-4 \\\\ \\hline \\end{array}$\n$f(x)$ has at least [ANS] root(s).", "output": "1"}

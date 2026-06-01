@@ -1,1 +1,0 @@
-{"id": "332", "instruction": "Let $N$ be the positive integer with 1998 decimal digits, all of them 1; that is, \\[N=1111\\cdots 11.\\] Find the 1000th digit after the decimal point of $\\sqrt N$.\n\nOptions:\nA. 8\nB. 0\nC. 1\nD. 2\nE. 5\nF. 9\nG. 3\nH. 4\nI. 7\nJ. 6", "output": "C"}

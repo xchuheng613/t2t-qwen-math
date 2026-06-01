@@ -1,10 +1,33 @@
 .claude/
 .venv/
+
+# Python/cache files
 __pycache__/
 *.pyc
 .DS_Store
+
+# Local model and run outputs
 checkpoints/
-LICENSE
-data/hf_mixed_math_100k/train.jsonl
-data/hf_mixed_math_free_100k/train.jsonl
+outputs/
+results/
+result_analyze/
+single_tasks/
+logs/
 results_autoresearch_free.tsv
+
+# Generated analysis payloads
+analysis/visualizations/
+analysis/*.jsonl
+analysis/*_ids.json
+
+# Regenerable training corpora
+data/autoresearch_free_concise_v2/
+data/autoresearch_free_full_clean/
+data/autoresearch_free_v1/
+data/hf_mixed_math_100k/
+data/hf_mixed_math_free_100k/
+data/lora_public_v1/
+data/lora_public_v2/
+data/sft_lora_compact_post_v1/
+data/sft_lora_public_v1/
+data/sft_lora_public_v2/

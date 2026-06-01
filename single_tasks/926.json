@@ -1,1 +1,0 @@
-{"id": "926", "instruction": "Suppose a random variable $x$ is normally distributed with $\\mu=28$ and $\\sigma=5.8$. According to the Central Limit Theorem, for samples of size 12:\n(a) The mean of the sampling distribution for $\\bar x$ is: [ANS]\n(b) The standard deviation of the sampling distribution for $\\bar x$ is: [ANS]", "output": "28, 1.67432"}

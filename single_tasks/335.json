@@ -1,1 +1,0 @@
-{"id": "335", "instruction": "Rewrite the expression $8 r (s-3)-24 (s-3)$ by taking out the greatest common factor.\n$\\big($ [ANS] $\\big) \\big($ [ANS] $\\big)$", "output": "8*(s-3), r-3"}

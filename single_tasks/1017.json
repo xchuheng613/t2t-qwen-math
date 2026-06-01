@@ -1,1 +1,0 @@
-{"id": "1017", "instruction": "Let $S$ be the sum of all positive integers $n$ such that $n^2+12n-2007$ is a perfect square. Find the remainder when $S$ is divided by $1000.$\n\nOptions:\nA. 460\nB. 465\nC. 462\nD. 467\nE. 468\nF. 463\nG. 461\nH. 466\nI. 464\nJ. 469", "output": "I"}

@@ -1,1 +1,0 @@
-{"id": "17", "instruction": "Use the formula for lowering the powers to simplify the expression:\n(a) If $\\cos^2 8x-\\sin^2 8x=\\cos (f(x))$, then $f(x)=$ [ANS] ; (b) If $\\cos^4 8x-\\sin^4 8x=\\cos (g(x))$, then $g(x)=$ [ANS]. Hint: For part (b), use $a^4-b^4=(a^2-b^2)(a^2+b^2)$!", "output": "2*8*x, 2*8*x"}

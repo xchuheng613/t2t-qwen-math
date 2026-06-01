@@ -1,1 +1,0 @@
-{"id": "866", "instruction": "The expression \\sqrt[5]{x^5 y^4}=x^ry^s where $x$ and $y$ are non-negative real numbers. r, the exponent of x, is: [ANS]\ns, the exponent of y, is: [ANS]", "output": "1, 0.8"}

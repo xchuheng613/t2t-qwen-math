@@ -1,1 +1,0 @@
-{"id": "86", "instruction": "Find the number of four digit multiples of $11$ that have the property that it is possible to remove a digit such that the remaining three-digit number is still a multiple of $11$ .\n\nOptions:\nA. 201\nB. 198\nC. 195\nD. 203\nE. 194\nF. 199\nG. 200\nH. 196\nI. 202\nJ. 197", "output": "A"}

@@ -1,1 +1,0 @@
-{"id": "406", "instruction": "You buy a saguaro cactus 7 feet high and it grows at a rate of 0.8 inches each year. Express its height $h$, in inches, as a function of time $t$, in years, since the purchase. Enter your answer as an equation with $h$ on the left side, and an expression involving $t$ on the right. [ANS]", "output": "h = 84+0.8*t"}

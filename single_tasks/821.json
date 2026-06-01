@@ -1,1 +1,0 @@
-{"id": "821", "instruction": "How many distinct irreducible monic factors divide\n$$\nf=x^{5}+2 x^{4}+x^{3}+x^{2}+2 \\quad \\text { in } \\mathbb{F}_{3}[x] \\text { ? }\n$$\n\nOptions:\nA. 6\nB. 4\nC. 1\nD. 8\nE. 2\nF. 7\nG. 3\nH. 9\nI. 5\nJ. 10", "output": "E"}

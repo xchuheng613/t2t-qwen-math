@@ -1,1 +1,0 @@
-{"id": "168", "instruction": "The equation $|x|=|y|$ is satisfied if $x=y$ or $x=-y$. Use this fact to solve the following equation. |x+6 |=| x-3 | Answer: $x=$ [ANS]\nHint: There is only one solution. There is only one solution.", "output": "-3/2"}

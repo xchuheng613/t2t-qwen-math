@@ -1,1 +1,0 @@
-{"id": "906", "instruction": "Determine the remainder obtained when the expression\n$2004^{2003^{2002^{2001}}}$\nis divided by $1000$ .\n\nOptions:\nA. 504\nB. 804\nC. 904\nD. 708\nE. 304\nF. 704\nG. 104\nH. 604\nI. 404\nJ. 204", "output": "F"}

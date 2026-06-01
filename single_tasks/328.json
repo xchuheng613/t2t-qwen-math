@@ -1,1 +1,0 @@
-{"id": "328", "instruction": "For a pole-vaulter in training, the height the athelete will be able to pole-vault after $t$ months of training is given by H(t)=20-13 e^{-0.02 t} After how many months will she be able to vault 14 ft? [ANS] months", "output": "-ln((20-14)/13)/0.02"}

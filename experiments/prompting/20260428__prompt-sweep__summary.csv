@@ -1,0 +1,14 @@
+type,prompt,config,n,correct,acc,err_correct,err_truncated,err_no_answer,err_out_of_range,err_wrong,err_judge_error
+free,strict_few_shot,sc_n1,100,57,0.57,57,2,0,0,41,0
+free,baseline,sc_n1,100,53,0.53,53,4,0,0,43,0
+free,strict_format,sc_n1,100,53,0.53,53,4,0,0,43,0
+free,few_shot,sc_n1,100,53,0.53,53,3,0,0,44,0
+free,verify,sc_n1,100,51,0.51,51,5,0,0,44,0
+free,concise,sc_n1,100,51,0.51,51,4,0,0,45,0
+mcq,match_back_few_shot,sc_n1,100,77,0.77,77,4,0,0,19,0
+mcq,strict_format,sc_n1,100,72,0.72,72,11,0,0,17,0
+mcq,eliminate,sc_n1,100,72,0.72,72,9,0,0,19,0
+mcq,baseline,sc_n1,100,71,0.71,71,12,0,0,17,0
+mcq,match_back,sc_n1,100,71,0.71,71,10,0,0,19,0
+mcq,few_shot,sc_n1,100,70,0.7,70,9,0,0,21,0
+mcq,strict_few_shot,sc_n1,100,70,0.7,70,10,0,0,20,0

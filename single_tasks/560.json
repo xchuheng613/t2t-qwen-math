@@ -1,1 +1,0 @@
-{"id": "560", "instruction": "For each positive integer $n$, let $k(n)$ be the number of ones in the binary representation of $2023 \\cdot n$. What is the minimum value of $k(n)$?\n\nOptions:\nA. 5\nB. 3\nC. 10\nD. 6\nE. 9\nF. 2\nG. 4\nH. 1\nI. 8\nJ. 7", "output": "B"}

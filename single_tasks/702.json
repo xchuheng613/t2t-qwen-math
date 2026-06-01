@@ -1,1 +1,0 @@
-{"id": "702", "instruction": "Find the hydrogen ion concentration for Lemon Juice, with a pH of 2.0. Hint: $pH=-\\log{\\lbrack H^+\\rbrack}$. [ANS] moles per liter", "output": "10^(-2)"}

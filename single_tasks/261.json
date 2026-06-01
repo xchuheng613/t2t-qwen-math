@@ -1,1 +1,0 @@
-{"id": "261", "instruction": "Evaluate the expressions for $x=7$, $y=9$ and $z=3$:\n$x+7$=[ANS]\n$2 z-7$=[ANS]\n$x y z$=[ANS]\n$y+z$=[ANS]", "output": "7+7, 2*3-7, 7*9*3, 9+3"}

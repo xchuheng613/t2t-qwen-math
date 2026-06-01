@@ -1,0 +1,16 @@
+{
+  "output_submission": "submissions/20260531_final/final_private_submission.csv",
+  "audit_jsonl": "submissions/20260531_final/final_private_submission_audit.jsonl",
+  "source_data": "data/private.jsonl",
+  "mcq_source": "submissions/20260531_final/mcq_like_source_submission.csv",
+  "free_response_source": "submissions/20260531_final/grpo_free_source_submission.csv",
+  "expected_rows": 943,
+  "merged_rows": 943,
+  "mcq_like_rows_from_submission_best": 397,
+  "free_rows_from_current_grpo": 546,
+  "free_rows_changed_from_submission_best": 188,
+  "missing": [],
+  "extra": [],
+  "duplicate_count": 0,
+  "empty": 0
+}

@@ -1,1 +1,0 @@
-{"id": "883", "instruction": "The expression $(3a^5 b^4 c^4)^2(2a^4 b^3 c^3)^3$ equals $na^rb^sc^t$ where $n$, the leading coefficient, is: [ANS]\nand $r$, the exponent of $a$, is: [ANS]\nand $s$, the exponent of $b$, is: [ANS]\nand finally $t$, the exponent of $c$, is: [ANS]\n[NOTE: Your answers cannot be algebraic expressions.]", "output": "72, 22, 17, 17"}
