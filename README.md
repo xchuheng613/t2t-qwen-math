@@ -92,12 +92,12 @@ Model weights:
 - Optional base MCQ model: pass `--mcq-model-id Qwen/Qwen3-4B-Thinking-2507`
   to run MCQ-like rows with the base model instead of the GRPO checkpoint.
 
-Hardware/runtime used for final generation:
+Hardware/runtime used for the current model and final output generation:
 
-- GPU type for private-set inference: NVIDIA RTX 5090.
-- Approximate total private-set generation/inference time: about 2.5 hours.
-- GRPO training/checkpoint generation also used a dual NVIDIA RTX PRO 6000
-  96GB setup; see `docs/full_grpo_runbook.md`.
+- GRPO training/checkpoint generation hardware: 2 x NVIDIA RTX PRO 6000.
+- Approximate GRPO training time for the current checkpoint: about 8 hours.
+- Approximate total private-set output generation/inference time: about 1 hour.
+- See `docs/full_grpo_runbook.md` for the dual RTX PRO 6000 run details.
 
 Final submitted CSV in this working tree:
 
