@@ -30,7 +30,8 @@ The function runs the full final pipeline: it loads the base
 `Qwen/Qwen3-4B-Thinking-2507` model for MCQ-like rows, loads the fine-tuned
 GRPO checkpoint from `T2T_QWEN_GRPO_MODEL_ID` for free-response rows, applies
 the compact prompt post-processing/fallback logic, merges the routed outputs,
-and writes a Kaggle-compatible CSV.
+and writes a Kaggle-compatible CSV. MCQ-like rows run with greedy `n=1`;
+free-response rows run with self-consistency `n=3`.
 
 Model weights:
 

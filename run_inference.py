@@ -239,7 +239,10 @@ def run_inference(
         output_dir=output_dir / "mcq_like_base",
         gpu_id=gpu_id,
         mcq_config="greedy_n1",
-        free_config="sc_n3",
+        # Some MCQ-like rows have inline A/B/C choices but no structured
+        # ``options`` field, so the legacy runner treats them as free format.
+        # Keep those in the base-model MCQ phase and run them greedily too.
+        free_config="greedy_n1",
         max_tokens=max_tokens,
         fallback_max_tokens=fallback_max_tokens,
         fallback_tail_tokens=fallback_tail_tokens,
